@@ -1,22 +1,42 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Hero from '@/components/Hero';
 import Pricing from '@/components/Pricing';
 import FAQ from '@/components/FAQ';
 import Dashboard from '@/components/Dashboard';
 import Footer from '@/components/Footer';
+import AuthDialog from '@/components/AuthDialog';
 import { Button } from '@/components/ui/button';
+import { api } from '@/lib/api';
 
 const Index = () => {
   const [currentView, setCurrentView] = useState<'landing' | 'dashboard'>('landing');
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [authDialogOpen, setAuthDialogOpen] = useState(false);
 
-  const handleLogin = () => {
+  useEffect(() => {
+    if (api.isAuthenticated()) {
+      setIsLoggedIn(true);
+      setCurrentView('dashboard');
+    }
+  }, []);
+
+  const handleAuthSuccess = () => {
     setIsLoggedIn(true);
     setCurrentView('dashboard');
   };
 
+  const handleOpenAuth = () => {
+    setAuthDialogOpen(true);
+  };
+
+  const handleLogout = () => {
+    api.clearAuth();
+    setIsLoggedIn(false);
+    setCurrentView('landing');
+  };
+
   if (currentView === 'dashboard' && isLoggedIn) {
-    return <Dashboard onLogout={() => { setIsLoggedIn(false); setCurrentView('landing'); }} />;
+    return <Dashboard onLogout={handleLogout} />;
   }
 
   return (
@@ -36,8 +56,8 @@ const Index = () => {
             <a href="#contacts" className="hover:text-gold transition-colors">Контакты</a>
           </div>
           <div className="flex items-center gap-4">
-            <Button variant="ghost" onClick={handleLogin}>Войти</Button>
-            <Button className="bg-gold text-black hover:bg-gold/90" onClick={handleLogin}>
+            <Button variant="ghost" onClick={handleOpenAuth}>Войти</Button>
+            <Button className="bg-gold text-black hover:bg-gold/90" onClick={handleOpenAuth}>
               Регистрация
             </Button>
           </div>
@@ -45,12 +65,18 @@ const Index = () => {
       </header>
 
       <main className="pt-20">
-        <Hero onGetStarted={handleLogin} />
-        <Pricing onSelectPlan={handleLogin} />
+        <Hero onGetStarted={handleOpenAuth} />
+        <Pricing onSelectPlan={handleOpenAuth} />
         <FAQ />
       </main>
 
       <Footer />
+      
+      <AuthDialog 
+        open={authDialogOpen} 
+        onOpenChange={setAuthDialogOpen} 
+        onSuccess={handleAuthSuccess}
+      />
     </div>
   );
 };

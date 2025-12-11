@@ -1,0 +1,17 @@
+{
+  "tests": [
+    {
+      "name": "Get user cards",
+      "method": "GET",
+      "path": "/",
+      "headers": {
+        "X-User-Id": "1"
+      },
+      "expectedStatus": 200,
+      "expectedBody": {
+        "cards": "array"
+      },
+      "bodyMatcher": "partial"
+    }
+  ]
+}
