@@ -31,7 +31,7 @@ const Hero = ({ onGetStarted }: HeroProps) => {
           </h1>
           
           <p className="text-xl md:text-2xl text-gray-300 mb-12 max-w-2xl mx-auto">
-            Создайте премиальную цифровую визитку с QR-кодом, макетами и AI-генерацией за минуты
+            Создайте премиальную цифровую визитку с QR-кодом, аналитикой и реферальной программой за минуты
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-16">
@@ -68,9 +68,9 @@ const Hero = ({ onGetStarted }: HeroProps) => {
               <div className="w-12 h-12 bg-gold/10 rounded-lg flex items-center justify-center mb-4 mx-auto">
                 <Icon name="Share2" className="text-gold" size={24} />
               </div>
-              <h3 className="text-xl font-semibold text-white mb-3">Шеринг в мессенджеры</h3>
+              <h3 className="text-xl font-semibold text-white mb-3">Аналитика просмотров</h3>
               <p className="text-gray-400">
-                Делитесь визиткой в WhatsApp, Telegram, Instagram
+                Отслеживайте кто и откуда смотрит вашу визитку
               </p>
             </div>
 

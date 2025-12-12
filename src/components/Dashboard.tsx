@@ -59,22 +59,26 @@ const Dashboard = ({ onLogout }: DashboardProps) => {
         </div>
 
         <Tabs defaultValue="card" className="space-y-6">
-          <TabsList>
+          <TabsList className="grid grid-cols-2 md:grid-cols-5 w-full">
             <TabsTrigger value="card">
               <Icon name="CreditCard" className="mr-2" size={18} />
-              Моя визитка
+              Визитка
             </TabsTrigger>
             <TabsTrigger value="edit">
               <Icon name="Edit" className="mr-2" size={18} />
               Редактировать
             </TabsTrigger>
-            <TabsTrigger value="media">
-              <Icon name="Image" className="mr-2" size={18} />
-              Макеты
+            <TabsTrigger value="design">
+              <Icon name="Palette" className="mr-2" size={18} />
+              Дизайн
             </TabsTrigger>
-            <TabsTrigger value="upgrade">
-              <Icon name="Sparkles" className="mr-2" size={18} />
-              Подписка
+            <TabsTrigger value="analytics">
+              <Icon name="BarChart" className="mr-2" size={18} />
+              Аналитика
+            </TabsTrigger>
+            <TabsTrigger value="referral">
+              <Icon name="Users" className="mr-2" size={18} />
+              Реферал
             </TabsTrigger>
           </TabsList>
 
@@ -176,10 +180,37 @@ const Dashboard = ({ onLogout }: DashboardProps) => {
                         className="w-full h-auto"
                       />
                     </div>
-                    <Button className="w-full mt-4 bg-gold text-black hover:bg-gold/90">
-                      <Icon name="Download" className="mr-2" size={18} />
-                      Скачать QR-код
-                    </Button>
+                    <div className="flex gap-2 mt-4">
+                      <Button className="flex-1 bg-gold text-black hover:bg-gold/90">
+                        <Icon name="Download" className="mr-2" size={18} />
+                        QR-код
+                      </Button>
+                      <Button 
+                        className="flex-1 bg-gold text-black hover:bg-gold/90"
+                        onClick={() => {
+                          const vcard = `BEGIN:VCARD
+VERSION:3.0
+FN:${userInfo.name}
+TITLE:${userInfo.position}
+ORG:${userInfo.company}
+TEL:${userInfo.phone}
+EMAIL:${userInfo.email}
+URL:${userInfo.website}
+NOTE:${userInfo.description}
+END:VCARD`;
+                          const blob = new Blob([vcard], { type: 'text/vcard' });
+                          const url = URL.createObjectURL(blob);
+                          const a = document.createElement('a');
+                          a.href = url;
+                          a.download = `${userInfo.name}.vcf`;
+                          a.click();
+                          URL.revokeObjectURL(url);
+                        }}
+                      >
+                        <Icon name="Contact" className="mr-2" size={18} />
+                        vCard
+                      </Button>
+                    </div>
                   </CardContent>
                 </Card>
               </div>
@@ -359,6 +390,159 @@ const Dashboard = ({ onLogout }: DashboardProps) => {
                 </CardContent>
               </Card>
             </div>
+          </TabsContent>
+
+          <TabsContent value="design" className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle>Дизайн визитки</CardTitle>
+                <CardDescription>Выберите тему оформления для вашей визитки</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  {['classic', 'modern', 'minimal', 'gradient', 'dark', 'elegant'].map((theme) => (
+                    <div
+                      key={theme}
+                      className="border-2 border-border rounded-lg p-6 text-center hover:border-gold cursor-pointer transition-all hover:shadow-lg"
+                      onClick={() => setUserInfo({...userInfo})}
+                    >
+                      <div className={`w-full h-32 rounded mb-3 ${
+                        theme === 'classic' ? 'bg-gradient-to-br from-gray-100 to-gray-200' :
+                        theme === 'modern' ? 'bg-gradient-to-br from-blue-500 to-purple-500' :
+                        theme === 'minimal' ? 'bg-white border-2' :
+                        theme === 'gradient' ? 'bg-gradient-to-br from-pink-500 to-orange-400' :
+                        theme === 'dark' ? 'bg-gradient-to-br from-gray-800 to-black' :
+                        'bg-gradient-to-br from-gold/30 to-gold/60'
+                      }`}></div>
+                      <p className="font-semibold capitalize">{theme}</p>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="analytics" className="space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-sm font-medium">Всего просмотров</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-3xl font-bold">1,234</div>
+                  <p className="text-sm text-muted-foreground mt-1">+12% за неделю</p>
+                </CardContent>
+              </Card>
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-sm font-medium">Уникальные посетители</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-3xl font-bold">892</div>
+                  <p className="text-sm text-muted-foreground mt-1">+8% за неделю</p>
+                </CardContent>
+              </Card>
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-sm font-medium">Дней активности</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-3xl font-bold">45</div>
+                  <p className="text-sm text-muted-foreground mt-1">С момента создания</p>
+                </CardContent>
+              </Card>
+            </div>
+
+            <Card>
+              <CardHeader>
+                <CardTitle>Последние просмотры</CardTitle>
+                <CardDescription>10 недавних посещений вашей визитки</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-3">
+                  {[
+                    {city: 'Москва', country: 'Россия', time: '5 мин назад'},
+                    {city: 'Санкт-Петербург', country: 'Россия', time: '1 час назад'},
+                    {city: 'Казань', country: 'Россия', time: '3 часа назад'},
+                  ].map((view, i) => (
+                    <div key={i} className="flex items-center justify-between p-3 border rounded-lg">
+                      <div className="flex items-center gap-3">
+                        <Icon name="MapPin" className="text-muted-foreground" size={20} />
+                        <div>
+                          <p className="font-medium">{view.city}, {view.country}</p>
+                          <p className="text-sm text-muted-foreground">{view.time}</p>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="referral" className="space-y-6">
+            <Card className="border-gold/20">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Icon name="Gift" className="text-gold" size={24} />
+                  Реферальная программа
+                </CardTitle>
+                <CardDescription>
+                  Приглашайте друзей и получайте +7 дней Premium за каждого
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <div className="bg-muted/50 p-6 rounded-lg">
+                  <p className="text-sm text-muted-foreground mb-2">Ваш реферальный код</p>
+                  <div className="flex gap-2">
+                    <Input 
+                      value="VISITKA2024XYZ" 
+                      readOnly 
+                      className="font-mono text-lg font-bold"
+                    />
+                    <Button className="bg-gold text-black hover:bg-gold/90">
+                      <Icon name="Copy" size={18} />
+                    </Button>
+                  </div>
+                  <p className="text-sm text-muted-foreground mt-3">
+                    Поделитесь этим кодом с друзьями при регистрации
+                  </p>
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="p-4 border rounded-lg text-center">
+                    <div className="text-3xl font-bold text-gold">12</div>
+                    <p className="text-sm text-muted-foreground mt-1">Приглашено друзей</p>
+                  </div>
+                  <div className="p-4 border rounded-lg text-center">
+                    <div className="text-3xl font-bold text-gold">84</div>
+                    <p className="text-sm text-muted-foreground mt-1">Дней Premium</p>
+                  </div>
+                </div>
+
+                <div>
+                  <h3 className="font-semibold mb-3">Приглашенные пользователи</h3>
+                  <div className="space-y-2">
+                    {[
+                      {name: 'Анна Смирнова', date: '15.12.2024', rewarded: true},
+                      {name: 'Петр Иванов', date: '10.12.2024', rewarded: true},
+                      {name: 'Мария Козлова', date: '05.12.2024', rewarded: true},
+                    ].map((user, i) => (
+                      <div key={i} className="flex items-center justify-between p-3 border rounded-lg">
+                        <div className="flex items-center gap-3">
+                          <Icon name="UserCheck" className="text-green-500" size={20} />
+                          <div>
+                            <p className="font-medium">{user.name}</p>
+                            <p className="text-sm text-muted-foreground">{user.date}</p>
+                          </div>
+                        </div>
+                        <Badge variant="outline" className="border-gold text-gold">+7 дней</Badge>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
           </TabsContent>
         </Tabs>
       </main>

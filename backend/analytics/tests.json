@@ -1,0 +1,29 @@
+{
+  "tests": [
+    {
+      "name": "Get analytics for card",
+      "method": "GET",
+      "path": "/?card_id=1",
+      "expectedStatus": 200,
+      "expectedBody": {
+        "total_views": "number",
+        "unique_visitors": "number",
+        "days_active": "number"
+      },
+      "bodyMatcher": "partial"
+    },
+    {
+      "name": "Record card view",
+      "method": "POST",
+      "path": "/",
+      "body": {
+        "card_id": 1
+      },
+      "expectedStatus": 200,
+      "expectedBody": {
+        "success": true
+      },
+      "bodyMatcher": "partial"
+    }
+  ]
+}
