@@ -25,6 +25,8 @@ const Dashboard = ({ onLogout }: DashboardProps) => {
 
   const messengers = [
     { name: 'Telegram', icon: 'Send', color: 'text-blue-500', url: `https://t.me/share/url?url=${encodeURIComponent(window.location.origin)}&text=${encodeURIComponent(`Моя визитка: ${userInfo.name}`)}` },
+    { name: 'WhatsApp', icon: 'MessageCircle', color: 'text-green-500', url: `https://wa.me/?text=${encodeURIComponent(`Моя визитка: ${userInfo.name} ${window.location.origin}`)}` },
+    { name: 'Viber', icon: 'Phone', color: 'text-purple-500', url: `viber://forward?text=${encodeURIComponent(`Моя визитка: ${userInfo.name} ${window.location.origin}`)}` },
     { name: 'VK', icon: 'Share2', color: 'text-blue-600', url: `https://vk.com/share.php?url=${encodeURIComponent(window.location.origin)}&title=${encodeURIComponent(userInfo.name)}` },
     { name: 'Одноклассники', icon: 'Users', color: 'text-orange-500', url: `https://connect.ok.ru/offer?url=${encodeURIComponent(window.location.origin)}&title=${encodeURIComponent(userInfo.name)}` },
     { name: 'Скопировать ссылку', icon: 'Link', color: 'text-gray-500', url: '' }
