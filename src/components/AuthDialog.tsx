@@ -4,9 +4,11 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Checkbox } from '@/components/ui/checkbox';
 import { api } from '@/lib/api';
 import { useToast } from '@/hooks/use-toast';
 import Icon from '@/components/ui/icon';
+import PrivacyPolicy from './PrivacyPolicy';
 
 interface AuthDialogProps {
   open: boolean;
@@ -17,6 +19,8 @@ interface AuthDialogProps {
 const AuthDialog = ({ open, onOpenChange, onSuccess }: AuthDialogProps) => {
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
+  const [privacyOpen, setPrivacyOpen] = useState(false);
+  const [agreedToPolicy, setAgreedToPolicy] = useState(false);
   
   const [loginData, setLoginData] = useState({ email: '', password: '' });
   const [registerData, setRegisterData] = useState({ email: '', password: '', name: '' });
@@ -46,6 +50,16 @@ const AuthDialog = ({ open, onOpenChange, onSuccess }: AuthDialogProps) => {
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    if (!agreedToPolicy) {
+      toast({
+        title: 'Требуется согласие',
+        description: 'Необходимо согласиться с политикой обработки персональных данных',
+        variant: 'destructive',
+      });
+      return;
+    }
+    
     setIsLoading(true);
 
     try {
@@ -177,10 +191,36 @@ const AuthDialog = ({ open, onOpenChange, onSuccess }: AuthDialogProps) => {
                   required
                 />
               </div>
+              
+              <div className="flex items-start space-x-2 pt-2">
+                <Checkbox 
+                  id="privacy-policy" 
+                  checked={agreedToPolicy}
+                  onCheckedChange={(checked) => setAgreedToPolicy(checked as boolean)}
+                />
+                <label
+                  htmlFor="privacy-policy"
+                  className="text-sm leading-tight text-muted-foreground cursor-pointer"
+                >
+                  Я согласен с{' '}
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      setPrivacyOpen(true);
+                    }}
+                    className="text-gold hover:underline"
+                  >
+                    политикой обработки персональных данных
+                  </button>
+                  {' '}в соответствии с ФЗ-152
+                </label>
+              </div>
+              
               <Button
                 type="submit"
                 className="w-full bg-gold text-black hover:bg-gold/90"
-                disabled={isLoading}
+                disabled={isLoading || !agreedToPolicy}
               >
                 {isLoading ? (
                   <>
@@ -218,6 +258,8 @@ const AuthDialog = ({ open, onOpenChange, onSuccess }: AuthDialogProps) => {
           </TabsContent>
         </Tabs>
       </DialogContent>
+      
+      <PrivacyPolicy open={privacyOpen} onOpenChange={setPrivacyOpen} />
     </Dialog>
   );
 };

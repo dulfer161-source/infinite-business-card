@@ -1,0 +1,16 @@
+{
+  "tests": [
+    {
+      "name": "Missing required fields",
+      "method": "POST",
+      "path": "/",
+      "body": {
+        "subject": "Test"
+      },
+      "expectedStatus": 400,
+      "expectedBody": {
+        "error": "to_email and subject are required"
+      }
+    }
+  ]
+}

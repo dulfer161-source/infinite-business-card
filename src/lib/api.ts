@@ -75,6 +75,22 @@ class ApiService {
 
     const data = await response.json();
     this.setAuth(data.token, data.user.id);
+    
+    // Send welcome email
+    try {
+      await fetch('https://functions.poehali.dev/74c49dcb-78dd-46f7-9f32-46f1dffa39be/send', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          to_email: email,
+          subject: 'Добро пожаловать в visitka.site!',
+          type: 'welcome'
+        })
+      });
+    } catch (e) {
+      console.error('Failed to send welcome email:', e);
+    }
+    
     return data;
   }
 
