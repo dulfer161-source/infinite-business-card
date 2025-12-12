@@ -37,13 +37,13 @@ const Footer = () => {
             <h4 className="font-semibold mb-4 text-gold">Соцсети</h4>
             <div className="flex gap-4">
               <a href="#" className="w-10 h-10 bg-gold/10 rounded-lg flex items-center justify-center hover:bg-gold/20 transition-colors">
-                <Icon name="MessageCircle" className="text-gold" size={20} />
+                <Icon name="Send" className="text-gold" size={20} />
               </a>
               <a href="#" className="w-10 h-10 bg-gold/10 rounded-lg flex items-center justify-center hover:bg-gold/20 transition-colors">
-                <Icon name="Instagram" className="text-gold" size={20} />
+                <Icon name="Mail" className="text-gold" size={20} />
               </a>
               <a href="#" className="w-10 h-10 bg-gold/10 rounded-lg flex items-center justify-center hover:bg-gold/20 transition-colors">
-                <Icon name="Twitter" className="text-gold" size={20} />
+                <Icon name="Phone" className="text-gold" size={20} />
               </a>
             </div>
           </div>
