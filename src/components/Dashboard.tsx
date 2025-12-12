@@ -24,10 +24,10 @@ const Dashboard = ({ onLogout }: DashboardProps) => {
   });
 
   const messengers = [
-    { name: 'WhatsApp', icon: 'MessageCircle', color: 'text-green-500' },
-    { name: 'Telegram', icon: 'Send', color: 'text-blue-500' },
-    { name: 'Instagram', icon: 'Instagram', color: 'text-pink-500' },
-    { name: 'Facebook', icon: 'Facebook', color: 'text-blue-600' }
+    { name: 'Telegram', icon: 'Send', color: 'text-blue-500', url: `https://t.me/share/url?url=${encodeURIComponent(window.location.origin)}&text=${encodeURIComponent(`Моя визитка: ${userInfo.name}`)}` },
+    { name: 'VK', icon: 'Share2', color: 'text-blue-600', url: `https://vk.com/share.php?url=${encodeURIComponent(window.location.origin)}&title=${encodeURIComponent(userInfo.name)}` },
+    { name: 'Одноклассники', icon: 'Users', color: 'text-orange-500', url: `https://connect.ok.ru/offer?url=${encodeURIComponent(window.location.origin)}&title=${encodeURIComponent(userInfo.name)}` },
+    { name: 'Скопировать ссылку', icon: 'Link', color: 'text-gray-500', url: '' }
   ];
 
   const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=BEGIN:VCARD%0AVERSION:3.0%0AFN:${encodeURIComponent(userInfo.name)}%0ATEL:${encodeURIComponent(userInfo.phone)}%0AEMAIL:${encodeURIComponent(userInfo.email)}%0AEND:VCARD`;
@@ -137,6 +137,14 @@ const Dashboard = ({ onLogout }: DashboardProps) => {
                             size="icon"
                             className="hover-scale"
                             title={messenger.name}
+                            onClick={() => {
+                              if (messenger.name === 'Скопировать ссылку') {
+                                navigator.clipboard.writeText(window.location.origin);
+                                alert('Ссылка скопирована!');
+                              } else {
+                                window.open(messenger.url, '_blank');
+                              }
+                            }}
                           >
                             <Icon name={messenger.icon as any} className={messenger.color} size={20} />
                           </Button>
