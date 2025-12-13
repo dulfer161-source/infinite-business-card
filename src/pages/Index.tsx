@@ -6,6 +6,7 @@ import Dashboard from '@/components/Dashboard';
 import Footer from '@/components/Footer';
 import AuthDialog from '@/components/AuthDialog';
 import HelpCenter from '@/components/HelpCenter';
+import Logo from '@/components/Logo';
 import { Button } from '@/components/ui/button';
 import { api } from '@/lib/api';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
@@ -86,12 +87,7 @@ const Index = () => {
     <div className="min-h-screen bg-background">
       <header className="fixed top-0 w-full bg-background/80 backdrop-blur-lg border-b border-border z-50">
         <nav className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <div className="text-2xl font-bold">
-              <span className="text-gold">∞7</span>
-              <span className="ml-2">visitka.site</span>
-            </div>
-          </div>
+          <Logo size="md" />
           <div className="hidden md:flex items-center gap-8">
             <a href="#features" className="hover:text-gold transition-colors">Возможности</a>
             <a href="#pricing" className="hover:text-gold transition-colors">Тарифы</a>

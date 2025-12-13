@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import Icon from '@/components/ui/icon';
+import Logo from './Logo';
 import BusinessCardTab from './dashboard/BusinessCardTab';
 import EditTab from './dashboard/EditTab';
 import DesignTab from './dashboard/DesignTab';
@@ -34,10 +35,7 @@ const Dashboard = ({ onLogout }: DashboardProps) => {
     <div className="min-h-screen bg-background">
       <header className="border-b border-border bg-background/80 backdrop-blur-lg sticky top-0 z-50">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <span className="text-2xl font-bold text-gold">∞7</span>
-            <span className="text-xl font-semibold">visitka.site</span>
-          </div>
+          <Logo size="md" />
           <div className="flex items-center gap-4">
             <Badge variant="outline" className="border-gold text-gold">Базовый тариф</Badge>
             <Button variant="ghost" onClick={onLogout}>

@@ -6,6 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import Icon from '@/components/ui/icon';
+import Logo from '@/components/Logo';
 import { Helmet } from 'react-helmet-async';
 import { toast } from 'sonner';
 
@@ -170,9 +171,8 @@ const PublicCard = () => {
         <div className="container max-w-2xl mx-auto">
           {/* Header */}
           <div className="text-center mb-6">
-            <div className="flex items-center justify-center gap-2 mb-4">
-              <span className="text-2xl font-bold text-gold">∞7</span>
-              <span className="text-xl font-semibold">visitka.site</span>
+            <div className="flex items-center justify-center mb-4">
+              <Logo size="md" />
             </div>
             <Badge variant="outline" className="border-gold/50 text-gold/80">
               <Icon name="Eye" size={14} className="mr-1" />
