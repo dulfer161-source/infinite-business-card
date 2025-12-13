@@ -16,6 +16,8 @@ import PortfolioTab from './dashboard/PortfolioTab';
 import LeadsTab from './dashboard/LeadsTab';
 import Reviews from './Reviews';
 import DemoTour from './DemoTour';
+import VideoDemo from './VideoDemo';
+import AnimatedTooltips from './AnimatedTooltips';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 
 interface DemoDashboardProps {
@@ -26,6 +28,8 @@ interface DemoDashboardProps {
 const DemoDashboard = ({ onExit, plan }: DemoDashboardProps) => {
   const [showTour, setShowTour] = useState(false);
   const [tourCompleted, setTourCompleted] = useState(false);
+  const [showVideo, setShowVideo] = useState(false);
+  const [showTooltips, setShowTooltips] = useState(false);
 
   useEffect(() => {
     setShowTour(true);
@@ -33,6 +37,13 @@ const DemoDashboard = ({ onExit, plan }: DemoDashboardProps) => {
 
   const handleTourComplete = () => {
     setTourCompleted(true);
+    setTimeout(() => {
+      setShowTooltips(true);
+    }, 1000);
+  };
+
+  const handleTooltipsComplete = () => {
+    setShowTooltips(false);
   };
 
   const [userInfo, setUserInfo] = useState({
@@ -87,9 +98,13 @@ const DemoDashboard = ({ onExit, plan }: DemoDashboardProps) => {
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
           <Logo size="md" />
           <div className="flex items-center gap-4">
+            <Button variant="ghost" size="sm" className="hover:text-orange" onClick={() => setShowVideo(true)}>
+              <Icon name="PlayCircle" className="mr-2" size={16} />
+              Видео
+            </Button>
             <Button variant="ghost" size="sm" className="hover:text-blue" onClick={() => setShowTour(true)}>
               <Icon name="HelpCircle" className="mr-2" size={16} />
-              Повторить тур
+              Тур
             </Button>
             <Badge variant="outline" className="border-orange text-orange font-semibold">
               <Icon name="Eye" className="mr-1" size={14} />
@@ -213,6 +228,39 @@ const DemoDashboard = ({ onExit, plan }: DemoDashboardProps) => {
         onOpenChange={setShowTour}
         plan={plan}
         onComplete={handleTourComplete}
+      />
+
+      <VideoDemo
+        open={showVideo}
+        onOpenChange={setShowVideo}
+      />
+
+      <AnimatedTooltips
+        enabled={showTooltips}
+        steps={[
+          {
+            target: '[data-value="card"]',
+            title: 'Визитка',
+            description: 'Здесь отображается ваша визитка — это то, что видят клиенты',
+            icon: 'CreditCard',
+            position: 'bottom'
+          },
+          {
+            target: '[data-value="edit"]',
+            title: 'Редактирование',
+            description: 'Нажмите сюда, чтобы изменить данные вашей визитки',
+            icon: 'Edit',
+            position: 'bottom'
+          },
+          {
+            target: '[data-value="analytics"]',
+            title: 'Аналитика',
+            description: 'Отслеживайте просмотры и эффективность визитки',
+            icon: 'BarChart',
+            position: 'bottom'
+          }
+        ]}
+        onComplete={handleTooltipsComplete}
       />
     </div>
   );
