@@ -1,0 +1,44 @@
+{
+  "tests": [
+    {
+      "name": "Save quiz session",
+      "method": "POST",
+      "path": "/",
+      "body": {
+        "videoTitle": "Тестовое видео",
+        "totalQuestions": 2,
+        "correctAnswers": 1,
+        "completionTimeSeconds": 45,
+        "answers": [
+          {
+            "questionText": "Тестовый вопрос 1",
+            "selectedAnswerIndex": 0,
+            "correctAnswerIndex": 0,
+            "isCorrect": true
+          },
+          {
+            "questionText": "Тестовый вопрос 2",
+            "selectedAnswerIndex": 1,
+            "correctAnswerIndex": 2,
+            "isCorrect": false
+          }
+        ]
+      },
+      "expectedStatus": 200,
+      "expectedBody": {
+        "success": true
+      },
+      "bodyMatcher": "partial"
+    },
+    {
+      "name": "Get analytics",
+      "method": "GET",
+      "path": "/",
+      "expectedStatus": 200,
+      "expectedBody": {
+        "overallStats": {}
+      },
+      "bodyMatcher": "partial"
+    }
+  ]
+}

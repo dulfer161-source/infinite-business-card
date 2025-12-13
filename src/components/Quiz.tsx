@@ -1,8 +1,9 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import Icon from '@/components/ui/icon';
 import { motion, AnimatePresence } from 'framer-motion';
+import funcUrls from '../../backend/func2url.json';
 
 interface QuizProps {
   open: boolean;
@@ -15,6 +16,13 @@ interface Question {
   options: string[];
   correctAnswer: number;
   explanation: string;
+}
+
+interface AnswerRecord {
+  questionText: string;
+  selectedAnswerIndex: number;
+  correctAnswerIndex: number;
+  isCorrect: boolean;
 }
 
 const quizData: Record<string, Question[]> = {
@@ -82,6 +90,8 @@ const Quiz = ({ open, onOpenChange, videoTitle }: QuizProps) => {
   const [showResult, setShowResult] = useState(false);
   const [score, setScore] = useState(0);
   const [answeredQuestions, setAnsweredQuestions] = useState<boolean[]>([]);
+  const [answerRecords, setAnswerRecords] = useState<AnswerRecord[]>([]);
+  const [startTime] = useState<number>(Date.now());
 
   const questions = quizData[videoTitle] || [];
 
@@ -90,9 +100,17 @@ const Quiz = ({ open, onOpenChange, videoTitle }: QuizProps) => {
     
     setSelectedAnswer(answerIndex);
     
-    if (answerIndex === questions[currentQuestion].correctAnswer) {
+    const isCorrect = answerIndex === questions[currentQuestion].correctAnswer;
+    if (isCorrect) {
       setScore(score + 1);
     }
+
+    setAnswerRecords([...answerRecords, {
+      questionText: questions[currentQuestion].question,
+      selectedAnswerIndex: answerIndex,
+      correctAnswerIndex: questions[currentQuestion].correctAnswer,
+      isCorrect
+    }]);
 
     setAnsweredQuestions([...answeredQuestions, true]);
   };
@@ -106,12 +124,39 @@ const Quiz = ({ open, onOpenChange, videoTitle }: QuizProps) => {
     }
   };
 
+  const sendAnalytics = async () => {
+    const completionTime = Math.round((Date.now() - startTime) / 1000);
+    
+    try {
+      await fetch(funcUrls['quiz-analytics'], {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          videoTitle,
+          totalQuestions: questions.length,
+          correctAnswers: score,
+          completionTimeSeconds: completionTime,
+          answers: answerRecords
+        })
+      });
+    } catch (error) {
+      console.error('Failed to send quiz analytics:', error);
+    }
+  };
+
+  useEffect(() => {
+    if (showResult && answerRecords.length > 0) {
+      sendAnalytics();
+    }
+  }, [showResult]);
+
   const handleRestart = () => {
     setCurrentQuestion(0);
     setSelectedAnswer(null);
     setShowResult(false);
     setScore(0);
     setAnsweredQuestions([]);
+    setAnswerRecords([]);
   };
 
   const handleClose = () => {

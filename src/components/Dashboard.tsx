@@ -15,6 +15,7 @@ import TeamManagementTab from './dashboard/TeamManagementTab';
 import PortfolioTab from './dashboard/PortfolioTab';
 import LeadsTab from './dashboard/LeadsTab';
 import Reviews from './Reviews';
+import AnalyticsDashboard from './AnalyticsDashboard';
 
 interface DashboardProps {
   onLogout: () => void;
@@ -31,12 +32,23 @@ const Dashboard = ({ onLogout }: DashboardProps) => {
     description: 'Предлагаем комплексные решения в области IT-консалтинга и автоматизации бизнес-процессов'
   });
 
+  const [analyticsOpen, setAnalyticsOpen] = useState(false);
+
   return (
     <div className="min-h-screen bg-background">
       <header className="border-b border-green/20 bg-background/90 backdrop-blur-lg sticky top-0 z-50">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
           <Logo size="md" />
           <div className="flex items-center gap-4">
+            <Button 
+              variant="ghost" 
+              size="sm"
+              className="hover:text-blue"
+              onClick={() => setAnalyticsOpen(true)}
+            >
+              <Icon name="BarChart3" className="mr-2" size={18} />
+              Аналитика тестов
+            </Button>
             <Badge variant="outline" className="border-green text-green font-semibold">Базовый тариф</Badge>
             <Button variant="ghost" className="hover:text-green" onClick={onLogout}>
               <Icon name="LogOut" className="mr-2" size={18} />
@@ -45,6 +57,8 @@ const Dashboard = ({ onLogout }: DashboardProps) => {
           </div>
         </div>
       </header>
+
+      <AnalyticsDashboard open={analyticsOpen} onOpenChange={setAnalyticsOpen} />
 
       <main className="container mx-auto px-4 py-8">
         <div className="mb-8">
