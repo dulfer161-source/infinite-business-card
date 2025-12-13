@@ -41,7 +41,7 @@ const FAQ = () => {
     <section id="faq" className="py-24 bg-background">
       <div className="container mx-auto px-4">
         <div className="text-center mb-16 animate-fade-in">
-          <Badge className="mb-4 bg-purple/10 text-purple border-purple/20 font-semibold">FAQ</Badge>
+          <Badge className="mb-4 bg-blue/10 text-blue border-blue/20 font-semibold">FAQ</Badge>
           <h2 className="text-4xl md:text-5xl font-bold mb-4 gradient-text">
             Часто задаваемые вопросы
           </h2>
@@ -56,9 +56,9 @@ const FAQ = () => {
               <AccordionItem 
                 key={index} 
                 value={`item-${index}`}
-                className="bg-card border border-border rounded-lg px-6 hover:border-teal/40 transition-all duration-300 hover:shadow-lg hover:shadow-teal/10"
+                className="bg-card border border-border rounded-lg px-6 hover:border-green/40 transition-all duration-300 hover:shadow-lg hover:shadow-green/10"
               >
-                <AccordionTrigger className="text-left hover:text-teal transition-colors">
+                <AccordionTrigger className="text-left hover:text-green transition-colors">
                   <span className="font-semibold">{faq.question}</span>
                 </AccordionTrigger>
                 <AccordionContent className="text-muted-foreground pt-2">
@@ -70,7 +70,7 @@ const FAQ = () => {
         </div>
 
         <div id="contacts" className="mt-24 text-center">
-          <div className="bg-card border border-teal/20 rounded-lg p-8 max-w-2xl mx-auto hover:border-teal/40 transition-all duration-300">
+          <div className="bg-card border border-green/20 rounded-lg p-8 max-w-2xl mx-auto hover:border-green/40 transition-all duration-300">
             <h3 className="text-2xl font-bold mb-4 gradient-text">Остались вопросы?</h3>
             <p className="text-muted-foreground mb-6">
               Наша команда поддержки готова помочь вам в любое время
@@ -78,13 +78,13 @@ const FAQ = () => {
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <a 
                 href="mailto:support@visitka.site" 
-                className="inline-flex items-center justify-center px-6 py-3 gradient-bg text-white rounded-lg hover:opacity-90 transition-all duration-300 shadow-lg shadow-purple/20 hover:shadow-purple/40 font-semibold"
+                className="inline-flex items-center justify-center px-6 py-3 gradient-bg text-white rounded-lg hover:opacity-90 transition-all duration-300 shadow-lg shadow-blue/20 hover:shadow-green/40 font-semibold"
               >
                 Написать на email
               </a>
               <a 
                 href="https://t.me/visitka_support" 
-                className="inline-flex items-center justify-center px-6 py-3 border-2 border-teal text-teal rounded-lg hover:bg-teal hover:text-white transition-all duration-300 font-semibold"
+                className="inline-flex items-center justify-center px-6 py-3 gradient-accent text-white rounded-lg hover:opacity-90 transition-all duration-300 shadow-lg shadow-orange/20 font-semibold"
               >
                 Telegram поддержка
               </a>

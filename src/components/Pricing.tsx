@@ -78,7 +78,7 @@ const Pricing = ({ onSelectPlan }: PricingProps) => {
     <section id="pricing" className="py-24 bg-muted/30">
       <div className="container mx-auto px-4">
         <div className="text-center mb-16 animate-fade-in">
-          <Badge className="mb-4 bg-teal/10 text-teal border-teal/20 font-semibold">Тарифы</Badge>
+          <Badge className="mb-4 bg-green/10 text-green border-green/20 font-semibold">Тарифы</Badge>
           <h2 className="text-4xl md:text-5xl font-bold mb-4 gradient-text">
             Выберите свой план
           </h2>
@@ -93,8 +93,8 @@ const Pricing = ({ onSelectPlan }: PricingProps) => {
               key={index}
               className={`relative overflow-hidden transition-all duration-300 hover:scale-105 ${
                 plan.popular 
-                  ? 'border-2 border-purple shadow-2xl shadow-purple/30 bg-gradient-to-br from-card to-purple/5' 
-                  : 'border border-border hover:border-teal/50 hover:shadow-lg hover:shadow-teal/10'
+                  ? 'border-2 border-blue shadow-2xl shadow-blue/30 bg-gradient-to-br from-card to-blue/5' 
+                  : 'border border-border hover:border-green/50 hover:shadow-lg hover:shadow-green/10'
               }`}
             >
               {plan.popular && (
@@ -118,7 +118,7 @@ const Pricing = ({ onSelectPlan }: PricingProps) => {
                     <li key={idx} className="flex items-start gap-2">
                       <Icon 
                         name="Check" 
-                        className={`${plan.popular ? 'text-purple' : 'text-teal'} mt-0.5 flex-shrink-0`}
+                        className={`${plan.popular ? 'text-blue' : 'text-green'} mt-0.5 flex-shrink-0`}
                         size={20}
                       />
                       <span className="text-sm">{feature}</span>
@@ -131,8 +131,8 @@ const Pricing = ({ onSelectPlan }: PricingProps) => {
                 <Button 
                   className={`w-full font-semibold transition-all duration-300 ${
                     plan.popular 
-                      ? 'gradient-bg text-white hover:opacity-90 shadow-lg shadow-purple/30 hover:shadow-purple/50' 
-                      : 'bg-teal/10 text-teal border-2 border-teal hover:bg-teal hover:text-white'
+                      ? 'gradient-bg text-white hover:opacity-90 shadow-lg shadow-blue/30 hover:shadow-green/50' 
+                      : 'gradient-accent text-white hover:opacity-90 shadow-lg shadow-orange/30'
                   }`}
                   onClick={() => onSelectPlan(plan.name, plan.price)}
                   disabled={plan.name === 'Базовый'}
