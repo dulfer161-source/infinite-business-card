@@ -33,12 +33,12 @@ const Dashboard = ({ onLogout }: DashboardProps) => {
 
   return (
     <div className="min-h-screen bg-background">
-      <header className="border-b border-border bg-background/80 backdrop-blur-lg sticky top-0 z-50">
+      <header className="border-b border-teal/20 bg-background/90 backdrop-blur-lg sticky top-0 z-50">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
           <Logo size="md" />
           <div className="flex items-center gap-4">
-            <Badge variant="outline" className="border-gold text-gold">Базовый тариф</Badge>
-            <Button variant="ghost" onClick={onLogout}>
+            <Badge variant="outline" className="border-teal text-teal font-semibold">Базовый тариф</Badge>
+            <Button variant="ghost" className="hover:text-teal" onClick={onLogout}>
               <Icon name="LogOut" className="mr-2" size={18} />
               Выйти
             </Button>
@@ -48,7 +48,7 @@ const Dashboard = ({ onLogout }: DashboardProps) => {
 
       <main className="container mx-auto px-4 py-8">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold mb-2">Личный кабинет</h1>
+          <h1 className="text-3xl font-bold mb-2 gradient-text">Личный кабинет</h1>
           <p className="text-muted-foreground">Управляйте своей цифровой визиткой</p>
         </div>
 

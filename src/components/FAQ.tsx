@@ -38,11 +38,11 @@ const FAQ = () => {
   ];
 
   return (
-    <section id="faq" className="py-24 bg-muted/30">
+    <section id="faq" className="py-24 bg-background">
       <div className="container mx-auto px-4">
         <div className="text-center mb-16 animate-fade-in">
-          <Badge className="mb-4 bg-gold/10 text-gold border-gold/20">FAQ</Badge>
-          <h2 className="text-4xl md:text-5xl font-bold mb-4">
+          <Badge className="mb-4 bg-purple/10 text-purple border-purple/20 font-semibold">FAQ</Badge>
+          <h2 className="text-4xl md:text-5xl font-bold mb-4 gradient-text">
             Часто задаваемые вопросы
           </h2>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
@@ -56,9 +56,9 @@ const FAQ = () => {
               <AccordionItem 
                 key={index} 
                 value={`item-${index}`}
-                className="bg-card border border-border rounded-lg px-6 hover:border-gold/40 transition-colors"
+                className="bg-card border border-border rounded-lg px-6 hover:border-teal/40 transition-all duration-300 hover:shadow-lg hover:shadow-teal/10"
               >
-                <AccordionTrigger className="text-left hover:text-gold transition-colors">
+                <AccordionTrigger className="text-left hover:text-teal transition-colors">
                   <span className="font-semibold">{faq.question}</span>
                 </AccordionTrigger>
                 <AccordionContent className="text-muted-foreground pt-2">
@@ -70,21 +70,21 @@ const FAQ = () => {
         </div>
 
         <div id="contacts" className="mt-24 text-center">
-          <div className="bg-card border border-gold/20 rounded-lg p-8 max-w-2xl mx-auto">
-            <h3 className="text-2xl font-bold mb-4">Остались вопросы?</h3>
+          <div className="bg-card border border-teal/20 rounded-lg p-8 max-w-2xl mx-auto hover:border-teal/40 transition-all duration-300">
+            <h3 className="text-2xl font-bold mb-4 gradient-text">Остались вопросы?</h3>
             <p className="text-muted-foreground mb-6">
               Наша команда поддержки готова помочь вам в любое время
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <a 
                 href="mailto:support@visitka.site" 
-                className="inline-flex items-center justify-center px-6 py-3 bg-gold text-black rounded-md hover:bg-gold/90 transition-colors"
+                className="inline-flex items-center justify-center px-6 py-3 gradient-bg text-white rounded-lg hover:opacity-90 transition-all duration-300 shadow-lg shadow-purple/20 hover:shadow-purple/40 font-semibold"
               >
                 Написать на email
               </a>
               <a 
                 href="https://t.me/visitka_support" 
-                className="inline-flex items-center justify-center px-6 py-3 border border-gold text-gold rounded-md hover:bg-gold/10 transition-colors"
+                className="inline-flex items-center justify-center px-6 py-3 border-2 border-teal text-teal rounded-lg hover:bg-teal hover:text-white transition-all duration-300 font-semibold"
               >
                 Telegram поддержка
               </a>

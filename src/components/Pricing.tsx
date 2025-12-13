@@ -75,11 +75,11 @@ const Pricing = ({ onSelectPlan }: PricingProps) => {
   ];
 
   return (
-    <section id="pricing" className="py-24 bg-background">
+    <section id="pricing" className="py-24 bg-muted/30">
       <div className="container mx-auto px-4">
         <div className="text-center mb-16 animate-fade-in">
-          <Badge className="mb-4 bg-gold/10 text-gold border-gold/20">Тарифы</Badge>
-          <h2 className="text-4xl md:text-5xl font-bold mb-4">
+          <Badge className="mb-4 bg-teal/10 text-teal border-teal/20 font-semibold">Тарифы</Badge>
+          <h2 className="text-4xl md:text-5xl font-bold mb-4 gradient-text">
             Выберите свой план
           </h2>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
@@ -91,23 +91,23 @@ const Pricing = ({ onSelectPlan }: PricingProps) => {
           {plans.map((plan, index) => (
             <Card 
               key={index}
-              className={`relative overflow-hidden hover-scale ${
+              className={`relative overflow-hidden transition-all duration-300 hover:scale-105 ${
                 plan.popular 
-                  ? 'border-gold shadow-lg shadow-gold/20' 
-                  : 'border-border'
+                  ? 'border-2 border-purple shadow-2xl shadow-purple/30 bg-gradient-to-br from-card to-purple/5' 
+                  : 'border border-border hover:border-teal/50 hover:shadow-lg hover:shadow-teal/10'
               }`}
             >
               {plan.popular && (
-                <div className="absolute top-0 right-0 bg-gold text-black text-xs font-semibold px-3 py-1 rounded-bl-lg">
+                <div className="absolute top-0 right-0 gradient-bg text-white text-xs font-semibold px-4 py-1.5 rounded-bl-lg shadow-lg">
                   Популярный
                 </div>
               )}
               
               <CardHeader>
-                <CardTitle className="text-2xl">{plan.name}</CardTitle>
+                <CardTitle className="text-2xl font-bold">{plan.name}</CardTitle>
                 <CardDescription className="text-base">{plan.description}</CardDescription>
                 <div className="mt-4">
-                  <span className="text-4xl font-bold">{plan.price}₽</span>
+                  <span className={`text-4xl font-bold ${plan.popular ? 'gradient-text' : ''}`}>{plan.price}₽</span>
                   {plan.period && <span className="text-muted-foreground ml-2">{plan.period}</span>}
                 </div>
               </CardHeader>
@@ -118,7 +118,7 @@ const Pricing = ({ onSelectPlan }: PricingProps) => {
                     <li key={idx} className="flex items-start gap-2">
                       <Icon 
                         name="Check" 
-                        className={`${plan.popular ? 'text-gold' : 'text-primary'} mt-0.5 flex-shrink-0`}
+                        className={`${plan.popular ? 'text-purple' : 'text-teal'} mt-0.5 flex-shrink-0`}
                         size={20}
                       />
                       <span className="text-sm">{feature}</span>
@@ -129,13 +129,14 @@ const Pricing = ({ onSelectPlan }: PricingProps) => {
 
               <CardFooter>
                 <Button 
-                  className={`w-full ${
+                  className={`w-full font-semibold transition-all duration-300 ${
                     plan.popular 
-                      ? 'bg-gold text-black hover:bg-gold/90' 
-                      : 'bg-primary text-primary-foreground'
+                      ? 'gradient-bg text-white hover:opacity-90 shadow-lg shadow-purple/30 hover:shadow-purple/50' 
+                      : 'bg-teal/10 text-teal border-2 border-teal hover:bg-teal hover:text-white'
                   }`}
                   onClick={() => onSelectPlan(plan.name, plan.price)}
                   disabled={plan.name === 'Базовый'}
+                  variant={plan.popular ? 'default' : 'outline'}
                 >
                   {plan.cta}
                 </Button>

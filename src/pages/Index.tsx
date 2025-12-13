@@ -85,19 +85,19 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <header className="fixed top-0 w-full bg-background/80 backdrop-blur-lg border-b border-border z-50">
+      <header className="fixed top-0 w-full bg-background/90 backdrop-blur-lg border-b border-border z-50">
         <nav className="container mx-auto px-4 py-4 flex items-center justify-between">
           <Logo size="md" />
           <div className="hidden md:flex items-center gap-8">
-            <a href="#features" className="hover:text-gold transition-colors">Возможности</a>
-            <a href="#pricing" className="hover:text-gold transition-colors">Тарифы</a>
-            <a href="#help" className="hover:text-gold transition-colors">Обучение</a>
-            <a href="#faq" className="hover:text-gold transition-colors">FAQ</a>
-            <a href="#contacts" className="hover:text-gold transition-colors">Контакты</a>
+            <a href="#features" className="hover:text-teal transition-colors font-medium">Возможности</a>
+            <a href="#pricing" className="hover:text-teal transition-colors font-medium">Тарифы</a>
+            <a href="#help" className="hover:text-purple transition-colors font-medium">Обучение</a>
+            <a href="#faq" className="hover:text-purple transition-colors font-medium">FAQ</a>
+            <a href="#contacts" className="hover:text-teal transition-colors font-medium">Контакты</a>
           </div>
           <div className="flex items-center gap-4">
-            <Button variant="ghost" onClick={handleOpenAuth}>Войти</Button>
-            <Button className="bg-gold text-black hover:bg-gold/90" onClick={handleOpenAuth}>
+            <Button variant="ghost" className="hover:text-teal" onClick={handleOpenAuth}>Войти</Button>
+            <Button className="gradient-bg text-white hover:opacity-90 shadow-lg shadow-purple/20" onClick={handleOpenAuth}>
               Регистрация
             </Button>
           </div>
