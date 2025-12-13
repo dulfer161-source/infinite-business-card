@@ -4,6 +4,8 @@ import UseCases from '@/components/UseCases';
 import Pricing from '@/components/Pricing';
 import FAQ from '@/components/FAQ';
 import Dashboard from '@/components/Dashboard';
+import DemoDashboard from '@/components/DemoDashboard';
+import DemoModeDialog from '@/components/DemoModeDialog';
 import Footer from '@/components/Footer';
 import AuthDialog from '@/components/AuthDialog';
 import HelpCenter from '@/components/HelpCenter';
@@ -11,13 +13,16 @@ import Logo from '@/components/Logo';
 import { Button } from '@/components/ui/button';
 import { api } from '@/lib/api';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import Icon from '@/components/ui/icon';
 
 const Index = () => {
-  const [currentView, setCurrentView] = useState<'landing' | 'dashboard'>('landing');
+  const [currentView, setCurrentView] = useState<'landing' | 'dashboard' | 'demo'>('landing');
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [authDialogOpen, setAuthDialogOpen] = useState(false);
+  const [demoDialogOpen, setDemoDialogOpen] = useState(false);
   const [paymentDialogOpen, setPaymentDialogOpen] = useState(false);
   const [selectedPlan, setSelectedPlan] = useState<{ name: string; price: string } | null>(null);
+  const [demoPlan, setDemoPlan] = useState<'free' | 'basic' | 'pro'>('basic');
   const [isProcessingPayment, setIsProcessingPayment] = useState(false);
 
   useEffect(() => {
@@ -80,8 +85,25 @@ const Index = () => {
     setCurrentView('landing');
   };
 
+  const handleStartDemo = (plan: 'free' | 'basic' | 'pro') => {
+    setDemoPlan(plan);
+    setCurrentView('demo');
+  };
+
+  const handleExitDemo = () => {
+    setCurrentView('landing');
+  };
+
+  const handleOpenDemoDialog = () => {
+    setDemoDialogOpen(true);
+  };
+
   if (currentView === 'dashboard' && isLoggedIn) {
     return <Dashboard onLogout={handleLogout} />;
+  }
+
+  if (currentView === 'demo') {
+    return <DemoDashboard onExit={handleExitDemo} plan={demoPlan} />;
   }
 
   return (
@@ -97,6 +119,10 @@ const Index = () => {
             <a href="#contacts" className="hover:text-green transition-colors font-medium">Контакты</a>
           </div>
           <div className="flex items-center gap-4">
+            <Button variant="ghost" className="hover:text-blue" onClick={handleOpenDemoDialog}>
+              <Icon name="PlayCircle" className="mr-2" size={18} />
+              Демо
+            </Button>
             <Button variant="ghost" className="hover:text-green" onClick={handleOpenAuth}>Войти</Button>
             <Button className="gradient-bg text-white hover:opacity-90 shadow-lg shadow-blue/30 hover:shadow-green/50" onClick={handleOpenAuth}>
               Регистрация
@@ -106,7 +132,7 @@ const Index = () => {
       </header>
 
       <main className="pt-20">
-        <Hero onGetStarted={handleOpenAuth} />
+        <Hero onGetStarted={handleOpenAuth} onStartDemo={handleOpenDemoDialog} />
         <UseCases />
         <Pricing onSelectPlan={handleSelectPlan} />
         <HelpCenter />
@@ -119,6 +145,12 @@ const Index = () => {
         open={authDialogOpen} 
         onOpenChange={setAuthDialogOpen} 
         onSuccess={handleAuthSuccess}
+      />
+
+      <DemoModeDialog
+        open={demoDialogOpen}
+        onOpenChange={setDemoDialogOpen}
+        onSelectPlan={handleStartDemo}
       />
 
       <Dialog open={paymentDialogOpen} onOpenChange={setPaymentDialogOpen}>

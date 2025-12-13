@@ -3,9 +3,10 @@ import Icon from '@/components/ui/icon';
 
 interface HeroProps {
   onGetStarted: () => void;
+  onStartDemo: () => void;
 }
 
-const Hero = ({ onGetStarted }: HeroProps) => {
+const Hero = ({ onGetStarted, onStartDemo }: HeroProps) => {
   return (
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-background">
       <div className="absolute inset-0 gradient-corporate opacity-95"></div>
@@ -46,10 +47,11 @@ const Hero = ({ onGetStarted }: HeroProps) => {
             <Button 
               size="lg" 
               variant="outline" 
-              className="border-2 border-orange/80 text-white hover:bg-orange/10 hover:border-orange text-lg px-10 py-7 rounded-xl backdrop-blur-sm transition-all duration-300"
-              onClick={() => document.getElementById('pricing')?.scrollIntoView({ behavior: 'smooth' })}
+              className="border-2 border-green/80 text-white hover:bg-green/10 hover:border-green text-lg px-10 py-7 rounded-xl backdrop-blur-sm transition-all duration-300"
+              onClick={onStartDemo}
             >
-              Смотреть тарифы
+              <Icon name="PlayCircle" className="mr-2" size={22} />
+              Попробовать демо
             </Button>
           </div>
 
