@@ -25,13 +25,13 @@ const Hero = ({ onGetStarted }: HeroProps) => {
           </div>
           
           <h1 className="text-5xl md:text-7xl font-bold text-white mb-8 leading-[1.1] tracking-tight">
-            Бесконечные возможности
+            Профессиональные визитки
             <br />
-            <span className="gradient-text">вашей визитки</span>
+            <span className="gradient-text">для роста бизнеса</span>
           </h1>
           
           <p className="text-xl md:text-2xl text-white/80 mb-12 max-w-3xl mx-auto font-light leading-relaxed">
-            Создайте премиальную цифровую визитку с QR-кодом, аналитикой и реферальной программой за минуты
+            Экспертное решение для предпринимателей, агентств и корпораций. QR-коды, аналитика, интеграции и автоматизация.
           </p>
 
           <div className="flex flex-col sm:flex-row gap-6 justify-center items-center mb-20">

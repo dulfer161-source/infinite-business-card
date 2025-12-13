@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import Hero from '@/components/Hero';
+import UseCases from '@/components/UseCases';
 import Pricing from '@/components/Pricing';
 import FAQ from '@/components/FAQ';
 import Dashboard from '@/components/Dashboard';
@@ -89,15 +90,15 @@ const Index = () => {
         <nav className="container mx-auto px-4 py-4 flex items-center justify-between">
           <Logo size="md" />
           <div className="hidden md:flex items-center gap-8">
-            <a href="#features" className="hover:text-teal transition-colors font-medium">Возможности</a>
-            <a href="#pricing" className="hover:text-teal transition-colors font-medium">Тарифы</a>
-            <a href="#help" className="hover:text-purple transition-colors font-medium">Обучение</a>
-            <a href="#faq" className="hover:text-purple transition-colors font-medium">FAQ</a>
-            <a href="#contacts" className="hover:text-teal transition-colors font-medium">Контакты</a>
+            <a href="#features" className="hover:text-green transition-colors font-medium">Возможности</a>
+            <a href="#solutions" className="hover:text-blue transition-colors font-medium">Решения</a>
+            <a href="#pricing" className="hover:text-green transition-colors font-medium">Тарифы</a>
+            <a href="#faq" className="hover:text-blue transition-colors font-medium">FAQ</a>
+            <a href="#contacts" className="hover:text-green transition-colors font-medium">Контакты</a>
           </div>
           <div className="flex items-center gap-4">
-            <Button variant="ghost" className="hover:text-teal" onClick={handleOpenAuth}>Войти</Button>
-            <Button className="gradient-bg text-white hover:opacity-90 shadow-lg shadow-purple/20" onClick={handleOpenAuth}>
+            <Button variant="ghost" className="hover:text-green" onClick={handleOpenAuth}>Войти</Button>
+            <Button className="gradient-bg text-white hover:opacity-90 shadow-lg shadow-blue/30 hover:shadow-green/50" onClick={handleOpenAuth}>
               Регистрация
             </Button>
           </div>
@@ -106,6 +107,7 @@ const Index = () => {
 
       <main className="pt-20">
         <Hero onGetStarted={handleOpenAuth} />
+        <UseCases />
         <Pricing onSelectPlan={handleSelectPlan} />
         <HelpCenter />
         <FAQ />
@@ -136,7 +138,7 @@ const Index = () => {
               </div>
               <div className="flex justify-between items-center">
                 <span className="text-sm text-muted-foreground">Стоимость:</span>
-                <span className="text-2xl font-bold text-gold">{selectedPlan?.price}₽</span>
+                <span className="text-2xl font-bold gradient-text">{selectedPlan?.price}₽</span>
               </div>
             </div>
 
@@ -147,7 +149,7 @@ const Index = () => {
             </div>
 
             <Button
-              className="w-full bg-gold text-black hover:bg-gold/90"
+              className="w-full gradient-accent text-white hover:opacity-90 shadow-lg shadow-orange/30"
               onClick={handlePayment}
               disabled={isProcessingPayment}
             >

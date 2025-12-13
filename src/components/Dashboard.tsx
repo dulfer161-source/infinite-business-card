@@ -33,12 +33,12 @@ const Dashboard = ({ onLogout }: DashboardProps) => {
 
   return (
     <div className="min-h-screen bg-background">
-      <header className="border-b border-teal/20 bg-background/90 backdrop-blur-lg sticky top-0 z-50">
+      <header className="border-b border-green/20 bg-background/90 backdrop-blur-lg sticky top-0 z-50">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
           <Logo size="md" />
           <div className="flex items-center gap-4">
-            <Badge variant="outline" className="border-teal text-teal font-semibold">Базовый тариф</Badge>
-            <Button variant="ghost" className="hover:text-teal" onClick={onLogout}>
+            <Badge variant="outline" className="border-green text-green font-semibold">Базовый тариф</Badge>
+            <Button variant="ghost" className="hover:text-green" onClick={onLogout}>
               <Icon name="LogOut" className="mr-2" size={18} />
               Выйти
             </Button>
