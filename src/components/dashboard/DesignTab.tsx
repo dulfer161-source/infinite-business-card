@@ -1,10 +1,20 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import Icon from '@/components/ui/icon';
+import { toast } from 'sonner';
 
 const DesignTab = () => {
-  const [selectedTheme, setSelectedTheme] = useState('classic');
+  const [selectedTheme, setSelectedTheme] = useState(() => {
+    return localStorage.getItem('selectedTheme') || 'classic';
+  });
+
+  useEffect(() => {
+    const savedTheme = localStorage.getItem('selectedTheme');
+    if (savedTheme) {
+      applyThemeStyles(savedTheme);
+    }
+  }, []);
 
   const themes = [
     { id: 'classic', name: 'Классическая', colors: ['bg-black', 'bg-gold', 'bg-white'], icon: 'Crown' },
@@ -15,47 +25,49 @@ const DesignTab = () => {
     { id: 'elegant', name: 'Элегантная', colors: ['bg-rose-900', 'bg-amber-600', 'bg-stone-200'], icon: 'Star' }
   ];
 
+  const applyThemeStyles = (themeId: string) => {
+    const root = document.documentElement;
+    
+    switch(themeId) {
+      case 'modern':
+        root.style.setProperty('--gold', '14 100% 57%');
+        root.style.setProperty('--green', '173 80% 40%');
+        root.style.setProperty('--blue', '217 91% 60%');
+        break;
+      case 'minimal':
+        root.style.setProperty('--gold', '0 0% 45%');
+        root.style.setProperty('--green', '142 71% 45%');
+        root.style.setProperty('--blue', '221 83% 53%');
+        break;
+      case 'gradient':
+        root.style.setProperty('--gold', '340 82% 52%');
+        root.style.setProperty('--green', '262 83% 58%');
+        root.style.setProperty('--blue', '280 87% 65%');
+        break;
+      case 'dark':
+        root.style.setProperty('--gold', '240 5% 65%');
+        root.style.setProperty('--green', '142 71% 45%');
+        root.style.setProperty('--blue', '217 91% 60%');
+        break;
+      case 'elegant':
+        root.style.setProperty('--gold', '38 92% 50%');
+        root.style.setProperty('--green', '142 76% 36%');
+        root.style.setProperty('--blue', '221 83% 53%');
+        break;
+      default:
+        root.style.setProperty('--gold', '46 100% 50%');
+        root.style.setProperty('--green', '142 71% 45%');
+        root.style.setProperty('--blue', '217 91% 60%');
+    }
+  };
+
   const handleApplyTheme = () => {
     const theme = themes.find(t => t.id === selectedTheme);
     if (!theme) return;
 
-    const root = document.documentElement;
-    
-    // Apply theme based on selection
-    switch(selectedTheme) {
-      case 'modern':
-        root.style.setProperty('--gold', '14 100% 57%'); // Cyan
-        root.style.setProperty('--background', '222 47% 11%'); // Dark slate
-        root.style.setProperty('--foreground', '210 40% 98%');
-        break;
-      case 'minimal':
-        root.style.setProperty('--gold', '0 0% 45%'); // Gray
-        root.style.setProperty('--background', '0 0% 100%'); // White
-        root.style.setProperty('--foreground', '0 0% 9%');
-        break;
-      case 'gradient':
-        root.style.setProperty('--gold', '340 82% 52%'); // Pink
-        root.style.setProperty('--background', '262 83% 58%'); // Purple
-        root.style.setProperty('--foreground', '0 0% 98%');
-        break;
-      case 'dark':
-        root.style.setProperty('--gold', '240 5% 65%'); // Zinc
-        root.style.setProperty('--background', '240 10% 4%'); // Zinc-950
-        root.style.setProperty('--foreground', '0 0% 98%');
-        break;
-      case 'elegant':
-        root.style.setProperty('--gold', '38 92% 50%'); // Amber
-        root.style.setProperty('--background', '4 56% 28%'); // Rose-900
-        root.style.setProperty('--foreground', '60 9% 98%');
-        break;
-      default: // classic
-        root.style.setProperty('--gold', '46 100% 50%');
-        root.style.setProperty('--background', '0 0% 0%');
-        root.style.setProperty('--foreground', '0 0% 98%');
-    }
-    
+    applyThemeStyles(selectedTheme);
     localStorage.setItem('selectedTheme', selectedTheme);
-    alert(`Тема "${theme.name}" применена! Обновите страницу для полного эффекта.`);
+    toast.success(`Тема "${theme.name}" применена успешно!`);
   };
 
   return (
