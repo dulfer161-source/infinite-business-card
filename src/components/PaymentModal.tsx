@@ -7,6 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import Icon from '@/components/ui/icon';
 import { toast } from 'sonner';
+import { paymentService } from '@/lib/payment';
 
 interface PaymentModalProps {
   open: boolean;
@@ -54,24 +55,56 @@ const PaymentModal = ({
   const handlePayment = async () => {
     setLoading(true);
     
-    if (paymentMethod === 'card') {
-      if (!cardData.number || !cardData.name || !cardData.expiry || !cardData.cvv) {
-        toast.error('Заполните все поля карты');
+    try {
+      const payment = await paymentService.createPayment({
+        amount: planPrice,
+        description: `Подписка ${planName} (${billingPeriod === 'monthly' ? 'месяц' : 'год'})`,
+        email: userDetails.email,
+        phone: userDetails.phone,
+        return_url: window.location.origin + '?payment=success'
+      });
+
+      const paymentWindow = paymentService.openPaymentWindow(payment.confirmation_url);
+      
+      if (!paymentWindow) {
+        toast.error('Разрешите всплывающие окна для оплаты');
         setLoading(false);
         return;
       }
-    }
 
-    await new Promise(resolve => setTimeout(resolve, 2000));
-    
-    setStep('success');
-    setLoading(false);
-    
-    setTimeout(() => {
-      toast.success(`Подписка "${planName}" активирована!`);
-      onOpenChange(false);
-      setStep('details');
-    }, 3000);
+      toast.info('Завершите оплату в открывшемся окне', { duration: 5000 });
+
+      paymentService.pollPaymentStatus(
+        payment.payment_id,
+        (status) => {
+          console.log('Payment status:', status);
+        }
+      ).then((finalStatus) => {
+        if (finalStatus.paid) {
+          setStep('success');
+          setLoading(false);
+          if (paymentWindow && !paymentWindow.closed) {
+            paymentWindow.close();
+          }
+          
+          setTimeout(() => {
+            toast.success(`Подписка "${planName}" активирована!`);
+            onOpenChange(false);
+            setStep('details');
+          }, 3000);
+        }
+      }).catch((error) => {
+        toast.error(error.message || 'Ошибка при оплате');
+        setLoading(false);
+        if (paymentWindow && !paymentWindow.closed) {
+          paymentWindow.close();
+        }
+      });
+
+    } catch (error: any) {
+      toast.error(error.message || 'Ошибка при создании платежа');
+      setLoading(false);
+    }
   };
 
   const formatCardNumber = (value: string) => {

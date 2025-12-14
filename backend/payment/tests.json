@@ -1,0 +1,33 @@
+{
+  "tests": [
+    {
+      "name": "OPTIONS request for CORS",
+      "method": "OPTIONS",
+      "path": "/",
+      "expectedStatus": 200,
+      "expectedHeaders": {
+        "Access-Control-Allow-Origin": "*"
+      }
+    },
+    {
+      "name": "Create payment without credentials returns error",
+      "method": "POST",
+      "path": "/?action=create",
+      "body": {
+        "amount": 490,
+        "description": "Test payment"
+      },
+      "expectedStatus": 500,
+      "expectedBody": {
+        "error": "string"
+      },
+      "bodyMatcher": "partial"
+    },
+    {
+      "name": "Unknown action returns 404",
+      "method": "GET",
+      "path": "/",
+      "expectedStatus": 404
+    }
+  ]
+}
