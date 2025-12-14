@@ -23,6 +23,7 @@ import WelcomeNotification from './WelcomeNotification';
 import HelpButton from './HelpButton';
 import ProgressTracker from './ProgressTracker';
 import SettingsTab from './dashboard/SettingsTab';
+import SubscriptionTab from './dashboard/SubscriptionTab';
 
 interface DashboardProps {
   onLogout: () => void;
@@ -93,7 +94,7 @@ const Dashboard = ({ onLogout }: DashboardProps) => {
         <ProgressTracker userInfo={userInfo} />
 
         <Tabs defaultValue="card" className="space-y-6">
-          <TabsList className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-12 w-full">
+          <TabsList className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-13 w-full">
             <TabsTrigger value="card">
               <Icon name="CreditCard" className="mr-2" size={18} />
               <span className="hidden sm:inline">Визитка</span>
@@ -133,6 +134,10 @@ const Dashboard = ({ onLogout }: DashboardProps) => {
             <TabsTrigger value="reviews">
               <Icon name="Star" className="mr-2" size={18} />
               <span className="hidden sm:inline">Отзывы</span>
+            </TabsTrigger>
+            <TabsTrigger value="subscription">
+              <Icon name="Sparkles" className="mr-2" size={18} />
+              <span className="hidden sm:inline">Подписка</span>
             </TabsTrigger>
             <TabsTrigger value="referral">
               <Icon name="Gift" className="mr-2" size={18} />
@@ -182,6 +187,10 @@ const Dashboard = ({ onLogout }: DashboardProps) => {
 
           <TabsContent value="reviews" className="space-y-6">
             <Reviews />
+          </TabsContent>
+
+          <TabsContent value="subscription" className="space-y-6">
+            <SubscriptionTab />
           </TabsContent>
 
           <TabsContent value="referral" className="space-y-6">
