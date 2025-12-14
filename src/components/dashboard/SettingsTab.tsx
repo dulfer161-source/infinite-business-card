@@ -7,6 +7,7 @@ import PrivacySettings from './settings/PrivacySettings';
 import ProfileSettings from './settings/ProfileSettings';
 import ApiKeysSettings from './settings/ApiKeysSettings';
 import AppearanceSettings from './settings/AppearanceSettings';
+import PaymentSettings from './settings/PaymentSettings';
 
 const SettingsTab = () => {
   const [settings, setSettings] = useState({
@@ -43,7 +44,7 @@ const SettingsTab = () => {
   return (
     <div className="space-y-6">
       <Tabs defaultValue="notifications" className="w-full">
-        <TabsList className="grid w-full grid-cols-2 md:grid-cols-3 lg:grid-cols-6">
+        <TabsList className="grid w-full grid-cols-2 md:grid-cols-3 lg:grid-cols-7">
           <TabsTrigger value="notifications">
             <Icon name="Bell" className="mr-2" size={16} />
             <span className="hidden sm:inline">Уведомления</span>
@@ -67,6 +68,10 @@ const SettingsTab = () => {
           <TabsTrigger value="data">
             <Icon name="Database" className="mr-2" size={16} />
             <span className="hidden sm:inline">Данные</span>
+          </TabsTrigger>
+          <TabsTrigger value="payment">
+            <Icon name="CreditCard" className="mr-2" size={16} />
+            <span className="hidden sm:inline">Оплата</span>
           </TabsTrigger>
         </TabsList>
 
@@ -92,6 +97,10 @@ const SettingsTab = () => {
 
         <TabsContent value="data" className="space-y-6">
           <AppearanceSettings />
+        </TabsContent>
+
+        <TabsContent value="payment" className="space-y-6">
+          <PaymentSettings />
         </TabsContent>
       </Tabs>
     </div>
