@@ -36,14 +36,12 @@ const Logo = ({ variant = 'default', size = 'md', animated = true, className = '
 
   const getImgSrc = () => {
     if (variant === 'light') {
-      return 'https://cdn.poehali.dev/files/photo_5323474829841207821_y.jpg';
+      return 'https://cdn.poehali.dev/files/61582.jpg';
     }
     if (variant === 'dark') {
-      return 'https://cdn.poehali.dev/files/photo_5323474829841207535_y.jpg';
+      return 'https://cdn.poehali.dev/files/61582.jpg';
     }
-    return isDark
-      ? 'https://cdn.poehali.dev/files/photo_5323474829841207535_y.jpg'
-      : 'https://cdn.poehali.dev/files/photo_5323474829841207821_y.jpg';
+    return 'https://cdn.poehali.dev/files/61582.jpg';
   };
 
   return (
