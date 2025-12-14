@@ -83,7 +83,7 @@ const AnimatedTooltips = ({ steps, enabled, onComplete }: AnimatedTooltipsProps)
       <style>{`
         .tooltip-highlight {
           position: relative;
-          z-index: 9999;
+          z-index: 60;
           animation: pulse-ring 2s infinite;
         }
 
@@ -106,7 +106,7 @@ const AnimatedTooltips = ({ steps, enabled, onComplete }: AnimatedTooltipsProps)
           animate={{ opacity: 1, scale: 1 }}
           exit={{ opacity: 0, scale: 0.8 }}
           transition={{ duration: 0.3 }}
-          className="fixed z-[10000] pointer-events-none"
+          className="fixed z-[70] pointer-events-none"
           style={{
             left: `${tooltipPosition.x}px`,
             top: `${tooltipPosition.y}px`,
@@ -176,7 +176,7 @@ const AnimatedTooltips = ({ steps, enabled, onComplete }: AnimatedTooltipsProps)
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
-        className="fixed inset-0 bg-black/40 backdrop-blur-sm z-[9998]"
+        className="fixed inset-0 bg-black/40 backdrop-blur-sm z-[60]"
         onClick={handleSkip}
       />
     </>
