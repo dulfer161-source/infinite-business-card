@@ -5,7 +5,7 @@ from psycopg2.extras import RealDictCursor
 
 def handler(event, context):
     '''
-    Управление визитками
+    Управление визитками пользователя
     GET / - получить визитки пользователя
     GET /{id} - публичный просмотр визитки
     POST / - создать новую визитку
@@ -35,7 +35,7 @@ def handler(event, context):
         
         # Public GET card by ID
         if method == 'GET' and card_id:
-            cur.execute("SELECT * FROM business_cards WHERE id = %s", (card_id,))
+            cur.execute("SELECT * FROM t_p18253922_infinite_business_ca.business_cards WHERE id = %s", (card_id,))
             card = cur.fetchone()
             
             if not card:
@@ -62,14 +62,14 @@ def handler(event, context):
             
             cur.execute(
                 """
-                INSERT INTO card_views (card_id, viewer_ip, viewer_user_agent)
+                INSERT INTO t_p18253922_infinite_business_ca.card_views (card_id, viewer_ip, viewer_user_agent)
                 VALUES (%s, %s, %s)
                 """,
                 (card_id, source_ip, user_agent)
             )
             
             cur.execute(
-                "UPDATE business_cards SET view_count = view_count + 1 WHERE id = %s",
+                "UPDATE t_p18253922_infinite_business_ca.business_cards SET view_count = view_count + 1 WHERE id = %s",
                 (card_id,)
             )
             conn.commit()
@@ -95,7 +95,7 @@ def handler(event, context):
         
         if method == 'GET':
             cur.execute(
-                "SELECT * FROM business_cards WHERE user_id = %s ORDER BY created_at DESC",
+                "SELECT * FROM t_p18253922_infinite_business_ca.business_cards WHERE user_id = %s ORDER BY created_at DESC",
                 (user_id,)
             )
             cards = [dict(row) for row in cur.fetchall()]
@@ -112,7 +112,7 @@ def handler(event, context):
             
             cur.execute(
                 """
-                INSERT INTO business_cards 
+                INSERT INTO t_p18253922_infinite_business_ca.business_cards 
                 (user_id, name, position, company, phone, email, website, description)
                 VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
                 RETURNING *
@@ -152,7 +152,7 @@ def handler(event, context):
             
             cur.execute(
                 """
-                UPDATE business_cards 
+                UPDATE t_p18253922_infinite_business_ca.business_cards 
                 SET name = %s, position = %s, company = %s, phone = %s, 
                     email = %s, website = %s, description = %s, updated_at = CURRENT_TIMESTAMP
                 WHERE id = %s AND user_id = %s

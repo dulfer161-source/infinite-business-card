@@ -58,13 +58,13 @@ def handler(event, context):
             password_hash = hashlib.sha256(password.encode()).hexdigest()
             
             cur.execute(
-                "INSERT INTO users (email, password_hash, name) VALUES (%s, %s, %s) RETURNING id, email, name",
+                "INSERT INTO t_p18253922_infinite_business_ca.users (email, password_hash, name) VALUES (%s, %s, %s) RETURNING id, email, name",
                 (email, password_hash, name)
             )
             user = dict(cur.fetchone())
             
             cur.execute(
-                "INSERT INTO user_subscriptions (user_id, plan_id, status) VALUES (%s, 1, %s)",
+                "INSERT INTO t_p18253922_infinite_business_ca.user_subscriptions (user_id, plan_id, status) VALUES (%s, 1, %s)",
                 (user['id'], 'active')
             )
             
@@ -98,7 +98,7 @@ def handler(event, context):
             password_hash = hashlib.sha256(password.encode()).hexdigest()
             
             cur.execute(
-                "SELECT id, email, name FROM users WHERE email = %s AND password_hash = %s",
+                "SELECT id, email, name FROM t_p18253922_infinite_business_ca.users WHERE email = %s AND password_hash = %s",
                 (email, password_hash)
             )
             user = cur.fetchone()

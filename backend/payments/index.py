@@ -99,7 +99,7 @@ def handler(event, context):
             
             cur.execute(
                 """
-                INSERT INTO payments 
+                INSERT INTO t_p18253922_infinite_business_ca.payments 
                 (user_id, amount, payment_type, payment_provider, provider_payment_id, status, metadata)
                 VALUES (%s, %s, %s, %s, %s, %s, %s)
                 RETURNING *
@@ -140,7 +140,7 @@ def handler(event, context):
                 }
             
             cur.execute(
-                "SELECT * FROM payments WHERE id = %s",
+                "SELECT * FROM t_p18253922_infinite_business_ca.payments WHERE id = %s",
                 (payment_id,)
             )
             payment = cur.fetchone()
