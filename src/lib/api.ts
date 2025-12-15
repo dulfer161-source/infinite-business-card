@@ -183,7 +183,7 @@ class ApiService {
   }
 
   async createPayment(amount: number, paymentType: string, returnUrl?: string): Promise<{ payment: any; confirmation_url: string }> {
-    const response = await fetch(`${API_URLS.payments}/create`, {
+    const response = await fetch(API_URLS.payments, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
