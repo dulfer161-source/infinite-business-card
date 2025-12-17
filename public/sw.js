@@ -1,4 +1,4 @@
-const CACHE_NAME = 'infinity7-v1';
+const CACHE_NAME = 'infinity7-v2-2025-12-17';
 const ASSETS_TO_CACHE = [
   '/',
   '/index.html',
@@ -23,14 +23,18 @@ self.addEventListener('activate', (event) => {
     caches.keys().then((cacheNames) => {
       return Promise.all(
         cacheNames.map((cacheName) => {
+          // Удаляем все старые кэши
           if (cacheName !== CACHE_NAME) {
+            console.log('Удаляем старый кэш:', cacheName);
             return caches.delete(cacheName);
           }
         })
       );
+    }).then(() => {
+      // Форсируем обновление всех клиентов
+      return self.clients.claim();
     })
   );
-  self.clients.claim();
 });
 
 // Стратегия кеширования: Network First, падаем на Cache
