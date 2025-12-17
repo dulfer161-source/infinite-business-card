@@ -28,7 +28,7 @@ def handler(event, context):
         }
     
     vk_app_id = os.environ.get('VK_APP_ID')
-    vk_app_secret = os.environ.get('VK_APP_SECRET')
+    vk_app_secret = os.environ.get('VK_SECRET_KEY')
     
     if not vk_app_id or not vk_app_secret:
         return {
