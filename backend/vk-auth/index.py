@@ -99,9 +99,11 @@ def handler(event, context):
         conn = psycopg2.connect(os.environ['DATABASE_URL'])
         cur = conn.cursor()
         
+        # Экранируем данные для Simple Query Protocol
+        vk_user_id_escaped = str(vk_user_id).replace("'", "''")
+        
         cur.execute(
-            "SELECT id, email FROM t_p18253922_infinite_business_ca.users WHERE vk_id = %s",
-            (str(vk_user_id),)
+            f"SELECT id, email FROM t_p18253922_infinite_business_ca.users WHERE vk_id = '{vk_user_id_escaped}'"
         )
         existing_user = cur.fetchone()
         
@@ -111,9 +113,13 @@ def handler(event, context):
             if not vk_email:
                 vk_email = f"vk{vk_user_id}@visitka.site"
             
+            # Экранируем все строковые данные
+            vk_email_escaped = vk_email.replace("'", "''")
+            full_name_escaped = full_name.replace("'", "''")
+            created_at = datetime.now().isoformat()
+            
             cur.execute(
-                "INSERT INTO t_p18253922_infinite_business_ca.users (email, name, vk_id, created_at) VALUES (%s, %s, %s, %s) RETURNING id",
-                (vk_email, full_name, str(vk_user_id), datetime.now())
+                f"INSERT INTO t_p18253922_infinite_business_ca.users (email, name, vk_id, created_at) VALUES ('{vk_email_escaped}', '{full_name_escaped}', '{vk_user_id_escaped}', '{created_at}') RETURNING id"
             )
             user_id = cur.fetchone()[0]
         
