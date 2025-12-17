@@ -138,9 +138,20 @@ def handler(event, context):
             
             conn.commit()
             
+            jwt_secret = os.environ.get('JWT_SECRET')
+            if not jwt_secret:
+                cur.close()
+                conn.close()
+                return {
+                    'statusCode': 500,
+                    'headers': {'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json'},
+                    'body': json.dumps({'error': 'Server configuration error'}),
+                    'isBase64Encoded': False
+                }
+            
             token = jwt.encode(
                 {'user_id': user['id'], 'email': user['email'], 'exp': datetime.utcnow() + timedelta(days=30)},
-                os.environ.get('JWT_SECRET', 'fallback_secret_for_dev'),
+                jwt_secret,
                 algorithm='HS256'
             )
             

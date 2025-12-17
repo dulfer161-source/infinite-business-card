@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Тест авторизации</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .test-block {
+            background: white;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        button {
+            background: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background: #45a049;
+        }
+        .result {
+            margin-top: 15px;
+            padding: 15px;
+            border-radius: 5px;
+            font-family: monospace;
+            white-space: pre-wrap;
+        }
+        .success {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+        }
+        .error {
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+        }
+        .info {
+            background: #d1ecf1;
+            border: 1px solid #bee5eb;
+            color: #0c5460;
+        }
+        h1 {
+            color: #333;
+        }
+        h2 {
+            color: #666;
+            font-size: 18px;
+        }
+    </style>
+</head>
+<body>
+    <h1>🔐 Тест системы авторизации</h1>
+    
+    <div class="test-block">
+        <h2>1️⃣ Тест регистрации нового пользователя</h2>
+        <button onclick="testRegistration()">Запустить тест</button>
+        <div id="result1" class="result" style="display:none;"></div>
+    </div>
+
+    <div class="test-block">
+        <h2>2️⃣ Тест валидации email</h2>
+        <button onclick="testValidation()">Запустить тест</button>
+        <div id="result2" class="result" style="display:none;"></div>
+    </div>
+
+    <div class="test-block">
+        <h2>3️⃣ Тест rate limiting</h2>
+        <button onclick="testRateLimit()">Запустить тест (6 запросов)</button>
+        <div id="result3" class="result" style="display:none;"></div>
+    </div>
+
+    <div class="test-block">
+        <h2>4️⃣ Тест входа (login)</h2>
+        <button onclick="testLogin()">Запустить тест</button>
+        <div id="result4" class="result" style="display:none;"></div>
+    </div>
+
+    <script>
+        const AUTH_URL = 'https://functions.poehali.dev/063b09be-f07e-478c-a626-807980d111e1';
+        const testEmail = `test_${Date.now()}@example.com`;
+
+        async function testRegistration() {
+            const result = document.getElementById('result1');
+            result.style.display = 'block';
+            result.textContent = '⏳ Выполняется тест...';
+            result.className = 'result info';
+
+            try {
+                const response = await fetch(AUTH_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        action: 'register',
+                        email: testEmail,
+                        password: 'testPassword123',
+                        name: 'Test User'
+                    })
+                });
+
+                const data = await response.json();
+                
+                if (response.status === 200 && data.token) {
+                    result.className = 'result success';
+                    result.textContent = `✅ УСПЕХ! Регистрация работает!\n\nСтатус: ${response.status}\nПолучен JWT токен: ${data.token.substring(0, 50)}...\nUser ID: ${data.user.id}\nEmail: ${data.user.email}`;
+                    
+                    // Сохраняем для теста входа
+                    window.testEmail = testEmail;
+                    window.testToken = data.token;
+                } else if (response.status === 500) {
+                    result.className = 'result error';
+                    result.textContent = `❌ ОШИБКА: JWT_SECRET не настроен!\n\nСтатус: ${response.status}\nОшибка: ${JSON.stringify(data, null, 2)}`;
+                } else {
+                    result.className = 'result error';
+                    result.textContent = `⚠️ Неожиданный ответ\n\nСтатус: ${response.status}\nОтвет: ${JSON.stringify(data, null, 2)}`;
+                }
+            } catch (error) {
+                result.className = 'result error';
+                result.textContent = `❌ Ошибка: ${error.message}`;
+            }
+        }
+
+        async function testValidation() {
+            const result = document.getElementById('result2');
+            result.style.display = 'block';
+            result.textContent = '⏳ Выполняется тест...';
+            result.className = 'result info';
+
+            try {
+                const response = await fetch(AUTH_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        action: 'register',
+                        email: 'invalid-email',
+                        password: 'test',
+                        name: 'Test'
+                    })
+                });
+
+                const data = await response.json();
+                
+                if (response.status === 400) {
+                    result.className = 'result success';
+                    result.textContent = `✅ УСПЕХ! Валидация email работает!\n\nСтатус: ${response.status}\nОшибка: ${data.error}`;
+                } else {
+                    result.className = 'result error';
+                    result.textContent = `⚠️ Валидация не сработала\n\nСтатус: ${response.status}\nОтвет: ${JSON.stringify(data, null, 2)}`;
+                }
+            } catch (error) {
+                result.className = 'result error';
+                result.textContent = `❌ Ошибка: ${error.message}`;
+            }
+        }
+
+        async function testRateLimit() {
+            const result = document.getElementById('result3');
+            result.style.display = 'block';
+            result.textContent = '⏳ Отправляю 6 запросов подряд...\n';
+            result.className = 'result info';
+
+            const testData = {
+                action: 'register',
+                email: `rate_test_${Date.now()}@example.com`,
+                password: 'test123',
+                name: 'Rate Test'
+            };
+
+            let log = '';
+            for (let i = 1; i <= 6; i++) {
+                try {
+                    const response = await fetch(AUTH_URL, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(testData)
+                    });
+
+                    const data = await response.json();
+                    
+                    if (response.status === 429) {
+                        const retryAfter = response.headers.get('Retry-After');
+                        result.className = 'result success';
+                        log += `\n✅ Rate limiting сработал на запросе #${i}!\nRetry-After: ${retryAfter} секунд`;
+                        result.textContent = log;
+                        break;
+                    } else {
+                        log += `\nЗапрос #${i}: статус ${response.status}`;
+                        result.textContent = log;
+                    }
+                } catch (error) {
+                    log += `\n❌ Ошибка на запросе #${i}: ${error.message}`;
+                    result.className = 'result error';
+                    result.textContent = log;
+                    break;
+                }
+            }
+        }
+
+        async function testLogin() {
+            const result = document.getElementById('result4');
+            result.style.display = 'block';
+            result.className = 'result info';
+
+            if (!window.testEmail) {
+                result.textContent = '⚠️ Сначала выполните Тест #1 (регистрацию)';
+                return;
+            }
+
+            result.textContent = '⏳ Выполняется тест входа...';
+
+            try {
+                const response = await fetch(AUTH_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        action: 'login',
+                        email: window.testEmail,
+                        password: 'testPassword123'
+                    })
+                });
+
+                const data = await response.json();
+                
+                if (response.status === 200 && data.token) {
+                    result.className = 'result success';
+                    result.textContent = `✅ УСПЕХ! Вход работает!\n\nСтатус: ${response.status}\nПолучен JWT токен: ${data.token.substring(0, 50)}...\nUser: ${data.user.name} (${data.user.email})`;
+                } else {
+                    result.className = 'result error';
+                    result.textContent = `⚠️ Вход не работает\n\nСтатус: ${response.status}\nОтвет: ${JSON.stringify(data, null, 2)}`;
+                }
+            } catch (error) {
+                result.className = 'result error';
+                result.textContent = `❌ Ошибка: ${error.message}`;
+            }
+        }
+    </script>
+</body>
+</html>
