@@ -4,6 +4,8 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import Icon from '@/components/ui/icon';
 import { Alert, AlertDescription } from '@/components/ui/alert';
+import { useToast } from '@/hooks/use-toast';
+import func2url from '../../../backend/func2url.json';
 
 interface SecretStatus {
   name: string;
@@ -13,6 +15,9 @@ interface SecretStatus {
 }
 
 const SystemHealthTab = () => {
+  const { toast } = useToast();
+  const [notificationsEnabled, setNotificationsEnabled] = useState(false);
+  const [isSending, setIsSending] = useState(false);
   const [secrets, setSecrets] = useState<SecretStatus[]>([
     { name: 'VK_APP_ID', description: 'VK авторизация', status: 'checking', category: 'auth' },
     { name: 'VK_SECRET_KEY', description: 'VK защищённый ключ', status: 'checking', category: 'auth' },
@@ -47,6 +52,46 @@ const SystemHealthTab = () => {
       ...s,
       status: Math.random() > 0.3 ? 'configured' : 'missing'
     })));
+    
+    // Проверяем, нужно ли отправить уведомление
+    const missing = secrets.filter(s => s.status === 'missing');
+    if (notificationsEnabled && missing.length > 0) {
+      await sendAlertEmail('missing_secrets', {
+        missing_secrets: missing.map(s => s.name)
+      });
+    }
+  };
+  
+  const sendAlertEmail = async (type: string, data: Record<string, unknown>) => {
+    setIsSending(true);
+    try {
+      const monitorUrl = func2url['system-monitor' as keyof typeof func2url];
+      const response = await fetch(monitorUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ type, data })
+      });
+      
+      if (response.ok) {
+        toast({
+          title: '✅ Уведомление отправлено',
+          description: 'Email с информацией о проблемах отправлен администратору',
+        });
+        return true;
+      }
+    } catch (error) {
+      console.error('Failed to send alert:', error);
+    } finally {
+      setIsSending(false);
+    }
+    return false;
+  };
+  
+  const testNotification = async () => {
+    await sendAlertEmail('function_error', {
+      function: 'test',
+      error: 'Тестовое уведомление из панели мониторинга'
+    });
   };
 
   const categoryIcons = {
@@ -165,28 +210,74 @@ const SystemHealthTab = () => {
         </Card>
       </div>
 
-      <Card className="border-green/20">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Icon name="Activity" size={20} className="text-green" />
-            Быстрые действия
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="flex flex-wrap gap-3">
-          <Button variant="outline" onClick={checkSystemHealth}>
-            <Icon name="RefreshCw" size={16} className="mr-2" />
-            Обновить статус
-          </Button>
-          <Button variant="outline" onClick={() => window.open('https://docs.poehali.dev/deploy/publish', '_blank')}>
-            <Icon name="BookOpen" size={16} className="mr-2" />
-            Инструкции
-          </Button>
-          <Button variant="outline" onClick={() => window.open('/SETUP.md', '_blank')}>
-            <Icon name="FileText" size={16} className="mr-2" />
-            SETUP.md
-          </Button>
-        </CardContent>
-      </Card>
+      <div className="grid gap-6 md:grid-cols-2">
+        <Card className="border-green/20">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Icon name="Activity" size={20} className="text-green" />
+              Быстрые действия
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="flex flex-wrap gap-3">
+            <Button variant="outline" onClick={checkSystemHealth}>
+              <Icon name="RefreshCw" size={16} className="mr-2" />
+              Обновить статус
+            </Button>
+            <Button variant="outline" onClick={() => window.open('https://docs.poehali.dev/deploy/publish', '_blank')}>
+              <Icon name="BookOpen" size={16} className="mr-2" />
+              Инструкции
+            </Button>
+            <Button variant="outline" onClick={() => window.open('/SETUP.md', '_blank')}>
+              <Icon name="FileText" size={16} className="mr-2" />
+              SETUP.md
+            </Button>
+          </CardContent>
+        </Card>
+
+        <Card className="border-green/20">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Icon name="Bell" size={20} className="text-green" />
+              Email-уведомления
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="flex items-center justify-between">
+              <div className="space-y-1">
+                <p className="text-sm font-medium">Автоуведомления</p>
+                <p className="text-xs text-muted-foreground">
+                  Получать письма о проблемах
+                </p>
+              </div>
+              <Button
+                variant={notificationsEnabled ? "default" : "outline"}
+                size="sm"
+                onClick={() => setNotificationsEnabled(!notificationsEnabled)}
+              >
+                {notificationsEnabled ? 'Включено' : 'Выключено'}
+              </Button>
+            </div>
+            <Button 
+              variant="outline" 
+              className="w-full" 
+              onClick={testNotification}
+              disabled={isSending}
+            >
+              {isSending ? (
+                <>
+                  <Icon name="Loader2" size={16} className="mr-2 animate-spin" />
+                  Отправка...
+                </>
+              ) : (
+                <>
+                  <Icon name="Send" size={16} className="mr-2" />
+                  Отправить тестовое письмо
+                </>
+              )}
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
 };

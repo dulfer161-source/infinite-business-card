@@ -1,0 +1,48 @@
+{
+  "tests": [
+    {
+      "name": "Health check",
+      "method": "GET",
+      "path": "/",
+      "expectedStatus": 200,
+      "expectedBody": {
+        "status": "healthy",
+        "service": "system-monitor"
+      },
+      "bodyMatcher": "partial"
+    },
+    {
+      "name": "Send function error alert",
+      "method": "POST",
+      "path": "/",
+      "body": {
+        "type": "function_error",
+        "data": {
+          "function": "payment",
+          "error": "Connection timeout"
+        }
+      },
+      "expectedStatus": 200,
+      "expectedBody": {
+        "success": true
+      },
+      "bodyMatcher": "partial"
+    },
+    {
+      "name": "Send missing secrets alert",
+      "method": "POST",
+      "path": "/",
+      "body": {
+        "type": "missing_secrets",
+        "data": {
+          "missing_secrets": ["VK_APP_ID", "YOOKASSA_SHOP_ID"]
+        }
+      },
+      "expectedStatus": 200,
+      "expectedBody": {
+        "success": true
+      },
+      "bodyMatcher": "partial"
+    }
+  ]
+}
