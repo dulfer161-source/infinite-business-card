@@ -154,6 +154,37 @@ const MyCardsTab = () => {
     }
   };
 
+  const handleDuplicateCard = async (card: CardData) => {
+    try {
+      const authToken = localStorage.getItem('auth_token');
+      const response = await fetch('https://functions.poehali.dev/1b1c5f28-bcb7-48d0-9437-b01ccc89239f', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Auth-Token': authToken || ''
+        },
+        body: JSON.stringify({
+          name: `${card.name} (копия)`,
+          position: card.position || '',
+          company: card.company || '',
+          phone: card.phone || '',
+          email: card.email || '',
+          website: card.website || '',
+          description: card.description || ''
+        })
+      });
+
+      if (response.ok) {
+        toast.success('Визитка продублирована!');
+        loadCards();
+      } else {
+        throw new Error('Failed to duplicate');
+      }
+    } catch (error) {
+      toast.error('Не удалось дублировать визитку');
+    }
+  };
+
   if (loading) {
     return (
       <div className="flex items-center justify-center py-12">
@@ -244,6 +275,15 @@ const MyCardsTab = () => {
                   >
                     <Icon name="Copy" size={14} className="mr-2" />
                     Скопировать ссылку
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => handleDuplicateCard(card)}
+                    className="w-full text-gold hover:text-gold hover:bg-gold/10"
+                  >
+                    <Icon name="CopyPlus" size={14} className="mr-2" />
+                    Дублировать
                   </Button>
                   <Button
                     variant="ghost"
