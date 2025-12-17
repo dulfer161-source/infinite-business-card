@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Security Monitor Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .dashboard {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+        }
+        
+        .header h1 {
+            color: #1e3c72;
+            margin-bottom: 10px;
+            font-size: 32px;
+        }
+        
+        .header p {
+            color: #666;
+            font-size: 16px;
+        }
+        
+        .controls {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+        
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+        }
+        
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        button.secondary {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        }
+        
+        .score-card {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            text-align: center;
+        }
+        
+        .score-value {
+            font-size: 72px;
+            font-weight: bold;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin: 20px 0;
+        }
+        
+        .score-status {
+            font-size: 24px;
+            font-weight: 600;
+            margin-top: 10px;
+        }
+        
+        .score-status.excellent { color: #28a745; }
+        .score-status.good { color: #17a2b8; }
+        .score-status.needs_improvement { color: #ffc107; }
+        .score-status.critical { color: #dc3545; }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        }
+        
+        .stat-label {
+            font-size: 12px;
+            text-transform: uppercase;
+            color: #999;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+        
+        .stat-value {
+            font-size: 36px;
+            font-weight: bold;
+            color: #1e3c72;
+        }
+        
+        .functions-grid {
+            display: grid;
+            gap: 20px;
+        }
+        
+        .function-card {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        }
+        
+        .function-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+        
+        .function-name {
+            font-size: 20px;
+            font-weight: 700;
+            color: #1e3c72;
+        }
+        
+        .function-score {
+            font-size: 18px;
+            font-weight: 600;
+            padding: 8px 16px;
+            border-radius: 20px;
+        }
+        
+        .function-score.passed {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .function-score.warning {
+            background: #fff3cd;
+            color: #856404;
+        }
+        
+        .function-score.failed {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        
+        .checks-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        
+        .check-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            padding: 12px;
+            border-radius: 8px;
+            background: #f8f9fa;
+        }
+        
+        .check-icon {
+            font-size: 20px;
+            flex-shrink: 0;
+        }
+        
+        .check-content {
+            flex: 1;
+        }
+        
+        .check-name {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 4px;
+        }
+        
+        .check-message {
+            font-size: 14px;
+            color: #666;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: white;
+            font-size: 18px;
+        }
+        
+        .spinner {
+            border: 4px solid rgba(255,255,255,0.3);
+            border-top: 4px solid white;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .timestamp {
+            text-align: center;
+            color: white;
+            margin-top: 20px;
+            font-size: 14px;
+            opacity: 0.8;
+        }
+        
+        .auto-refresh {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #666;
+            font-size: 14px;
+        }
+        
+        .toggle-switch {
+            position: relative;
+            width: 50px;
+            height: 24px;
+        }
+        
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 24px;
+        }
+        
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        
+        input:checked + .toggle-slider {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        
+        input:checked + .toggle-slider:before {
+            transform: translateX(26px);
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard">
+        <div class="header">
+            <h1>🔐 Security Monitor Dashboard</h1>
+            <p>Автоматический мониторинг безопасности всех backend функций</p>
+            <div class="controls">
+                <button onclick="runCheck()" id="checkBtn">
+                    🔄 Запустить проверку
+                </button>
+                <button onclick="exportReport()" id="exportBtn" class="secondary">
+                    📥 Экспорт отчёта
+                </button>
+                <div class="auto-refresh">
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="autoRefresh" onchange="toggleAutoRefresh()">
+                        <span class="toggle-slider"></span>
+                    </label>
+                    <span>Авто-обновление (60 сек)</span>
+                </div>
+            </div>
+        </div>
+
+        <div id="loading" class="loading" style="display:none;">
+            <div class="spinner"></div>
+            <p>Проверка безопасности...</p>
+        </div>
+
+        <div id="results" style="display:none;">
+            <div class="score-card">
+                <div>Общий уровень безопасности</div>
+                <div class="score-value" id="scoreValue">-</div>
+                <div class="score-status" id="scoreStatus">-</div>
+            </div>
+
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-label">Всего проверок</div>
+                    <div class="stat-value" id="totalChecks">0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Успешно ✅</div>
+                    <div class="stat-value" id="passedChecks" style="color: #28a745;">0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Предупреждения ⚠️</div>
+                    <div class="stat-value" id="warningChecks" style="color: #ffc107;">0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Ошибки ❌</div>
+                    <div class="stat-value" id="failedChecks" style="color: #dc3545;">0</div>
+                </div>
+            </div>
+
+            <div class="functions-grid" id="functionsGrid">
+                <!-- Функции загрузятся динамически -->
+            </div>
+        </div>
+
+        <div class="timestamp" id="timestamp"></div>
+    </div>
+
+    <script>
+        const API_URL = 'https://functions.poehali.dev/89e7e273-4388-4149-8e3e-7a1caf667d5b';
+        let autoRefreshInterval = null;
+        let currentReport = null;
+
+        async function runCheck() {
+            const checkBtn = document.getElementById('checkBtn');
+            const loading = document.getElementById('loading');
+            const results = document.getElementById('results');
+            
+            checkBtn.disabled = true;
+            loading.style.display = 'block';
+            results.style.display = 'none';
+
+            try {
+                const response = await fetch(API_URL);
+                const data = await response.json();
+                currentReport = data;
+                
+                displayResults(data);
+                
+                loading.style.display = 'none';
+                results.style.display = 'block';
+                
+                const timestamp = new Date(data.timestamp).toLocaleString('ru-RU');
+                document.getElementById('timestamp').textContent = `Последняя проверка: ${timestamp}`;
+            } catch (error) {
+                loading.style.display = 'none';
+                alert('Ошибка при проверке: ' + error.message);
+            } finally {
+                checkBtn.disabled = false;
+            }
+        }
+
+        function displayResults(data) {
+            // Обновляем общий счёт
+            document.getElementById('scoreValue').textContent = data.security_score + '%';
+            
+            const statusElement = document.getElementById('scoreStatus');
+            const statusTexts = {
+                'excellent': '🌟 Отлично',
+                'good': '✅ Хорошо',
+                'needs_improvement': '⚠️ Требует улучшений',
+                'critical': '❌ Критично'
+            };
+            statusElement.textContent = statusTexts[data.status] || data.status;
+            statusElement.className = 'score-status ' + data.status;
+
+            // Обновляем статистику
+            document.getElementById('totalChecks').textContent = data.total_checks;
+            document.getElementById('passedChecks').textContent = data.passed;
+            document.getElementById('warningChecks').textContent = data.warnings;
+            document.getElementById('failedChecks').textContent = data.failed;
+
+            // Отображаем функции
+            const functionsGrid = document.getElementById('functionsGrid');
+            functionsGrid.innerHTML = '';
+
+            for (const [name, func] of Object.entries(data.functions)) {
+                const card = createFunctionCard(name, func);
+                functionsGrid.appendChild(card);
+            }
+        }
+
+        function createFunctionCard(name, func) {
+            const card = document.createElement('div');
+            card.className = 'function-card';
+
+            const scorePercent = func.total_checks > 0 
+                ? Math.round((func.passed / func.total_checks) * 100) 
+                : 0;
+            
+            let scoreClass = 'passed';
+            if (func.failed > 0) scoreClass = 'failed';
+            else if (func.warnings > 0) scoreClass = 'warning';
+
+            card.innerHTML = `
+                <div class="function-header">
+                    <div class="function-name">${name}</div>
+                    <div class="function-score ${scoreClass}">
+                        ${func.passed}/${func.total_checks} (${scorePercent}%)
+                    </div>
+                </div>
+                <div class="checks-list">
+                    ${func.checks.map(check => createCheckItem(check)).join('')}
+                </div>
+            `;
+
+            return card;
+        }
+
+        function createCheckItem(check) {
+            const icons = {
+                'passed': '✅',
+                'warning': '⚠️',
+                'failed': '❌',
+                'error': '🔴'
+            };
+
+            return `
+                <div class="check-item">
+                    <div class="check-icon">${icons[check.status] || '❓'}</div>
+                    <div class="check-content">
+                        <div class="check-name">${check.name}</div>
+                        <div class="check-message">${check.message}</div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function toggleAutoRefresh() {
+            const checkbox = document.getElementById('autoRefresh');
+            
+            if (checkbox.checked) {
+                runCheck();
+                autoRefreshInterval = setInterval(runCheck, 60000);
+            } else {
+                if (autoRefreshInterval) {
+                    clearInterval(autoRefreshInterval);
+                    autoRefreshInterval = null;
+                }
+            }
+        }
+
+        function exportReport() {
+            if (!currentReport) {
+                alert('Сначала запустите проверку');
+                return;
+            }
+
+            const reportText = generateReportText(currentReport);
+            const blob = new Blob([reportText], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `security-report-${new Date().toISOString()}.txt`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
+        function generateReportText(data) {
+            let text = '═══════════════════════════════════════════════════\n';
+            text += '          SECURITY MONITORING REPORT\n';
+            text += '═══════════════════════════════════════════════════\n\n';
+            text += `Timestamp: ${new Date(data.timestamp).toLocaleString('ru-RU')}\n`;
+            text += `Security Score: ${data.security_score}%\n`;
+            text += `Status: ${data.status}\n\n`;
+            text += `Total Checks: ${data.total_checks}\n`;
+            text += `Passed: ${data.passed} ✅\n`;
+            text += `Warnings: ${data.warnings} ⚠️\n`;
+            text += `Failed: ${data.failed} ❌\n\n`;
+            
+            text += '═══════════════════════════════════════════════════\n';
+            text += '                  DETAILED RESULTS\n';
+            text += '═══════════════════════════════════════════════════\n\n';
+
+            for (const [name, func] of Object.entries(data.functions)) {
+                text += `\n▶ ${name.toUpperCase()}\n`;
+                text += `  Score: ${func.passed}/${func.total_checks}\n`;
+                text += `  ───────────────────────────────────────────\n`;
+                
+                for (const check of func.checks) {
+                    const icon = check.status === 'passed' ? '✅' : 
+                                check.status === 'warning' ? '⚠️' : '❌';
+                    text += `  ${icon} ${check.name}\n`;
+                    text += `     ${check.message}\n`;
+                }
+                text += '\n';
+            }
+
+            return text;
+        }
+
+        // Автозапуск при загрузке страницы
+        window.addEventListener('load', runCheck);
+    </script>
+</body>
+</html>

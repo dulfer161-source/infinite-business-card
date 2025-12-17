@@ -1,4 +1,5 @@
 {
+  "security-monitor": "https://functions.poehali.dev/89e7e273-4388-4149-8e3e-7a1caf667d5b",
   "sitemap": "https://functions.poehali.dev/04529237-fe25-4b58-9773-8ac02ad2cd2d",
   "system-monitor": "https://functions.poehali.dev/a937916c-264f-43b2-931a-f8f4f6bb2177",
   "rate-limiter": "https://functions.poehali.dev/37563d95-813f-4205-a309-7fa5f159cd06",

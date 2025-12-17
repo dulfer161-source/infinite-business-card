@@ -1,0 +1,10 @@
+{
+  "tests": [
+    {
+      "name": "Security monitor returns valid report",
+      "method": "GET",
+      "path": "/",
+      "expectedStatus": 200
+    }
+  ]
+}
