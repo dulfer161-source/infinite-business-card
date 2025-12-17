@@ -5,6 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import Icon from '@/components/ui/icon';
 import Logo from './Logo';
 import BusinessCardTab from './dashboard/BusinessCardTab';
+import MyCardsTab from './dashboard/MyCardsTab';
 import EditTab from './dashboard/EditTab';
 import DesignTab from './dashboard/DesignTab';
 import AnalyticsTab from './dashboard/AnalyticsTab';
@@ -108,8 +109,12 @@ const Dashboard = ({ onLogout }: DashboardProps) => {
 
         <ProgressTracker userInfo={userInfo} />
 
-        <Tabs defaultValue="card" className="space-y-6">
+        <Tabs defaultValue="my-cards" className="space-y-6">
           <TabsList className="flex flex-wrap justify-start gap-2 h-auto w-full bg-muted/50 p-2">
+            <TabsTrigger value="my-cards" className="flex-shrink-0">
+              <Icon name="FolderOpen" size={18} />
+              <span className="ml-2">Мои визитки</span>
+            </TabsTrigger>
             <TabsTrigger value="card" className="flex-shrink-0">
               <Icon name="CreditCard" size={18} />
               <span className="ml-2">Визитка</span>
@@ -167,6 +172,10 @@ const Dashboard = ({ onLogout }: DashboardProps) => {
               <span className="ml-2">Система</span>
             </TabsTrigger>
           </TabsList>
+
+          <TabsContent value="my-cards" className="space-y-6">
+            <MyCardsTab />
+          </TabsContent>
 
           <TabsContent value="card" className="space-y-6">
             <BusinessCardTab userInfo={userInfo} />
