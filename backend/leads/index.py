@@ -47,10 +47,10 @@ def handler(event, context):
             'isBase64Encoded': False
         }
     
-    # Rate limiting для публичного создания лидов
+    # Rate limiting для публичного создания лидов (10 запросов за 60 секунд)
     if method == 'POST' and not lead_id:
         ip = event.get('requestContext', {}).get('identity', {}).get('sourceIp', 'unknown')
-        allowed, retry_after = check_rate_limit(f'leads:{ip}', max_req=3, window=60)
+        allowed, retry_after = check_rate_limit(f'leads:{ip}', max_req=10, window=60)
         
         if not allowed:
             return {

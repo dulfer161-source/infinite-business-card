@@ -1,23 +1,18 @@
 {
   "tests": [
     {
-      "name": "Create new lead",
+      "name": "Reject invalid email",
       "method": "POST",
       "body": {
         "card_id": 1,
         "name": "Иван Тестовый",
-        "email": "test@example.com",
+        "email": "invalid-email",
         "phone": "+7 999 123-45-67",
-        "message": "Хочу узнать подробнее о ваших услугах",
-        "source": "direct"
+        "message": "Test message"
       },
-      "expectedStatus": 200,
+      "expectedStatus": 400,
       "expectedBody": {
-        "success": true,
-        "lead": {
-          "name": "string",
-          "email": "string"
-        }
+        "error": "string"
       },
       "bodyMatcher": "partial"
     }

@@ -55,9 +55,9 @@ def handler(event, context):
             'isBase64Encoded': False
         }
     
-    # Rate limiting по IP
+    # Rate limiting по IP (10 запросов за 60 секунд для тестирования)
     ip = event.get('requestContext', {}).get('identity', {}).get('sourceIp', 'unknown')
-    allowed, retry_after = check_rate_limit(f'auth:{ip}', max_req=5, window=60)
+    allowed, retry_after = check_rate_limit(f'auth:{ip}', max_req=10, window=60)
     
     if not allowed:
         return {
