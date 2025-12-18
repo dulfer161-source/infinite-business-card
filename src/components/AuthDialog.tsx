@@ -216,17 +216,30 @@ const AuthDialog = ({ open, onOpenChange, onSuccess }: AuthDialogProps) => {
                 </div>
               </div>
 
-              <Button
-                type="button"
-                variant="outline"
-                className="w-full border-[#0077FF] text-[#0077FF] hover:bg-[#0077FF] hover:text-white transition-colors"
-                onClick={handleVKAuth}
-              >
+              <div className="space-y-2">
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="w-full border-[#0077FF] text-[#0077FF] hover:bg-[#0077FF] hover:text-white transition-colors"
+                  onClick={handleVKAuth}
+                >
                 <svg className="mr-2" width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
                   <path d="M15.07 2H8.93C3.33 2 2 3.33 2 8.93v6.14C2 20.67 3.33 22 8.93 22h6.14c5.6 0 6.93-1.33 6.93-6.93V8.93C22 3.33 20.67 2 15.07 2zm3.45 14.22c-.63.47-1.29.7-1.97.7-.53 0-1.08-.14-1.65-.43-.97-.49-1.95-1.47-3.11-3.07-.54-.75-1.03-1.3-1.48-1.64-.41-.31-.78-.43-1.15-.38-.16.02-.37.14-.6.34l-.01 3.26c0 .45-.36.81-.81.81H6.67c-1.41 0-2.73-.53-3.82-1.53-1.3-1.19-2.47-2.99-3.48-5.35C-.99 6.81-.32 5.32.4 4.28c.41-.59 1.03-.91 1.74-.91h2.38c.74 0 1.36.54 1.47 1.27.22 1.45.68 2.78 1.38 3.95.18.3.4.43.67.43.09 0 .18-.01.27-.04.43-.14.66-.54.66-1.17V5.33c0-.6-.12-1.13-.37-1.58-.32-.58-.86-.9-1.53-.9h-.48c-.3 0-.55-.24-.55-.55 0-.3.25-.55.55-.55h.48c1.04 0 1.91.52 2.46 1.46.35.6.52 1.33.52 2.12v2.48c0 .97.43 1.54 1.17 1.54.25 0 .51-.07.79-.21.87-.43 1.63-1.45 2.52-3.4.59-1.29.94-2.43 1.05-3.39.08-.68.66-1.18 1.35-1.18h2.34c.17 0 .33.03.48.09.73.29 1.07 1.03.82 1.85-.44 1.43-1.14 2.77-2.09 3.97-.89 1.13-1.46 1.86-1.46 2.49 0 .43.2.83.65 1.32 1.39 1.51 2.3 2.59 2.77 3.29.49.73.62 1.39.38 1.96-.24.58-.77.92-1.46.92h-2.51c-.64 0-1.2-.31-1.58-.86-.38-.56-.94-1.36-1.69-2.41-.3-.42-.55-.68-.77-.81z"/>
                 </svg>
-                Войти через VK
-              </Button>
+                  Войти через VK
+                </Button>
+
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  className="w-full text-xs text-muted-foreground hover:text-foreground"
+                  onClick={() => window.open('/vk-diagnostics', '_blank')}
+                >
+                  <Icon name="Settings" className="mr-1" size={14} />
+                  VK не работает? Открыть диагностику
+                </Button>
+              </div>
 
               <Button
                 type="button"
