@@ -3,26 +3,25 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { lazy, Suspense } from "react";
+import { Suspense } from "react";
 import { HelmetProvider } from "react-helmet-async";
 import InstallPrompt from "./components/InstallPrompt";
 import ErrorBoundary from "./components/ErrorBoundary";
 import PageLoader from "./components/PageLoader";
+import Index from "./pages/Index";
+import PublicCard from "./pages/PublicCard";
+import PaymentSuccess from "./pages/PaymentSuccess";
+import PaymentError from "./pages/PaymentError";
+import YooKassaSetup from "./pages/YooKassaSetup";
+import TestAI from "./pages/TestAI";
+import VKCallback from "./pages/VKCallback";
+import VKDiagnostics from "./pages/VKDiagnostics";
+import NotFound from "./pages/NotFound";
 
 const future = {
   v7_startTransition: true,
   v7_relativeSplatPath: true,
 };
-
-const Index = lazy(() => import("./pages/Index"));
-const PublicCard = lazy(() => import("./pages/PublicCard"));
-const PaymentSuccess = lazy(() => import("./pages/PaymentSuccess"));
-const PaymentError = lazy(() => import("./pages/PaymentError"));
-const YooKassaSetup = lazy(() => import("./pages/YooKassaSetup"));
-const TestAI = lazy(() => import("./pages/TestAI"));
-const VKCallback = lazy(() => import("./pages/VKCallback"));
-const VKDiagnostics = lazy(() => import("./pages/VKDiagnostics"));
-const NotFound = lazy(() => import("./pages/NotFound"));
 
 const queryClient = new QueryClient();
 
