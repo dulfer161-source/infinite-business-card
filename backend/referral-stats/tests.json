@@ -1,0 +1,25 @@
+{
+  "tests": [
+    {
+      "name": "Test unauthorized access",
+      "method": "GET",
+      "path": "/",
+      "expectedStatus": 401,
+      "expectedBody": {
+        "error": "Unauthorized"
+      }
+    },
+    {
+      "name": "Test invalid token",
+      "method": "GET",
+      "path": "/",
+      "headers": {
+        "X-Auth-Token": "invalid_token_123"
+      },
+      "expectedStatus": 401,
+      "expectedBody": {
+        "error": "Invalid token"
+      }
+    }
+  ]
+}

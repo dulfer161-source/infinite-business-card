@@ -85,6 +85,7 @@ def handler(event, context):
             email = body.get('email', '')
             password = body.get('password', '')
             name = body.get('name', '')
+            referral_code = body.get('referral_code', '')
             
             # Валидация email
             if not email or len(email) > 255:
@@ -122,11 +123,27 @@ def handler(event, context):
                     'isBase64Encoded': False
                 }
             
+            # Проверка реферального кода (если указан)
+            referred_by_id = None
+            if referral_code:
+                cur.execute(
+                    "SELECT id FROM t_p18253922_infinite_business_ca.users WHERE referral_code = %s",
+                    (referral_code.upper(),)
+                )
+                referrer = cur.fetchone()
+                if referrer:
+                    referred_by_id = referrer[0]
+            
             password_hash = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
             
+            # Генерируем уникальный реферальный код для нового пользователя
+            import random
+            import string
+            new_referral_code = ''.join(random.choices(string.ascii_uppercase + string.digits, k=8))
+            
             cur.execute(
-                "INSERT INTO t_p18253922_infinite_business_ca.users (email, password_hash, name) VALUES (%s, %s, %s) RETURNING id, email, name",
-                (email, password_hash, name)
+                "INSERT INTO t_p18253922_infinite_business_ca.users (email, password_hash, name, referral_code, referred_by) VALUES (%s, %s, %s, %s, %s) RETURNING id, email, name",
+                (email, password_hash, name, new_referral_code, referred_by_id)
             )
             result = cur.fetchone()
             user = {'id': result[0], 'email': result[1], 'name': result[2]}

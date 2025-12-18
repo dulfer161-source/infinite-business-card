@@ -23,9 +23,18 @@ const AuthDialog = ({ open, onOpenChange, onSuccess }: AuthDialogProps) => {
   const [privacyOpen, setPrivacyOpen] = useState(false);
   const [agreedToPolicy, setAgreedToPolicy] = useState(false);
   const [demoAccountsOpen, setDemoAccountsOpen] = useState(false);
+
+  // Check for referral code in URL
+  useState(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const refCode = urlParams.get('ref');
+    if (refCode) {
+      setRegisterData(prev => ({ ...prev, referralCode: refCode }));
+    }
+  });
   
   const [loginData, setLoginData] = useState({ email: '', password: '' });
-  const [registerData, setRegisterData] = useState({ email: '', password: '', name: '' });
+  const [registerData, setRegisterData] = useState({ email: '', password: '', name: '', referralCode: '' });
 
   const handleDemoAccountSelect = async (account: any) => {
     setLoginData({ email: account.email, password: account.password });
@@ -88,7 +97,7 @@ const AuthDialog = ({ open, onOpenChange, onSuccess }: AuthDialogProps) => {
     setIsLoading(true);
 
     try {
-      await api.register(registerData.email, registerData.password, registerData.name);
+      await api.register(registerData.email, registerData.password, registerData.name, registerData.referralCode);
       toast({
         title: 'Регистрация успешна',
         description: 'Ваш аккаунт создан! Добро пожаловать!',
@@ -247,6 +256,16 @@ const AuthDialog = ({ open, onOpenChange, onSuccess }: AuthDialogProps) => {
                   value={registerData.password}
                   onChange={(e) => setRegisterData({ ...registerData, password: e.target.value })}
                   required
+                />
+              </div>
+              <div>
+                <Label htmlFor="register-referral">Реферальный код (необязательно)</Label>
+                <Input
+                  id="register-referral"
+                  placeholder="ABC12345"
+                  value={registerData.referralCode}
+                  onChange={(e) => setRegisterData({ ...registerData, referralCode: e.target.value.toUpperCase() })}
+                  maxLength={8}
                 />
               </div>
               

@@ -61,11 +61,11 @@ class ApiService {
     return this.userId ? { 'X-User-Id': this.userId } : {};
   }
 
-  async register(email: string, password: string, name: string): Promise<{ token: string; user: User }> {
+  async register(email: string, password: string, name: string, referralCode?: string): Promise<{ token: string; user: User }> {
     const response = await fetch(API_URLS.auth, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ action: 'register', email, password, name }),
+      body: JSON.stringify({ action: 'register', email, password, name, referral_code: referralCode || '' }),
     });
 
     if (!response.ok) {
