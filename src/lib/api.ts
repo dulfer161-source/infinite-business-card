@@ -39,6 +39,30 @@ class ApiService {
     }
   }
 
+  private async fetchWithRetry(url: string, options: RequestInit, maxRetries = 3): Promise<Response> {
+    let lastError: Error | null = null;
+    
+    for (let attempt = 0; attempt < maxRetries; attempt++) {
+      try {
+        const response = await fetch(url, options);
+        
+        if (response.status === 503 && attempt < maxRetries - 1) {
+          await new Promise(resolve => setTimeout(resolve, 1000 * (attempt + 1)));
+          continue;
+        }
+        
+        return response;
+      } catch (error) {
+        lastError = error as Error;
+        if (attempt < maxRetries - 1) {
+          await new Promise(resolve => setTimeout(resolve, 1000 * (attempt + 1)));
+        }
+      }
+    }
+    
+    throw lastError || new Error('Failed to fetch after retries');
+  }
+
   setAuth(token: string, userId: number) {
     this.token = token;
     this.userId = userId.toString();
@@ -62,7 +86,7 @@ class ApiService {
   }
 
   async register(email: string, password: string, name: string, referralCode?: string): Promise<{ token: string; user: User }> {
-    const response = await fetch(API_URLS.auth, {
+    const response = await this.fetchWithRetry(API_URLS.auth, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ action: 'register', email, password, name, referral_code: referralCode || '' }),
@@ -76,26 +100,11 @@ class ApiService {
     const data = await response.json();
     this.setAuth(data.token, data.user.id);
     
-    // Send welcome email
-    try {
-      await fetch('https://functions.poehali.dev/74c49dcb-78dd-46f7-9f32-46f1dffa39be/send', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          to_email: email,
-          subject: 'Добро пожаловать в visitka.site!',
-          type: 'welcome'
-        })
-      });
-    } catch (e) {
-      console.error('Failed to send welcome email:', e);
-    }
-    
     return data;
   }
 
   async login(email: string, password: string): Promise<{ token: string; user: User }> {
-    const response = await fetch(API_URLS.auth, {
+    const response = await this.fetchWithRetry(API_URLS.auth, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ action: 'login', email, password }),
@@ -112,7 +121,7 @@ class ApiService {
   }
 
   async getCards(): Promise<BusinessCard[]> {
-    const response = await fetch(API_URLS.cards, {
+    const response = await this.fetchWithRetry(API_URLS.cards, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -129,7 +138,7 @@ class ApiService {
   }
 
   async createCard(cardData: Partial<BusinessCard>): Promise<BusinessCard> {
-    const response = await fetch(API_URLS.cards, {
+    const response = await this.fetchWithRetry(API_URLS.cards, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -147,7 +156,7 @@ class ApiService {
   }
 
   async updateCard(cardData: Partial<BusinessCard> & { id: number }): Promise<BusinessCard> {
-    const response = await fetch(API_URLS.cards, {
+    const response = await this.fetchWithRetry(API_URLS.cards, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
@@ -165,7 +174,7 @@ class ApiService {
   }
 
   async generateImage(prompt: string): Promise<{ image_url: string; prompt: string }> {
-    const response = await fetch(API_URLS.aiGenerate, {
+    const response = await this.fetchWithRetry(API_URLS.aiGenerate, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -183,7 +192,7 @@ class ApiService {
   }
 
   async createPayment(amount: number, paymentType: string, returnUrl?: string): Promise<{ payment: any; confirmation_url: string }> {
-    const response = await fetch(API_URLS.payments, {
+    const response = await this.fetchWithRetry(API_URLS.payments, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
