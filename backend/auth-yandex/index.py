@@ -140,10 +140,10 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             cur = conn.cursor()
             
             try:
-                # Ищем пользователя по yandex_id
+                # Ищем пользователя по yandex_id (Simple Query - без параметров!)
+                yandex_id_escaped = str(yandex_id).replace("'", "''")
                 cur.execute(
-                    "SELECT id, email, name FROM t_p18253922_infinite_business_ca.users WHERE yandex_id = %s",
-                    (str(yandex_id),)
+                    f"SELECT id, email, name FROM t_p18253922_infinite_business_ca.users WHERE yandex_id = '{yandex_id_escaped}'"
                 )
                 user_row = cur.fetchone()
                 
@@ -155,20 +155,22 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                     import string
                     new_referral_code = ''.join(random.choices(string.ascii_uppercase + string.digits, k=8))
                     
+                    user_email = email or f'yandex_{yandex_id}@temp.local'
+                    user_name_escaped = name.replace("'", "''")
+                    user_email_escaped = user_email.replace("'", "''")
+                    
                     cur.execute(
-                        """INSERT INTO t_p18253922_infinite_business_ca.users 
+                        f"""INSERT INTO t_p18253922_infinite_business_ca.users 
                         (email, name, yandex_id, referral_code) 
-                        VALUES (%s, %s, %s, %s) 
-                        RETURNING id, email, name""",
-                        (email or f'yandex_{yandex_id}@temp.local', name, str(yandex_id), new_referral_code)
+                        VALUES ('{user_email_escaped}', '{user_name_escaped}', '{yandex_id_escaped}', '{new_referral_code}') 
+                        RETURNING id, email, name"""
                     )
                     user_row = cur.fetchone()
                     user_id, user_email, user_name = user_row
                     
                     # Добавляем бесплатную подписку
                     cur.execute(
-                        "INSERT INTO t_p18253922_infinite_business_ca.user_subscriptions (user_id, plan_id, status) VALUES (%s, %s, %s)",
-                        (user_id, 1, 'active')
+                        f"INSERT INTO t_p18253922_infinite_business_ca.user_subscriptions (user_id, plan_id, status) VALUES ({user_id}, 1, 'active')"
                     )
                 
                 conn.commit()
