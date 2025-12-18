@@ -147,6 +147,56 @@ const AuthDialog = ({ open, onOpenChange, onSuccess }: AuthDialogProps) => {
     }
   };
 
+  const handleGoogleAuth = async () => {
+    try {
+      const redirectUri = window.location.origin + '/auth/google';
+      const response = await fetch(`https://functions.poehali.dev/2faff2e2-9012-406b-bd38-07f4be72099b?action=login&redirect_uri=${encodeURIComponent(redirectUri)}`);
+      
+      if (!response.ok) {
+        throw new Error('Ошибка подключения к Google');
+      }
+      
+      const data = await response.json();
+      if (data.auth_url) {
+        window.location.href = data.auth_url;
+      }
+    } catch (error: any) {
+      toast({
+        title: 'Ошибка',
+        description: error.message || 'Не удалось подключиться к Google',
+        variant: 'destructive',
+      });
+    }
+  };
+
+  const handleTelegramAuth = (userData: any) => {
+    fetch('https://functions.poehali.dev/1f1f10e9-7be0-4c16-91b6-f53673e8b2ea', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(userData)
+    })
+    .then(res => res.json())
+    .then(data => {
+      if (data.token) {
+        localStorage.setItem('token', data.token);
+        localStorage.setItem('user', JSON.stringify(data.user));
+        toast({
+          title: 'Вход выполнен',
+          description: `Добро пожаловать, ${data.user.name}!`,
+        });
+        onSuccess();
+        onOpenChange(false);
+      }
+    })
+    .catch(error => {
+      toast({
+        title: 'Ошибка',
+        description: 'Не удалось войти через Telegram',
+        variant: 'destructive',
+      });
+    });
+  };
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-md">
@@ -245,7 +295,7 @@ const AuthDialog = ({ open, onOpenChange, onSuccess }: AuthDialogProps) => {
                 type="button"
                 variant="outline"
                 className="w-full border-gray-300 text-gray-700 hover:bg-gray-50 transition-colors"
-                onClick={() => console.log('Google auth')}
+                onClick={handleGoogleAuth}
               >
                 <svg className="mr-2" width="18" height="18" viewBox="0 0 24 24">
                   <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
@@ -260,7 +310,7 @@ const AuthDialog = ({ open, onOpenChange, onSuccess }: AuthDialogProps) => {
                 type="button"
                 variant="outline"
                 className="w-full border-[#FFCC00] text-black hover:bg-[#FFCC00] hover:text-black transition-colors"
-                onClick={() => console.log('Yandex auth')}
+                onClick={() => toast({ title: 'Скоро', description: 'Авторизация через Яндекс будет доступна позже' })}
               >
                 <svg className="mr-2" width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
                   <path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.6 0 12 0zm3.9 18.4h-2.6V9.2c0-1.5-.7-2.3-1.9-2.3-1 0-1.7.6-2.1 1.5v9.9H6.8V5.6h2.5v1.5c.7-1 1.8-1.7 3.2-1.7 2.3 0 3.8 1.5 3.8 4.2v8.8z"/>
@@ -272,7 +322,7 @@ const AuthDialog = ({ open, onOpenChange, onSuccess }: AuthDialogProps) => {
                 type="button"
                 variant="outline"
                 className="w-full border-[#229ED9] text-[#229ED9] hover:bg-[#229ED9] hover:text-white transition-colors"
-                onClick={() => console.log('Telegram auth')}
+                onClick={() => toast({ title: 'Telegram Widget', description: 'Для входа через Telegram нужно добавить виджет на сайт. Пока используйте другие методы.' })}
               >
                 <svg className="mr-2" width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
                   <path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.894 8.221l-1.97 9.28c-.145.658-.537.818-1.084.508l-3-2.21-1.446 1.394c-.14.18-.357.295-.6.295-.002 0-.003 0-.005 0l.213-3.054 5.56-5.022c.24-.213-.054-.334-.373-.121l-6.869 4.326-2.96-.924c-.64-.203-.658-.64.135-.954l11.566-4.458c.538-.196 1.006.128.832.941z"/>

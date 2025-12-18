@@ -1,0 +1,14 @@
+{
+  "tests": [
+    {
+      "name": "Get Google auth URL",
+      "method": "GET",
+      "path": "/?action=login&redirect_uri=https://preview--infinite-business-card.poehali.dev/auth/google",
+      "expectedStatus": 200,
+      "expectedBody": {
+        "auth_url": "string"
+      },
+      "bodyMatcher": "partial"
+    }
+  ]
+}

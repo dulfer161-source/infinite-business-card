@@ -1,4 +1,6 @@
 {
+  "auth-google": "https://functions.poehali.dev/2faff2e2-9012-406b-bd38-07f4be72099b",
+  "auth-telegram": "https://functions.poehali.dev/1f1f10e9-7be0-4c16-91b6-f53673e8b2ea",
   "referral-stats": "https://functions.poehali.dev/23b645b0-210f-48d9-8e8f-2fe667959c5a",
   "card-delete": "https://functions.poehali.dev/687d39ad-03bb-4587-a6f7-8eece4855a60",
   "upload-image": "https://functions.poehali.dev/50fdddd4-e611-4c44-a602-fc0d45e26445",
