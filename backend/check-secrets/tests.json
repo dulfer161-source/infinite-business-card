@@ -1,0 +1,15 @@
+{
+  "tests": [
+    {
+      "name": "Проверка секретов",
+      "method": "GET",
+      "path": "/",
+      "expectedStatus": 200,
+      "expectedBody": {
+        "secrets": "object",
+        "summary": "object"
+      },
+      "bodyMatcher": "partial"
+    }
+  ]
+}
