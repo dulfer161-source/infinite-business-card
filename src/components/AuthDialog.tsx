@@ -117,15 +117,31 @@ const AuthDialog = ({ open, onOpenChange, onSuccess }: AuthDialogProps) => {
 
   const handleVKAuth = async () => {
     try {
-      const response = await fetch('https://functions.poehali.dev/74d0ac96-7cc9-4254-86f4-508ca9a70f55?redirect_uri=' + encodeURIComponent(window.location.origin + '/auth/vk'));
-      const data = await response.json();
-      if (data.auth_url) {
-        window.location.href = data.auth_url;
+      const redirectUri = window.location.origin + '/auth/vk';
+      console.log('VK Auth: redirect_uri =', redirectUri);
+      
+      const response = await fetch('https://functions.poehali.dev/74d0ac96-7cc9-4254-86f4-508ca9a70f55?redirect_uri=' + encodeURIComponent(redirectUri));
+      
+      if (!response.ok) {
+        const errorData = await response.json();
+        console.error('VK Auth Error:', errorData);
+        throw new Error(errorData.error || 'Ошибка подключения к VK');
       }
-    } catch (error) {
+      
+      const data = await response.json();
+      console.log('VK Auth response:', data);
+      
+      if (data.auth_url) {
+        console.log('Redirecting to VK:', data.auth_url);
+        window.location.href = data.auth_url;
+      } else {
+        throw new Error('Не получен URL авторизации от VK');
+      }
+    } catch (error: any) {
+      console.error('VK Auth error:', error);
       toast({
         title: 'Ошибка',
-        description: 'Не удалось подключиться к VK',
+        description: error.message || 'Не удалось подключиться к VK',
         variant: 'destructive',
       });
     }

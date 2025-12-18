@@ -31,6 +31,9 @@ const VKCallback = () => {
 
     const handleCallback = async () => {
       try {
+        const redirectUri = window.location.origin + '/auth/vk';
+        console.log('VK Callback: code =', code, 'redirect_uri =', redirectUri);
+        
         const response = await fetch(
           'https://functions.poehali.dev/74d0ac96-7cc9-4254-86f4-508ca9a70f55',
           {
@@ -38,23 +41,33 @@ const VKCallback = () => {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
               code,
-              redirect_uri: window.location.origin + '/auth/vk'
+              redirect_uri: redirectUri
             })
           }
         );
 
+        console.log('VK Callback response status:', response.status);
+
         if (!response.ok) {
-          throw new Error('Ошибка авторизации');
+          const errorData = await response.json();
+          console.error('VK Callback error data:', errorData);
+          throw new Error(errorData.error || 'Ошибка авторизации');
         }
 
         const data = await response.json();
+        console.log('VK Callback data:', data);
 
         if (data.error) {
+          console.error('VK Callback error in response:', data.error);
           throw new Error(data.error);
         }
 
         localStorage.setItem('auth_token', data.token);
+        localStorage.setItem('user_id', data.user.id.toString());
         localStorage.setItem('user', JSON.stringify(data.user));
+        
+        // Синхронизация с ApiService
+        api.setAuth(data.token, data.user.id);
 
         // Показываем разные сообщения для новых и существующих пользователей
         if (data.is_new_user) {
