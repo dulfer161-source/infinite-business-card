@@ -141,13 +141,10 @@ def handler(event, context):
             import string
             new_referral_code = ''.join(random.choices(string.ascii_uppercase + string.digits, k=8))
             
-            # Get next ID from sequence explicitly
-            cur.execute("SELECT nextval('t_p18253922_infinite_business_ca.users_id_seq')")
-            next_id = cur.fetchone()[0]
-            
+            # Insert without specifying id - let DEFAULT handle it
             cur.execute(
-                "INSERT INTO t_p18253922_infinite_business_ca.users (id, email, password_hash, name, referral_code, referred_by) VALUES (%s, %s, %s, %s, %s, %s) RETURNING id, email, name",
-                (next_id, email, password_hash, name, new_referral_code, referred_by_id)
+                "INSERT INTO t_p18253922_infinite_business_ca.users (email, password_hash, name, referral_code, referred_by) VALUES (%s, %s, %s, %s, %s) RETURNING id, email, name",
+                (email, password_hash, name, new_referral_code, referred_by_id)
             )
             result = cur.fetchone()
             user = {'id': result[0], 'email': result[1], 'name': result[2]}
