@@ -22,7 +22,7 @@ def handler(event, context):
             'headers': {
                 'Access-Control-Allow-Origin': '*',
                 'Access-Control-Allow-Methods': 'GET, POST, PUT, OPTIONS',
-                'Access-Control-Allow-Headers': 'Content-Type, X-User-Id',
+                'Access-Control-Allow-Headers': 'Content-Type, X-Auth-Token',
                 'Access-Control-Max-Age': '86400'
             },
             'body': '',
@@ -35,7 +35,7 @@ def handler(event, context):
         
         # Public GET card by ID
         if method == 'GET' and card_id:
-            cur.execute("SELECT * FROM t_p18253922_infinite_business_ca.business_cards WHERE id = %s", (card_id,))
+            cur.execute(f"SELECT * FROM t_p18253922_infinite_business_ca.business_cards WHERE id = {int(card_id)}")
             card = cur.fetchone()
             
             if not card:
@@ -57,20 +57,18 @@ def handler(event, context):
         if method == 'POST' and card_id and '/view' in event.get('url', ''):
             request_ctx = event.get('requestContext', {})
             identity = request_ctx.get('identity', {})
-            source_ip = identity.get('sourceIp', 'unknown')
-            user_agent = identity.get('userAgent', 'unknown')
+            source_ip = identity.get('sourceIp', 'unknown').replace("'", "''")
+            user_agent = identity.get('userAgent', 'unknown').replace("'", "''")
             
             cur.execute(
-                """
+                f"""
                 INSERT INTO t_p18253922_infinite_business_ca.card_views (card_id, viewer_ip, viewer_user_agent)
-                VALUES (%s, %s, %s)
-                """,
-                (card_id, source_ip, user_agent)
+                VALUES ({int(card_id)}, '{source_ip}', '{user_agent}')
+                """
             )
             
             cur.execute(
-                "UPDATE t_p18253922_infinite_business_ca.business_cards SET view_count = view_count + 1 WHERE id = %s",
-                (card_id,)
+                f"UPDATE t_p18253922_infinite_business_ca.business_cards SET view_count = view_count + 1 WHERE id = {int(card_id)}"
             )
             conn.commit()
             
@@ -83,20 +81,33 @@ def handler(event, context):
         
         # All other methods require authentication
         headers = event.get('headers', {})
-        user_id = headers.get('X-User-Id') or headers.get('x-user-id')
+        auth_token = headers.get('X-Auth-Token') or headers.get('x-auth-token')
         
-        if not user_id:
+        if not auth_token:
             return {
                 'statusCode': 401,
                 'headers': {'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json'},
-                'body': json.dumps({'error': 'Unauthorized'}),
+                'body': json.dumps({'error': 'Unauthorized - no token'}),
                 'isBase64Encoded': False
             }
         
+        # Get user_id from token
+        cur.execute(f"SELECT user_id FROM t_p18253922_infinite_business_ca.auth_tokens WHERE token = '{auth_token}' AND expires_at > NOW()")
+        token_row = cur.fetchone()
+        
+        if not token_row:
+            return {
+                'statusCode': 401,
+                'headers': {'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json'},
+                'body': json.dumps({'error': 'Unauthorized - invalid token'}),
+                'isBase64Encoded': False
+            }
+        
+        user_id = token_row['user_id']
+        
         if method == 'GET':
             cur.execute(
-                "SELECT * FROM t_p18253922_infinite_business_ca.business_cards WHERE user_id = %s ORDER BY created_at DESC",
-                (user_id,)
+                f"SELECT * FROM t_p18253922_infinite_business_ca.business_cards WHERE user_id = {int(user_id)} ORDER BY created_at DESC"
             )
             cards = [dict(row) for row in cur.fetchall()]
             
@@ -110,23 +121,21 @@ def handler(event, context):
         elif method == 'POST':
             body = json.loads(event.get('body', '{}'))
             
+            name = body.get('name', '').replace("'", "''")
+            position = body.get('position', '').replace("'", "''")
+            company = body.get('company', '').replace("'", "''")
+            phone = body.get('phone', '').replace("'", "''")
+            email = body.get('email', '').replace("'", "''")
+            website = body.get('website', '').replace("'", "''")
+            description = body.get('description', '').replace("'", "''")
+            
             cur.execute(
-                """
+                f"""
                 INSERT INTO t_p18253922_infinite_business_ca.business_cards 
                 (user_id, name, position, company, phone, email, website, description)
-                VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
+                VALUES ({int(user_id)}, '{name}', '{position}', '{company}', '{phone}', '{email}', '{website}', '{description}')
                 RETURNING *
-                """,
-                (
-                    user_id,
-                    body.get('name'),
-                    body.get('position'),
-                    body.get('company'),
-                    body.get('phone'),
-                    body.get('email'),
-                    body.get('website'),
-                    body.get('description')
-                )
+                """
             )
             card = dict(cur.fetchone())
             conn.commit()
@@ -150,25 +159,22 @@ def handler(event, context):
                     'isBase64Encoded': False
                 }
             
+            name = body.get('name', '').replace("'", "''")
+            position = body.get('position', '').replace("'", "''")
+            company = body.get('company', '').replace("'", "''")
+            phone = body.get('phone', '').replace("'", "''")
+            email = body.get('email', '').replace("'", "''")
+            website = body.get('website', '').replace("'", "''")
+            description = body.get('description', '').replace("'", "''")
+            
             cur.execute(
-                """
+                f"""
                 UPDATE t_p18253922_infinite_business_ca.business_cards 
-                SET name = %s, position = %s, company = %s, phone = %s, 
-                    email = %s, website = %s, description = %s, updated_at = CURRENT_TIMESTAMP
-                WHERE id = %s AND user_id = %s
+                SET name = '{name}', position = '{position}', company = '{company}', phone = '{phone}', 
+                    email = '{email}', website = '{website}', description = '{description}', updated_at = CURRENT_TIMESTAMP
+                WHERE id = {int(card_id)} AND user_id = {int(user_id)}
                 RETURNING *
-                """,
-                (
-                    body.get('name'),
-                    body.get('position'),
-                    body.get('company'),
-                    body.get('phone'),
-                    body.get('email'),
-                    body.get('website'),
-                    body.get('description'),
-                    card_id,
-                    user_id
-                )
+                """
             )
             card = cur.fetchone()
             

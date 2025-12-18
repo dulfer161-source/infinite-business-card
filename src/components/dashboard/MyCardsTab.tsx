@@ -45,11 +45,28 @@ const MyCardsTab = () => {
     loadCards();
   }, []);
 
+  const fetchWithRetry = async (url: string, options: RequestInit, maxRetries = 3): Promise<Response> => {
+    for (let i = 0; i < maxRetries; i++) {
+      try {
+        const response = await fetch(url, options);
+        if (response.status === 503 && i < maxRetries - 1) {
+          await new Promise(resolve => setTimeout(resolve, 1000 * (i + 1)));
+          continue;
+        }
+        return response;
+      } catch (error) {
+        if (i === maxRetries - 1) throw error;
+        await new Promise(resolve => setTimeout(resolve, 1000 * (i + 1)));
+      }
+    }
+    throw new Error('Max retries reached');
+  };
+
   const loadCards = async () => {
     setLoading(true);
     try {
       const authToken = localStorage.getItem('auth_token');
-      const response = await fetch('https://functions.poehali.dev/1b1c5f28-bcb7-48d0-9437-b01ccc89239f', {
+      const response = await fetchWithRetry('https://functions.poehali.dev/1b1c5f28-bcb7-48d0-9437-b01ccc89239f', {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -77,7 +94,7 @@ const MyCardsTab = () => {
     setCreating(true);
     try {
       const authToken = localStorage.getItem('auth_token');
-      const response = await fetch('https://functions.poehali.dev/1b1c5f28-bcb7-48d0-9437-b01ccc89239f', {
+      const response = await fetchWithRetry('https://functions.poehali.dev/1b1c5f28-bcb7-48d0-9437-b01ccc89239f', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -130,7 +147,7 @@ const MyCardsTab = () => {
     setDeleting(true);
     try {
       const authToken = localStorage.getItem('auth_token');
-      const response = await fetch('https://functions.poehali.dev/687d39ad-03bb-4587-a6f7-8eece4855a60', {
+      const response = await fetchWithRetry('https://functions.poehali.dev/687d39ad-03bb-4587-a6f7-8eece4855a60', {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
