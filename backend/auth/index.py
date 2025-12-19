@@ -173,6 +173,14 @@ def handler(event, context):
                 algorithm='HS256'
             )
             
+            # Сохраняем токен в базу для других функций
+            expires_at = datetime.utcnow() + timedelta(days=30)
+            cur.execute(
+                "INSERT INTO t_p18253922_infinite_business_ca.auth_tokens (user_id, token, expires_at) VALUES (%s, %s, %s)",
+                (user['id'], token, expires_at)
+            )
+            conn.commit()
+            
             return {
                 'statusCode': 200,
                 'headers': {'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json'},
@@ -258,6 +266,14 @@ def handler(event, context):
                 jwt_secret,
                 algorithm='HS256'
             )
+            
+            # Сохраняем токен в базу для других функций
+            expires_at = datetime.utcnow() + timedelta(days=30)
+            cur.execute(
+                "INSERT INTO t_p18253922_infinite_business_ca.auth_tokens (user_id, token, expires_at) VALUES (%s, %s, %s)",
+                (user['id'], token, expires_at)
+            )
+            conn.commit()
             
             return {
                 'statusCode': 200,
