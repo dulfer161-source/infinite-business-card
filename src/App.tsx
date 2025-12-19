@@ -8,6 +8,7 @@ import { HelmetProvider } from "react-helmet-async";
 import InstallPrompt from "./components/InstallPrompt";
 import ErrorBoundary from "./components/ErrorBoundary";
 import PageLoader from "./components/PageLoader";
+import FeedbackWidget from "./components/FeedbackWidget";
 import Index from "./pages/Index";
 import PublicCard from "./pages/PublicCard";
 import PaymentSuccess from "./pages/PaymentSuccess";
@@ -37,6 +38,7 @@ const App = () => (
           <Toaster />
           <Sonner />
           <InstallPrompt />
+          <FeedbackWidget />
           <BrowserRouter future={future}>
             <Suspense fallback={<PageLoader />}>
               <Routes>

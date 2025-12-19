@@ -438,6 +438,88 @@ def handler(event, context):
                 'isBase64Encoded': False
             }
         
+        elif action == 'feedback':
+            import smtplib
+            from email.mime.text import MIMEText
+            from email.mime.multipart import MIMEMultipart
+            
+            message = body.get('message', '')
+            user_email = body.get('email', 'Не указан')
+            url = body.get('url', 'N/A')
+            user_agent = body.get('userAgent', 'N/A')
+            timestamp = body.get('timestamp', 'N/A')
+            
+            if not message:
+                return {
+                    'statusCode': 400,
+                    'headers': {'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json'},
+                    'body': json.dumps({'error': 'Message is required'}),
+                    'isBase64Encoded': False
+                }
+            
+            admin_email = os.environ.get('ADMIN_EMAIL')
+            smtp_host = os.environ.get('SMTP_HOST')
+            smtp_port = int(os.environ.get('SMTP_PORT', '465'))
+            smtp_user = os.environ.get('SMTP_USER')
+            smtp_password = os.environ.get('SMTP_PASSWORD')
+            
+            if not all([admin_email, smtp_host, smtp_user, smtp_password]):
+                return {
+                    'statusCode': 500,
+                    'headers': {'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json'},
+                    'body': json.dumps({'error': 'SMTP configuration incomplete'}),
+                    'isBase64Encoded': False
+                }
+            
+            msg = MIMEMultipart()
+            msg['From'] = smtp_user
+            msg['To'] = admin_email
+            msg['Subject'] = f'🐛 Сообщение об ошибке - Portfolio Site'
+            
+            email_body = f"""
+<html>
+<body style="font-family: Arial, sans-serif; padding: 20px; background-color: #f5f5f5;">
+    <div style="max-width: 600px; margin: 0 auto; background: white; padding: 30px; border-radius: 10px;">
+        <h2 style="color: #d4a574; margin-bottom: 20px;">🐛 Новое сообщение об ошибке</h2>
+        
+        <div style="background: #f9f9f9; padding: 15px; border-radius: 5px; margin-bottom: 20px;">
+            <h3 style="margin-top: 0;">Описание проблемы:</h3>
+            <p style="white-space: pre-wrap;">{message}</p>
+        </div>
+        
+        <div style="border-top: 1px solid #eee; padding-top: 20px;">
+            <p><strong>Email пользователя:</strong> {user_email}</p>
+            <p><strong>URL:</strong> <a href="{url}">{url}</a></p>
+            <p><strong>Время:</strong> {timestamp}</p>
+            <p><strong>User Agent:</strong> {user_agent}</p>
+        </div>
+    </div>
+</body>
+</html>
+            """
+            
+            msg.attach(MIMEText(email_body, 'html'))
+            
+            try:
+                with smtplib.SMTP_SSL(smtp_host, smtp_port) as server:
+                    server.login(smtp_user, smtp_password)
+                    server.send_message(msg)
+            except Exception as smtp_error:
+                print(f"Email send error: {smtp_error}")
+                return {
+                    'statusCode': 500,
+                    'headers': {'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json'},
+                    'body': json.dumps({'error': 'Failed to send email'}),
+                    'isBase64Encoded': False
+                }
+            
+            return {
+                'statusCode': 200,
+                'headers': {'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json'},
+                'body': json.dumps({'success': True, 'message': 'Feedback sent successfully'}),
+                'isBase64Encoded': False
+            }
+        
         else:
             return {
                 'statusCode': 400,
