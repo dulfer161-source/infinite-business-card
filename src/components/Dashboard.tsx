@@ -212,7 +212,10 @@ const Dashboard = ({ onLogout }: DashboardProps) => {
           </TabsContent>
 
           <TabsContent value="templates" className="space-y-6">
-            <TemplatesTab onApplyTemplate={(template) => alert(`Применён шаблон: ${template.name}`)} />
+            <TemplatesTab onApplyTemplate={(template) => {
+              localStorage.setItem('design_completed', 'true');
+              alert(`Применён шаблон: ${template.name}`);
+            }} />
           </TabsContent>
 
           <TabsContent value="integrations" className="space-y-6">

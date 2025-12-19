@@ -131,6 +131,7 @@ const MyCardsTab = () => {
   const copyCardLink = (id: number) => {
     const url = `${window.location.origin}/card/${id}`;
     navigator.clipboard.writeText(url);
+    localStorage.setItem('card_shared', 'true');
     toast.success('Ссылка скопирована!');
   };
 
@@ -285,6 +286,15 @@ const MyCardsTab = () => {
                   >
                     <Icon name="ExternalLink" size={14} className="mr-2" />
                     Открыть
+                  </Button>
+                  <Button
+                    variant="default"
+                    size="sm"
+                    onClick={() => openCard(card.id)}
+                    className="w-full bg-gold text-black hover:bg-gold/90"
+                  >
+                    <Icon name="Edit" size={14} className="mr-2" />
+                    Редактировать
                   </Button>
                   <Button
                     variant="ghost"

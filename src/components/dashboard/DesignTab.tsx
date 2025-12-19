@@ -67,6 +67,7 @@ const DesignTab = () => {
 
     applyThemeStyles(selectedTheme);
     localStorage.setItem('selectedTheme', selectedTheme);
+    localStorage.setItem('design_completed', 'true');
     toast.success(`Тема "${theme.name}" применена успешно!`);
   };
 

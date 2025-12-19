@@ -67,6 +67,14 @@ const ProgressTracker = ({ userInfo }: ProgressTrackerProps) => {
   ]);
 
   const [isCollapsed, setIsCollapsed] = useState(false);
+  const [refreshKey, setRefreshKey] = useState(0);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setRefreshKey(prev => prev + 1);
+    }, 2000);
+    return () => clearInterval(interval);
+  }, []);
 
   useEffect(() => {
     const updatedTasks = tasks.map(task => {
@@ -81,6 +89,21 @@ const ProgressTracker = ({ userInfo }: ProgressTrackerProps) => {
             ...task,
             completed: !!(userInfo.description && userInfo.description.length > 20)
           };
+        case 'design':
+          return {
+            ...task,
+            completed: localStorage.getItem('design_completed') === 'true'
+          };
+        case 'share':
+          return {
+            ...task,
+            completed: localStorage.getItem('card_shared') === 'true'
+          };
+        case 'qr_download':
+          return {
+            ...task,
+            completed: localStorage.getItem('qr_downloaded') === 'true'
+          };
         default:
           return task;
       }
@@ -92,7 +115,7 @@ const ProgressTracker = ({ userInfo }: ProgressTrackerProps) => {
     if (hasSeenProgress) {
       setIsCollapsed(true);
     }
-  }, [userInfo]);
+  }, [userInfo, refreshKey]);
 
   const completedCount = tasks.filter(t => t.completed).length;
   const progress = (completedCount / tasks.length) * 100;

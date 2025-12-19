@@ -67,6 +67,7 @@ const BusinessCardTab = ({ userInfo }: BusinessCardTabProps) => {
     a.href = qrCodeUrl;
     a.download = `qr-code-${userInfo.name}.png`;
     a.click();
+    localStorage.setItem('qr_downloaded', 'true');
   };
 
   const handleDownloadVCard = () => {
