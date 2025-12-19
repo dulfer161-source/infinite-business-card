@@ -33,16 +33,34 @@ interface DashboardProps {
 
 const Dashboard = ({ onLogout }: DashboardProps) => {
   const [userInfo, setUserInfo] = useState(() => {
+    // Получаем имя пользователя из user (регистрация/логин)
+    const userStr = localStorage.getItem('user');
+    let userName = 'Друг';
+    
+    if (userStr) {
+      try {
+        const user = JSON.parse(userStr);
+        userName = user.name || 'Друг';
+      } catch {}
+    }
+    
+    // Проверяем сохраненные данные визитки
     const saved = localStorage.getItem('userInfo');
     if (saved) {
       try {
-        return JSON.parse(saved);
+        const parsedInfo = JSON.parse(saved);
+        // Обновляем имя из user, если оно отличается
+        return {
+          ...parsedInfo,
+          name: userName
+        };
       } catch {
         // Если не удалось распарсить, используем дефолтные значения
       }
     }
+    
     return {
-      name: 'Иван Петров',
+      name: userName,
       position: 'Генеральный директор',
       company: 'ООО "Инновационные решения"',
       phone: '+7 (999) 123-45-67',
