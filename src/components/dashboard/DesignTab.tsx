@@ -61,6 +61,18 @@ const DesignTab = () => {
     }
   };
 
+  const handleThemeSelect = (themeId: string) => {
+    setSelectedTheme(themeId);
+    applyThemeStyles(themeId);
+    localStorage.setItem('selectedTheme', themeId);
+    localStorage.setItem('design_completed', 'true');
+    
+    const theme = themes.find(t => t.id === themeId);
+    if (theme) {
+      toast.success(`Тема "${theme.name}" применена успешно!`);
+    }
+  };
+
   const handleApplyTheme = () => {
     const theme = themes.find(t => t.id === selectedTheme);
     if (!theme) return;
@@ -87,7 +99,7 @@ const DesignTab = () => {
           {themes.map((theme) => (
             <div
               key={theme.id}
-              onClick={() => setSelectedTheme(theme.id)}
+              onClick={() => handleThemeSelect(theme.id)}
               className={`
                 relative p-6 rounded-lg border-2 cursor-pointer transition-all hover-scale
                 ${selectedTheme === theme.id 
