@@ -9,6 +9,7 @@ import InstallPrompt from "./components/InstallPrompt";
 import ErrorBoundary from "./components/ErrorBoundary";
 import PageLoader from "./components/PageLoader";
 import FeedbackWidget from "./components/FeedbackWidget";
+import BugReportWidget from "./components/BugReportWidget";
 import Index from "./pages/Index";
 import PublicCard from "./pages/PublicCard";
 import PaymentSuccess from "./pages/PaymentSuccess";
@@ -39,6 +40,7 @@ const App = () => (
           <Sonner />
           <InstallPrompt />
           <FeedbackWidget />
+          <BugReportWidget />
           <BrowserRouter future={future}>
             <Suspense fallback={<PageLoader />}>
               <Routes>
