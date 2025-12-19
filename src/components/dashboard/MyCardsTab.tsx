@@ -10,7 +10,6 @@ import { toast } from 'sonner';
 
 interface CardData {
   id: number;
-  slug: string;
   name: string;
   position?: string;
   company?: string;
@@ -129,14 +128,14 @@ const MyCardsTab = () => {
     }
   };
 
-  const copyCardLink = (slug: string) => {
-    const url = `${window.location.origin}/card/${slug}`;
+  const copyCardLink = (id: number) => {
+    const url = `${window.location.origin}/card/${id}`;
     navigator.clipboard.writeText(url);
     toast.success('Ссылка скопирована!');
   };
 
-  const openCard = (slug: string) => {
-    window.open(`/card/${slug}`, '_blank');
+  const openCard = (id: number) => {
+    window.open(`/card/${id}`, '_blank');
   };
 
   const handleDeleteClick = (card: CardData) => {
@@ -156,7 +155,7 @@ const MyCardsTab = () => {
           'Content-Type': 'application/json',
           'X-Auth-Token': authToken || ''
         },
-        body: JSON.stringify({ slug: cardToDelete.slug })
+        body: JSON.stringify({ id: cardToDelete.id })
       });
 
       if (response.ok) {
@@ -281,7 +280,7 @@ const MyCardsTab = () => {
                   <Button
                     variant="outline"
                     size="sm"
-                    onClick={() => openCard(card.slug)}
+                    onClick={() => openCard(card.id)}
                     className="w-full"
                   >
                     <Icon name="ExternalLink" size={14} className="mr-2" />
@@ -290,7 +289,7 @@ const MyCardsTab = () => {
                   <Button
                     variant="ghost"
                     size="sm"
-                    onClick={() => copyCardLink(card.slug)}
+                    onClick={() => copyCardLink(card.id)}
                     className="w-full"
                   >
                     <Icon name="Copy" size={14} className="mr-2" />

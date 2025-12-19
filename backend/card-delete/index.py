@@ -1,7 +1,7 @@
 import json
 import os
 import psycopg2
-import jwt
+from psycopg2.extras import RealDictCursor
 
 def handler(event, context):
     '''
@@ -42,51 +42,41 @@ def handler(event, context):
             'isBase64Encoded': False
         }
     
-    jwt_secret = os.environ.get('JWT_SECRET')
-    if not jwt_secret:
+    conn = psycopg2.connect(os.environ['DATABASE_URL'])
+    cur = conn.cursor(cursor_factory=RealDictCursor)
+    
+    # Get user_id from token
+    cur.execute(f"SELECT user_id FROM t_p18253922_infinite_business_ca.auth_tokens WHERE token = '{auth_token}' AND expires_at > NOW()")
+    token_row = cur.fetchone()
+    
+    if not token_row:
+        cur.close()
+        conn.close()
         return {
-            'statusCode': 500,
+            'statusCode': 401,
             'headers': {'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json'},
-            'body': json.dumps({'error': 'Server configuration error'}),
+            'body': json.dumps({'error': 'Invalid or expired token'}),
             'isBase64Encoded': False
         }
     
-    try:
-        payload = jwt.decode(auth_token, jwt_secret, algorithms=['HS256'])
-        user_id = payload.get('user_id')
-    except jwt.ExpiredSignatureError:
-        return {
-            'statusCode': 401,
-            'headers': {'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json'},
-            'body': json.dumps({'error': 'Token expired'}),
-            'isBase64Encoded': False
-        }
-    except jwt.InvalidTokenError:
-        return {
-            'statusCode': 401,
-            'headers': {'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json'},
-            'body': json.dumps({'error': 'Invalid token'}),
-            'isBase64Encoded': False
-        }
+    user_id = token_row['user_id']
     
     body = json.loads(event.get('body', '{}'))
-    card_slug = body.get('slug')
+    card_id = body.get('id')
     
-    if not card_slug:
+    if not card_id:
         return {
             'statusCode': 400,
             'headers': {'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json'},
-            'body': json.dumps({'error': 'Card slug required'}),
+            'body': json.dumps({'error': 'Card id required'}),
             'isBase64Encoded': False
         }
     
     conn = psycopg2.connect(os.environ['DATABASE_URL'])
     cur = conn.cursor()
     
-    card_slug_escaped = card_slug.replace("'", "''")
-    
     cur.execute(
-        f"SELECT user_id FROM t_p18253922_infinite_business_ca.cards WHERE slug = '{card_slug_escaped}'"
+        f"SELECT user_id FROM t_p18253922_infinite_business_ca.business_cards WHERE id = {int(card_id)}"
     )
     card_owner = cur.fetchone()
     
@@ -111,7 +101,7 @@ def handler(event, context):
         }
     
     cur.execute(
-        f"DELETE FROM t_p18253922_infinite_business_ca.cards WHERE slug = '{card_slug_escaped}'"
+        f"DELETE FROM t_p18253922_infinite_business_ca.business_cards WHERE id = {int(card_id)}"
     )
     conn.commit()
     

@@ -123,14 +123,14 @@ const PublicCard = () => {
     setSaving(true);
     try {
       const authToken = localStorage.getItem('auth_token');
-      const response = await fetch('https://functions.poehali.dev/d7834eac-8ea2-4b8d-a22a-fe2cd24b3a93', {
+      const response = await fetch('https://functions.poehali.dev/1b1c5f28-bcb7-48d0-9437-b01ccc89239f', {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
           'X-Auth-Token': authToken || ''
         },
         body: JSON.stringify({
-          slug: id,
+          id: editForm.id,
           name: editForm.name,
           position: editForm.position || '',
           company: editForm.company || '',
