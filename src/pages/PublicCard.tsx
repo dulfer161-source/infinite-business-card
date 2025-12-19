@@ -37,7 +37,7 @@ const PublicCard = () => {
       if (!id) return;
       
       try {
-        const response = await fetch(`https://functions.poehali.dev/1b1c5f28-bcb7-48d0-9437-b01ccc89239f/${id}`, {
+        const response = await fetch(`https://functions.poehali.dev/1b1c5f28-bcb7-48d0-9437-b01ccc89239f?id=${id}`, {
           method: 'GET',
           headers: { 'Content-Type': 'application/json' }
         });
@@ -59,7 +59,7 @@ const PublicCard = () => {
         }
         
         // Track view
-        await fetch(`https://functions.poehali.dev/1b1c5f28-bcb7-48d0-9437-b01ccc89239f/${id}/view`, {
+        await fetch(`https://functions.poehali.dev/1b1c5f28-bcb7-48d0-9437-b01ccc89239f?id=${id}`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' }
         }).catch(console.error);

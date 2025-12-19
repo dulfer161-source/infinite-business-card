@@ -11,6 +11,18 @@
       "bodyMatcher": "partial"
     },
     {
+      "name": "Get public card by ID",
+      "method": "GET",
+      "path": "/?id=8",
+      "expectedStatus": 200,
+      "expectedBody": {
+        "card": {
+          "id": 8
+        }
+      },
+      "bodyMatcher": "partial"
+    },
+    {
       "name": "OPTIONS preflight",
       "method": "OPTIONS",
       "path": "/",

@@ -33,9 +33,12 @@ def handler(event, context):
         conn = psycopg2.connect(os.environ['DATABASE_URL'])
         cur = conn.cursor(cursor_factory=RealDictCursor)
         
-        # Public GET card by ID
-        if method == 'GET' and card_id:
-            cur.execute(f"SELECT * FROM t_p18253922_infinite_business_ca.business_cards WHERE id = {int(card_id)}")
+        # Public GET card by ID (using query param ?id=123)
+        query_params = event.get('queryStringParameters', {})
+        card_id_query = query_params.get('id') if query_params else None
+        
+        if method == 'GET' and card_id_query:
+            cur.execute(f"SELECT * FROM t_p18253922_infinite_business_ca.business_cards WHERE id = {int(card_id_query)}")
             card = cur.fetchone()
             
             if not card:
@@ -53,8 +56,8 @@ def handler(event, context):
                 'isBase64Encoded': False
             }
         
-        # Track view
-        if method == 'POST' and card_id and '/view' in event.get('url', ''):
+        # Track view (using query param ?id=123)
+        if method == 'POST' and card_id_query:
             request_ctx = event.get('requestContext', {})
             identity = request_ctx.get('identity', {})
             source_ip = identity.get('sourceIp', 'unknown').replace("'", "''")
@@ -63,12 +66,12 @@ def handler(event, context):
             cur.execute(
                 f"""
                 INSERT INTO t_p18253922_infinite_business_ca.card_views (card_id, viewer_ip, viewer_user_agent)
-                VALUES ({int(card_id)}, '{source_ip}', '{user_agent}')
+                VALUES ({int(card_id_query)}, '{source_ip}', '{user_agent}')
                 """
             )
             
             cur.execute(
-                f"UPDATE t_p18253922_infinite_business_ca.business_cards SET view_count = view_count + 1 WHERE id = {int(card_id)}"
+                f"UPDATE t_p18253922_infinite_business_ca.business_cards SET view_count = view_count + 1 WHERE id = {int(card_id_query)}"
             )
             conn.commit()
             
