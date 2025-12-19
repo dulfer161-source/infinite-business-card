@@ -282,6 +282,142 @@ def handler(event, context):
                 'isBase64Encoded': False
             }
         
+        elif action == 'forgot_password':
+            email = body.get('email', '')
+            
+            if not email:
+                return {
+                    'statusCode': 400,
+                    'headers': {'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json'},
+                    'body': json.dumps({'error': 'Email is required'}),
+                    'isBase64Encoded': False
+                }
+            
+            cur.execute(
+                "SELECT id, name FROM t_p18253922_infinite_business_ca.users WHERE email = %s",
+                (email,)
+            )
+            user_result = cur.fetchone()
+            
+            if not user_result:
+                return {
+                    'statusCode': 200,
+                    'headers': {'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json'},
+                    'body': json.dumps({'message': 'If email exists, reset link sent'}),
+                    'isBase64Encoded': False
+                }
+            
+            import secrets
+            reset_token = secrets.token_urlsafe(32)
+            reset_expires = datetime.utcnow() + timedelta(hours=1)
+            
+            cur.execute(
+                "UPDATE t_p18253922_infinite_business_ca.users SET reset_token = %s, reset_token_expires = %s WHERE email = %s",
+                (reset_token, reset_expires, email)
+            )
+            conn.commit()
+            
+            smtp_host = os.environ.get('SMTP_HOST')
+            smtp_port = int(os.environ.get('SMTP_PORT', '465'))
+            smtp_user = os.environ.get('SMTP_USER')
+            smtp_password = os.environ.get('SMTP_PASSWORD')
+            
+            if all([smtp_host, smtp_user, smtp_password]):
+                import smtplib
+                from email.mime.text import MIMEText
+                from email.mime.multipart import MIMEMultipart
+                
+                reset_url = f"https://visitka.site/reset-password?token={reset_token}"
+                
+                msg = MIMEMultipart('alternative')
+                msg['Subject'] = 'Восстановление пароля'
+                msg['From'] = smtp_user
+                msg['To'] = email
+                
+                html = f"""
+                <html>
+                <body style="font-family: Arial, sans-serif; padding: 20px;">
+                    <h2>Восстановление пароля</h2>
+                    <p>Здравствуйте, {user_result[1]}!</p>
+                    <p>Вы запросили восстановление пароля. Перейдите по ссылке ниже:</p>
+                    <p><a href="{reset_url}" style="background: #4F46E5; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; display: inline-block;">Восстановить пароль</a></p>
+                    <p>Ссылка действительна 1 час.</p>
+                    <p>Если вы не запрашивали восстановление пароля, просто проигнорируйте это письмо.</p>
+                </body>
+                </html>
+                """
+                
+                msg.attach(MIMEText(html, 'html'))
+                
+                try:
+                    if smtp_port == 465:
+                        server = smtplib.SMTP_SSL(smtp_host, smtp_port)
+                    else:
+                        server = smtplib.SMTP(smtp_host, smtp_port)
+                        server.starttls()
+                    
+                    server.login(smtp_user, smtp_password)
+                    server.send_message(msg)
+                    server.quit()
+                except Exception as e:
+                    print(f"Email send error: {e}")
+            
+            return {
+                'statusCode': 200,
+                'headers': {'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json'},
+                'body': json.dumps({'message': 'If email exists, reset link sent'}),
+                'isBase64Encoded': False
+            }
+        
+        elif action == 'reset_password':
+            reset_token = body.get('token', '')
+            new_password = body.get('password', '')
+            
+            if not reset_token or not new_password:
+                return {
+                    'statusCode': 400,
+                    'headers': {'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json'},
+                    'body': json.dumps({'error': 'Token and password required'}),
+                    'isBase64Encoded': False
+                }
+            
+            if len(new_password) < 6 or len(new_password) > 100:
+                return {
+                    'statusCode': 400,
+                    'headers': {'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json'},
+                    'body': json.dumps({'error': 'Password must be 6-100 chars'}),
+                    'isBase64Encoded': False
+                }
+            
+            cur.execute(
+                "SELECT id FROM t_p18253922_infinite_business_ca.users WHERE reset_token = %s AND reset_token_expires > NOW()",
+                (reset_token,)
+            )
+            user_result = cur.fetchone()
+            
+            if not user_result:
+                return {
+                    'statusCode': 400,
+                    'headers': {'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json'},
+                    'body': json.dumps({'error': 'Invalid or expired token'}),
+                    'isBase64Encoded': False
+                }
+            
+            password_hash = bcrypt.hashpw(new_password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
+            
+            cur.execute(
+                "UPDATE t_p18253922_infinite_business_ca.users SET password_hash = %s, reset_token = NULL, reset_token_expires = NULL WHERE id = %s",
+                (password_hash, user_result[0])
+            )
+            conn.commit()
+            
+            return {
+                'statusCode': 200,
+                'headers': {'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json'},
+                'body': json.dumps({'message': 'Password reset successful'}),
+                'isBase64Encoded': False
+            }
+        
         else:
             return {
                 'statusCode': 400,

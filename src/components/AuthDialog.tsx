@@ -272,7 +272,12 @@ const AuthDialog = ({ open, onOpenChange, onSuccess }: AuthDialogProps) => {
                 />
               </div>
               <div>
-                <Label htmlFor="login-password">Пароль</Label>
+                <div className="flex items-center justify-between mb-2">
+                  <Label htmlFor="login-password">Пароль</Label>
+                  <a href="/forgot-password" className="text-xs text-indigo-600 hover:text-indigo-700">
+                    Забыли пароль?
+                  </a>
+                </div>
                 <Input
                   id="login-password"
                   type="password"

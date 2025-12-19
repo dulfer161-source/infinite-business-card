@@ -18,6 +18,8 @@ import VKCallback from "./pages/VKCallback";
 import VKDiagnostics from "./pages/VKDiagnostics";
 import GoogleCallback from "./pages/GoogleCallback";
 import YandexCallback from "./pages/YandexCallback";
+import ForgotPassword from "./pages/ForgotPassword";
+import ResetPassword from "./pages/ResetPassword";
 import NotFound from "./pages/NotFound";
 
 const future = {
@@ -48,6 +50,8 @@ const App = () => (
                 <Route path="/auth/google" element={<GoogleCallback />} />
                 <Route path="/auth/yandex" element={<YandexCallback />} />
                 <Route path="/vk-diagnostics" element={<VKDiagnostics />} />
+                <Route path="/forgot-password" element={<ForgotPassword />} />
+                <Route path="/reset-password" element={<ResetPassword />} />
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                 <Route path="*" element={<NotFound />} />
               </Routes>
