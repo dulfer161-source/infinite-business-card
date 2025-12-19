@@ -139,7 +139,27 @@ def handler(event, context):
             # Генерируем уникальный реферальный код для нового пользователя
             import random
             import string
-            new_referral_code = ''.join(random.choices(string.ascii_uppercase + string.digits, k=8))
+            new_referral_code = None
+            max_attempts = 10
+            for _ in range(max_attempts):
+                candidate = ''.join(random.choices(string.ascii_uppercase + string.digits, k=8))
+                cur.execute(
+                    "SELECT id FROM t_p18253922_infinite_business_ca.users WHERE referral_code = %s",
+                    (candidate,)
+                )
+                if not cur.fetchone():
+                    new_referral_code = candidate
+                    break
+            
+            if not new_referral_code:
+                cur.close()
+                conn.close()
+                return {
+                    'statusCode': 500,
+                    'headers': headers,
+                    'isBase64Encoded': False,
+                    'body': json.dumps({'error': 'Не удалось сгенерировать реферальный код'})
+                }
             
             # Insert without specifying id - let DEFAULT handle it
             cur.execute(
