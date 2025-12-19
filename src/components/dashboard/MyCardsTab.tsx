@@ -76,6 +76,8 @@ const MyCardsTab = () => {
       if (response.ok) {
         const data = await response.json();
         setCards(data.cards || []);
+      } else {
+        toast.error('Не удалось загрузить визитки');
       }
     } catch (error) {
       toast.error('Не удалось загрузить визитки');

@@ -82,7 +82,7 @@ class ApiService {
   }
 
   getAuthHeaders() {
-    return this.userId ? { 'X-User-Id': this.userId } : {};
+    return this.token ? { 'X-Auth-Token': this.token } : {};
   }
 
   async register(email: string, password: string, name: string, referralCode?: string): Promise<{ token: string; user: User }> {
