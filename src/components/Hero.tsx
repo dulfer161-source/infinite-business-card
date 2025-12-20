@@ -34,7 +34,7 @@ const Hero = ({ onGetStarted, onStartDemo }: HeroProps) => {
           
           <FadeIn delay={0.2}>
             <h1 className="text-5xl md:text-7xl font-bold text-white mb-6 leading-[1.1] tracking-tight">
-              Стань кем хочешь
+              Бесконечные связи - <br />Умные возможности!
               <br />
               <span className="gradient-text">с партнёром visitka.site</span>
             </h1>
