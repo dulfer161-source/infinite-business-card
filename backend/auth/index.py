@@ -442,12 +442,16 @@ def handler(event, context):
             import smtplib
             from email.mime.text import MIMEText
             from email.mime.multipart import MIMEMultipart
+            from email.mime.image import MIMEImage
+            import base64
             
             message = body.get('message', '')
             user_email = body.get('email', 'Не указан')
             url = body.get('url', 'N/A')
             user_agent = body.get('userAgent', 'N/A')
             timestamp = body.get('timestamp', 'N/A')
+            screenshot = body.get('screenshot')
+            screenshot_name = body.get('screenshotName', 'screenshot.png')
             
             if not message:
                 return {
@@ -471,10 +475,19 @@ def handler(event, context):
                     'isBase64Encoded': False
                 }
             
-            msg = MIMEMultipart()
+            msg = MIMEMultipart('related')
             msg['From'] = smtp_user
             msg['To'] = admin_email
             msg['Subject'] = f'🐛 Сообщение об ошибке - Portfolio Site'
+            
+            screenshot_html = ''
+            if screenshot:
+                screenshot_html = f'''
+        <div style="margin-top: 20px; border-top: 1px solid #eee; padding-top: 20px;">
+            <h3 style="margin-bottom: 10px;">📸 Прикрепленный скриншот:</h3>
+            <img src="cid:screenshot" style="max-width: 100%; border-radius: 5px; border: 1px solid #ddd;" alt="Screenshot"/>
+        </div>
+                '''
             
             email_body = f"""
 <html>
@@ -493,12 +506,32 @@ def handler(event, context):
             <p><strong>Время:</strong> {timestamp}</p>
             <p><strong>User Agent:</strong> {user_agent}</p>
         </div>
+        
+        {screenshot_html}
     </div>
 </body>
 </html>
             """
             
-            msg.attach(MIMEText(email_body, 'html'))
+            msg_alternative = MIMEMultipart('alternative')
+            msg.attach(msg_alternative)
+            msg_alternative.attach(MIMEText(email_body, 'html'))
+            
+            if screenshot:
+                try:
+                    if screenshot.startswith('data:image'):
+                        header, encoded = screenshot.split(',', 1)
+                        image_data = base64.b64decode(encoded)
+                        
+                        mime_type = header.split(';')[0].split(':')[1]
+                        maintype, subtype = mime_type.split('/')
+                        
+                        image = MIMEImage(image_data, _subtype=subtype)
+                        image.add_header('Content-ID', '<screenshot>')
+                        image.add_header('Content-Disposition', 'inline', filename=screenshot_name)
+                        msg.attach(image)
+                except Exception as img_error:
+                    print(f"Screenshot processing error: {img_error}")
             
             try:
                 with smtplib.SMTP_SSL(smtp_host, smtp_port) as server:

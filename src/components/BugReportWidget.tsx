@@ -1,12 +1,45 @@
-import { useState } from 'react';
-import { Bug, X, Send } from 'lucide-react';
+import { useState, useRef } from 'react';
+import { Bug, X, Send, Image as ImageIcon, Trash2 } from 'lucide-react';
 
 export default function BugReportWidget() {
   const [isOpen, setIsOpen] = useState(false);
   const [message, setMessage] = useState('');
   const [email, setEmail] = useState('');
+  const [screenshot, setScreenshot] = useState<string | null>(null);
+  const [screenshotName, setScreenshotName] = useState<string>('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState<'idle' | 'success' | 'error'>('idle');
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (!file.type.startsWith('image/')) {
+      alert('Пожалуйста, выберите изображение');
+      return;
+    }
+
+    if (file.size > 5 * 1024 * 1024) {
+      alert('Размер файла не должен превышать 5 МБ');
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setScreenshot(reader.result as string);
+      setScreenshotName(file.name);
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const removeScreenshot = () => {
+    setScreenshot(null);
+    setScreenshotName('');
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -28,7 +61,9 @@ export default function BugReportWidget() {
           email: email.trim() || 'Не указан',
           url: window.location.href,
           userAgent: navigator.userAgent,
-          timestamp: new Date().toISOString()
+          timestamp: new Date().toISOString(),
+          screenshot: screenshot || undefined,
+          screenshotName: screenshotName || undefined
         })
       });
 
@@ -36,6 +71,7 @@ export default function BugReportWidget() {
         setSubmitStatus('success');
         setMessage('');
         setEmail('');
+        removeScreenshot();
         setTimeout(() => {
           setIsOpen(false);
           setSubmitStatus('idle');
@@ -101,6 +137,45 @@ export default function BugReportWidget() {
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-[#d4a574] focus:border-transparent"
                 disabled={isSubmitting}
               />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Скриншот (необязательно)
+              </label>
+              
+              {!screenshot ? (
+                <label className="flex items-center justify-center gap-2 px-4 py-3 border-2 border-dashed border-gray-300 rounded-md hover:border-[#d4a574] transition-colors cursor-pointer">
+                  <ImageIcon size={20} className="text-gray-500" />
+                  <span className="text-sm text-gray-600">Загрузить изображение</span>
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept="image/*"
+                    onChange={handleFileChange}
+                    className="hidden"
+                    disabled={isSubmitting}
+                  />
+                </label>
+              ) : (
+                <div className="relative border border-gray-300 rounded-md p-2">
+                  <img 
+                    src={screenshot} 
+                    alt="Screenshot preview" 
+                    className="w-full h-32 object-contain rounded"
+                  />
+                  <button
+                    type="button"
+                    onClick={removeScreenshot}
+                    disabled={isSubmitting}
+                    className="absolute top-1 right-1 p-1.5 bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors"
+                  >
+                    <Trash2 size={14} />
+                  </button>
+                  <p className="text-xs text-gray-600 mt-1 truncate">{screenshotName}</p>
+                </div>
+              )}
+              <p className="text-xs text-gray-500 mt-1">PNG, JPG до 5 МБ</p>
             </div>
 
             {submitStatus === 'success' && (
