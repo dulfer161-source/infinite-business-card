@@ -66,46 +66,46 @@ export default {
 				teal: 'hsl(var(--teal))',
 				navy: 'hsl(var(--navy))',
 				blue: {
-					DEFAULT: '#2196F3',
-					light: '#64B5F6',
-					dark: '#1976D2',
-					darker: '#0D47A1',
-					500: '#2196F3',
-					600: '#1E88E5',
-					700: '#1976D2',
-					800: '#1565C0',
-					900: '#0D47A1'
+					DEFAULT: '#00d4ff',
+					light: '#5ae0ff',
+					dark: '#00a8cc',
+					darker: '#007a99',
+					500: '#00d4ff',
+					600: '#00bfe6',
+					700: '#00a8cc',
+					800: '#0091b3',
+					900: '#007a99'
 				},
 				green: {
-					DEFAULT: '#4CAF50',
-					light: '#81C784',
-					dark: '#388E3C',
-					500: '#4CAF50',
-					600: '#43A047',
-					700: '#388E3C'
+					DEFAULT: '#00c896',
+					light: '#5ce0b8',
+					dark: '#00a077',
+					500: '#00c896',
+					600: '#00b085',
+					700: '#00a077'
 				},
 				purple: {
-					DEFAULT: '#8b5cf6',
-					light: '#a78bfa',
-					dark: '#7c3aed',
-					500: '#8b5cf6',
-					600: '#7c3aed',
-					700: '#6d28d9'
+					DEFAULT: '#b44aff',
+					light: '#c878ff',
+					dark: '#9933e6',
+					500: '#b44aff',
+					600: '#a033f5',
+					700: '#9933e6'
 				},
 				cyan: {
-					DEFAULT: '#06b6d4',
-					light: '#22d3ee',
-					dark: '#0891b2',
-					500: '#06b6d4',
-					600: '#0891b2',
-					700: '#0e7490'
+					DEFAULT: '#00d4ff',
+					light: '#5ae0ff',
+					dark: '#00a8cc',
+					500: '#00d4ff',
+					600: '#00bfe6',
+					700: '#00a8cc'
 				},
 				orange: {
-					DEFAULT: '#ff6b35',
-					light: '#ff8c5a',
-					dark: '#e85a2a',
-					500: '#ff6b35',
-					600: '#e85a2a'
+					DEFAULT: '#ff4aff',
+					light: '#ff78ff',
+					dark: '#e633e6',
+					500: '#ff4aff',
+					600: '#e633e6'
 				},
 				gray: {
 					50: '#f8fafc',

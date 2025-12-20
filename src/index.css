@@ -1,4 +1,4 @@
-@import url("https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&family=Open+Sans:wght@300;400;500;600;700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700&display=swap");
 @import "./styles/animations.css";
 
 @tailwind base;
@@ -16,16 +16,16 @@
     --popover: 0 0% 100%;
     --popover-foreground: 0 0% 20%;
 
-    --primary: 207 90% 54%;
+    --primary: 191 100% 50%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 122 39% 49%;
+    --secondary: 271 91% 65%;
     --secondary-foreground: 0 0% 100%;
 
     --muted: 220 14% 96%;
     --muted-foreground: 220 9% 46%;
 
-    --accent: 45 100% 51%;
+    --accent: 280 100% 70%;
     --accent-foreground: 0 0% 20%;
 
     --destructive: 0 84.2% 60.2%;
@@ -33,19 +33,19 @@
 
     --border: 220 13% 91%;
     --input: 220 13% 91%;
-    --ring: 189 94% 43%;
+    --ring: 191 100% 50%;
 
     --radius: 0.75rem;
-    --gold: 45 100% 51%;
-    --blue: 207 90% 54%;
-    --blue-dark: 207 90% 40%;
-    --blue-darker: 207 90% 30%;
-    --navy: 207 50% 25%;
-    --purple: 271 81% 56%;
-    --cyan: 189 94% 43%;
-    --teal: 175 70% 50%;
-    --green: 122 39% 49%;
-    --orange: 45 100% 51%;
+    --gold: 280 100% 70%;
+    --blue: 191 100% 50%;
+    --blue-dark: 191 100% 40%;
+    --blue-darker: 191 100% 30%;
+    --navy: 220 40% 15%;
+    --purple: 271 91% 65%;
+    --cyan: 191 100% 50%;
+    --teal: 175 80% 40%;
+    --green: 160 84% 39%;
+    --orange: 280 100% 70%;
 
     --sidebar-background: 0 0% 98%;
 
@@ -74,16 +74,16 @@
     --popover: 217 33% 13%;
     --popover-foreground: 210 40% 98%;
 
-    --primary: 207 90% 54%;
+    --primary: 191 100% 50%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 122 39% 49%;
+    --secondary: 271 91% 65%;
     --secondary-foreground: 0 0% 100%;
 
     --muted: 215 25% 20%;
     --muted-foreground: 220 9% 65%;
 
-    --accent: 45 100% 51%;
+    --accent: 280 100% 70%;
     --accent-foreground: 0 0% 20%;
 
     --destructive: 0 62.8% 30.6%;
@@ -91,17 +91,17 @@
 
     --border: 215 25% 20%;
     --input: 215 25% 20%;
-    --ring: 45 100% 51%;
-    --gold: 45 100% 51%;
-    --blue: 207 90% 54%;
-    --blue-dark: 207 90% 40%;
-    --blue-darker: 207 90% 30%;
-    --navy: 207 50% 25%;
-    --purple: 271 81% 56%;
-    --cyan: 189 94% 43%;
-    --teal: 175 70% 50%;
-    --green: 122 39% 49%;
-    --orange: 45 100% 51%;
+    --ring: 280 100% 70%;
+    --gold: 280 100% 70%;
+    --blue: 191 100% 50%;
+    --blue-dark: 191 100% 40%;
+    --blue-darker: 191 100% 30%;
+    --navy: 220 40% 15%;
+    --purple: 271 91% 65%;
+    --cyan: 191 100% 50%;
+    --teal: 175 80% 40%;
+    --green: 160 84% 39%;
+    --orange: 280 100% 70%;
     --sidebar-background: 217 33% 17%;
     --sidebar-foreground: 210 40% 98%;
     --sidebar-primary: 217 91% 60%;
@@ -121,7 +121,7 @@
   body {
     @apply bg-background text-foreground;
     font-family:
-      "Open Sans",
+      "Inter",
       -apple-system,
       BlinkMacSystemFont,
       "Segoe UI",
@@ -137,9 +137,9 @@
   h4,
   h5,
   h6 {
-    font-family: "Montserrat", sans-serif;
+    font-family: "Orbitron", sans-serif;
     font-weight: 700;
-    letter-spacing: -0.01em;
+    letter-spacing: 0.02em;
   }
 
   h1 {
@@ -190,18 +190,18 @@
   }
 
   .gradient-text {
-    background: linear-gradient(135deg, #2196f3 0%, #4caf50 100%);
+    background: linear-gradient(135deg, #00d4ff 0%, #b44aff 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
   }
 
   .gradient-bg {
-    background: linear-gradient(135deg, #2196f3 0%, #4caf50 100%);
+    background: linear-gradient(135deg, #00d4ff 0%, #b44aff 100%);
   }
 
   .gradient-border {
-    border-image: linear-gradient(135deg, #2196f3 0%, #4caf50 100%) 1;
+    border-image: linear-gradient(135deg, #00d4ff 0%, #b44aff 100%) 1;
   }
 
   .gradient-blue-green {
@@ -217,7 +217,7 @@
   }
 
   .gradient-corporate {
-    background: linear-gradient(135deg, #0d47a1 0%, #1976d2 50%, #2196f3 100%);
+    background: linear-gradient(135deg, #0a1628 0%, #1a2742 50%, #00d4ff 100%);
   }
 
   .gradient-navy-teal {
