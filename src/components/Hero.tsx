@@ -25,18 +25,18 @@ const Hero = ({ onGetStarted, onStartDemo }: HeroProps) => {
       <div className="container mx-auto px-4 relative z-10">
         <div className="max-w-5xl mx-auto text-center">
           <FadeIn>
-            <div className="inline-flex items-center justify-center mb-12">
-              <img 
-                src="https://cdn.poehali.dev/files/photo_5323474829841207821_y.jpg" 
-                alt="visitka.site logo" 
-                className="w-full max-w-md md:max-w-2xl h-auto drop-shadow-2xl animate-fade-in"
-              />
+            <div className="inline-flex items-center justify-center mb-8">
+              <div className="text-8xl md:text-9xl font-bold gradient-text mb-4 relative animate-shimmer">
+                <span className="relative">∞7</span>
+              </div>
             </div>
           </FadeIn>
           
           <FadeIn delay={0.2}>
             <h1 className="text-5xl md:text-7xl font-bold text-white mb-6 leading-[1.1] tracking-tight">
               Бесконечные связи - <br />Умные возможности!
+              <br />
+              <span className="gradient-text">с партнёром visitka.site</span>
             </h1>
           </FadeIn>
           
