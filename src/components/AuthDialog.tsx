@@ -21,17 +21,16 @@ const AuthDialog = ({ open, onOpenChange, onSuccess }: AuthDialogProps) => {
   const [privacyOpen, setPrivacyOpen] = useState(false);
   const [agreedToPolicy, setAgreedToPolicy] = useState(false);
   const [demoAccountsOpen, setDemoAccountsOpen] = useState(false);
+  const [loginData, setLoginData] = useState({ email: '', password: '' });
+  const [registerData, setRegisterData] = useState({ email: '', password: '', name: '', referralCode: '' });
 
-  useState(() => {
+  useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
     const refCode = urlParams.get('ref');
     if (refCode) {
       setRegisterData(prev => ({ ...prev, referralCode: refCode }));
     }
-  });
-  
-  const [loginData, setLoginData] = useState({ email: '', password: '' });
-  const [registerData, setRegisterData] = useState({ email: '', password: '', name: '', referralCode: '' });
+  }, []);
 
   const handleDemoAccountSelect = async (account: any) => {
     setLoginData({ email: account.email, password: account.password });

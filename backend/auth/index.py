@@ -8,6 +8,7 @@ import time
 from datetime import datetime, timedelta
 from typing import Dict, Tuple, Optional
 import psycopg2
+from psycopg2.extras import RealDictCursor
 
 # In-memory rate limiting
 _rate_limit_store: Dict[str, list] = {}
@@ -79,7 +80,7 @@ def handler(event, context):
         action = body.get('action')
         
         conn = psycopg2.connect(os.environ['DATABASE_URL'])
-        cur = conn.cursor()
+        cur = conn.cursor(cursor_factory=RealDictCursor)
         
         if action == 'register':
             email = body.get('email', '')
@@ -126,13 +127,13 @@ def handler(event, context):
             # Проверка реферального кода (если указан)
             referred_by_id = None
             if referral_code:
+                referral_code_safe = referral_code.upper().replace("'", "''")
                 cur.execute(
-                    "SELECT id FROM t_p18253922_infinite_business_ca.users WHERE referral_code = %s",
-                    (referral_code.upper(),)
+                    f"SELECT id FROM t_p18253922_infinite_business_ca.users WHERE referral_code = '{referral_code_safe}'"
                 )
                 referrer = cur.fetchone()
                 if referrer:
-                    referred_by_id = referrer[0]
+                    referred_by_id = referrer['id']
             
             password_hash = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
             
@@ -144,8 +145,7 @@ def handler(event, context):
             for _ in range(max_attempts):
                 candidate = ''.join(random.choices(string.ascii_uppercase + string.digits, k=8))
                 cur.execute(
-                    "SELECT id FROM t_p18253922_infinite_business_ca.users WHERE referral_code = %s",
-                    (candidate,)
+                    f"SELECT id FROM t_p18253922_infinite_business_ca.users WHERE referral_code = '{candidate}'"
                 )
                 if not cur.fetchone():
                     new_referral_code = candidate
@@ -161,17 +161,28 @@ def handler(event, context):
                     'body': json.dumps({'error': 'Не удалось сгенерировать реферальный код'})
                 }
             
-            # Insert without specifying id - let DEFAULT handle it
-            cur.execute(
-                "INSERT INTO t_p18253922_infinite_business_ca.users (email, password_hash, name, referral_code, referred_by) VALUES (%s, %s, %s, %s, %s) RETURNING id, email, name",
-                (email, password_hash, name, new_referral_code, referred_by_id)
-            )
-            result = cur.fetchone()
-            user = {'id': result[0], 'email': result[1], 'name': result[2]}
+            # Get next id explicitly for users
+            cur.execute("SELECT COALESCE(MAX(id), 0) + 1 as next_id FROM t_p18253922_infinite_business_ca.users")
+            user_id = cur.fetchone()['next_id']
+            
+            # Escape values for Simple Query Protocol
+            email_safe = email.replace("'", "''")
+            password_hash_safe = password_hash.replace("'", "''")
+            name_safe = name.replace("'", "''")
+            referral_code_safe = new_referral_code.replace("'", "''")
             
             cur.execute(
-                "INSERT INTO t_p18253922_infinite_business_ca.user_subscriptions (user_id, plan_id, status) VALUES (%s, %s, %s)",
-                (user['id'], 1, 'active')
+                f"INSERT INTO t_p18253922_infinite_business_ca.users (id, email, password_hash, name, referral_code, referred_by) VALUES ({user_id}, '{email_safe}', '{password_hash_safe}', '{name_safe}', '{referral_code_safe}', {referred_by_id if referred_by_id else 'NULL'}) RETURNING id, email, name"
+            )
+            result = cur.fetchone()
+            user = {'id': result['id'], 'email': result['email'], 'name': result['name']}
+            
+            # Get next id explicitly for user_subscriptions
+            cur.execute("SELECT COALESCE(MAX(id), 0) + 1 as next_id FROM t_p18253922_infinite_business_ca.user_subscriptions")
+            sub_id = cur.fetchone()['next_id']
+            
+            cur.execute(
+                f"INSERT INTO t_p18253922_infinite_business_ca.user_subscriptions (id, user_id, plan_id, status) VALUES ({sub_id}, {user['id']}, 1, 'active')"
             )
             
             conn.commit()
@@ -222,9 +233,9 @@ def handler(event, context):
                     'isBase64Encoded': False
                 }
             
+            email_safe = email.replace("'", "''")
             cur.execute(
-                "SELECT id, email, name, password_hash FROM t_p18253922_infinite_business_ca.users WHERE email = %s",
-                (email,)
+                f"SELECT id, email, name, password_hash FROM t_p18253922_infinite_business_ca.users WHERE email = '{email_safe}'"
             )
             result = cur.fetchone()
             
@@ -238,7 +249,7 @@ def handler(event, context):
                     'isBase64Encoded': False
                 }
             
-            stored_hash = result[3]
+            stored_hash = result['password_hash']
             is_valid = False
             
             # Проверка bcrypt хеша
@@ -252,9 +263,9 @@ def handler(event, context):
                 # Если пароль верный - обновляем на bcrypt
                 if is_valid:
                     new_hash = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
+                    new_hash_safe = new_hash.replace("'", "''")
                     cur.execute(
-                        "UPDATE t_p18253922_infinite_business_ca.users SET password_hash = %s WHERE id = %s",
-                        (new_hash, result[0])
+                        f"UPDATE t_p18253922_infinite_business_ca.users SET password_hash = '{new_hash_safe}' WHERE id = {result['id']}"
                     )
                     conn.commit()
             
@@ -268,7 +279,7 @@ def handler(event, context):
                     'isBase64Encoded': False
                 }
             
-            user = {'id': result[0], 'email': result[1], 'name': result[2]}
+            user = {'id': result['id'], 'email': result['email'], 'name': result['name']}
             
             jwt_secret = os.environ.get('JWT_SECRET')
             if not jwt_secret:
@@ -287,11 +298,18 @@ def handler(event, context):
                 algorithm='HS256'
             )
             
-            # Сохраняем токен в базу для других функций
+            # Сохраняем токен в базу для других функций (login)
             expires_at = datetime.utcnow() + timedelta(days=30)
+            
+            # Get next id explicitly for auth_tokens
+            cur.execute("SELECT COALESCE(MAX(id), 0) + 1 as next_id FROM t_p18253922_infinite_business_ca.auth_tokens")
+            token_id = cur.fetchone()['next_id']
+            
+            token_safe = token.replace("'", "''")
+            expires_at_str = expires_at.strftime('%Y-%m-%d %H:%M:%S')
+            
             cur.execute(
-                "INSERT INTO t_p18253922_infinite_business_ca.auth_tokens (user_id, token, expires_at) VALUES (%s, %s, %s)",
-                (user['id'], token, expires_at)
+                f"INSERT INTO t_p18253922_infinite_business_ca.auth_tokens (id, user_id, token, expires_at) VALUES ({token_id}, {user['id']}, '{token_safe}', '{expires_at_str}')"
             )
             conn.commit()
             

@@ -63,10 +63,14 @@ def handler(event, context):
             source_ip = identity.get('sourceIp', 'unknown').replace("'", "''")
             user_agent = identity.get('userAgent', 'unknown').replace("'", "''")
             
+            # Get next sequence value explicitly
+            cur.execute("SELECT COALESCE(MAX(id), 0) + 1 as next_id FROM t_p18253922_infinite_business_ca.card_views")
+            next_id = cur.fetchone()['next_id']
+            
             cur.execute(
                 f"""
-                INSERT INTO t_p18253922_infinite_business_ca.card_views (card_id, viewer_ip, viewer_user_agent)
-                VALUES ({int(card_id_query)}, '{source_ip}', '{user_agent}')
+                INSERT INTO t_p18253922_infinite_business_ca.card_views (id, card_id, viewer_ip, viewer_user_agent)
+                VALUES ({next_id}, {int(card_id_query)}, '{source_ip}', '{user_agent}')
                 """
             )
             
@@ -132,11 +136,15 @@ def handler(event, context):
             website = body.get('website', '').replace("'", "''")
             description = body.get('description', '').replace("'", "''")
             
+            # Get next sequence value explicitly
+            cur.execute("SELECT COALESCE(MAX(id), 0) + 1 as next_id FROM t_p18253922_infinite_business_ca.business_cards")
+            next_id = cur.fetchone()['next_id']
+            
             cur.execute(
                 f"""
                 INSERT INTO t_p18253922_infinite_business_ca.business_cards 
-                (user_id, name, position, company, phone, email, website, description)
-                VALUES ({int(user_id)}, '{name}', '{position}', '{company}', '{phone}', '{email}', '{website}', '{description}')
+                (id, user_id, name, position, company, phone, email, website, description)
+                VALUES ({next_id}, {int(user_id)}, '{name}', '{position}', '{company}', '{phone}', '{email}', '{website}', '{description}')
                 RETURNING *
                 """
             )
