@@ -34,7 +34,8 @@ const MyCardsTab = () => {
     phone: '',
     email: '',
     website: '',
-    description: ''
+    description: '',
+    logo_url: ''
   });
   const [creating, setCreating] = useState(false);
   const [deleting, setDeleting] = useState(false);
@@ -135,7 +136,8 @@ const MyCardsTab = () => {
           phone: '',
           email: '',
           website: '',
-          description: ''
+          description: '',
+          logo_url: ''
         });
         loadCards();
       } else {

@@ -30,15 +30,26 @@ const CardItem = ({ card, onOpen, onCopyLink, onDuplicate, onDelete }: CardItemP
     <Card key={card.id} className="border-gold/20 hover:border-gold/40 transition-colors">
       <CardHeader>
         <div className="flex items-start justify-between mb-2">
-          {card.logo_url ? (
-            <div className="w-16 h-16 rounded-full overflow-hidden border-2 border-gold/20">
-              <img src={card.logo_url} alt={card.name} className="w-full h-full object-cover" />
-            </div>
-          ) : (
-            <div className="w-16 h-16 rounded-full bg-gradient-to-br from-gold/20 to-gold/5 flex items-center justify-center border-2 border-gold/20">
-              <Icon name="User" size={32} className="text-gold/60" />
-            </div>
-          )}
+          <div 
+            className="relative group cursor-pointer"
+            onClick={() => onOpen(card.id)}
+          >
+            {card.logo_url ? (
+              <div className="w-16 h-16 rounded-full overflow-hidden border-2 border-gold/20">
+                <img src={card.logo_url} alt={card.name} className="w-full h-full object-cover" />
+                <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                  <Icon name="Camera" size={20} className="text-white" />
+                </div>
+              </div>
+            ) : (
+              <div className="w-16 h-16 rounded-full bg-gradient-to-br from-gold/20 to-gold/5 flex items-center justify-center border-2 border-gold/20 group-hover:border-gold/40 transition-colors">
+                <Icon name="User" size={32} className="text-gold/60" />
+                <div className="absolute inset-0 bg-black/5 opacity-0 group-hover:opacity-100 transition-opacity rounded-full flex items-center justify-center">
+                  <Icon name="Camera" size={20} className="text-gold" />
+                </div>
+              </div>
+            )}
+          </div>
           <Badge variant="outline" className="text-xs">
             <Icon name="Eye" size={12} className="mr-1" />
             {card.view_count}
