@@ -124,6 +124,19 @@ def handler(event, context):
                     'isBase64Encoded': False
                 }
             
+            # Проверка существующего email
+            email_check = email.replace("'", "''")
+            cur.execute(
+                f"SELECT id FROM t_p18253922_infinite_business_ca.users WHERE email = '{email_check}'"
+            )
+            if cur.fetchone():
+                return {
+                    'statusCode': 400,
+                    'headers': {'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json'},
+                    'body': json.dumps({'error': 'Email уже зарегистрирован'}),
+                    'isBase64Encoded': False
+                }
+            
             # Проверка реферального кода (если указан)
             referred_by_id = None
             if referral_code:
