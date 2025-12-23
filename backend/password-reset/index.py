@@ -174,8 +174,7 @@ def handle_request(body_data: Dict[str, Any]) -> Dict[str, Any]:
     msg.attach(part2)
     
     try:
-        with smtplib.SMTP(smtp_host, smtp_port) as server:
-            server.starttls()
+        with smtplib.SMTP_SSL(smtp_host, smtp_port) as server:
             server.login(smtp_user, smtp_password)
             server.send_message(msg)
     except Exception as e:

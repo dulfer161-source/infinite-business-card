@@ -1,15 +1,35 @@
+import { useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import Icon from '@/components/ui/icon';
 
 interface SocialAuthButtonsProps {
   onVKAuth: () => void;
   onDemoAccountsOpen: () => void;
+  onTelegramAuth: (userData: any) => void;
 }
 
 export default function SocialAuthButtons({ 
   onVKAuth,
-  onDemoAccountsOpen 
+  onDemoAccountsOpen,
+  onTelegramAuth
 }: SocialAuthButtonsProps) {
+  useEffect(() => {
+    const container = document.getElementById('telegram-login-container');
+    if (container && !container.hasChildNodes()) {
+      const script = document.createElement('script');
+      script.src = 'https://telegram.org/js/telegram-widget.js?22';
+      script.setAttribute('data-telegram-login', 'infinitecardbot');
+      script.setAttribute('data-size', 'large');
+      script.setAttribute('data-radius', '8');
+      script.setAttribute('data-onauth', 'onTelegramAuthCallback(user)');
+      script.setAttribute('data-request-access', 'write');
+      script.async = true;
+      container.appendChild(script);
+      
+      (window as any).onTelegramAuthCallback = onTelegramAuth;
+    }
+  }, [onTelegramAuth]);
+
   return (
     <>
       <div className="relative my-6">
@@ -32,7 +52,7 @@ export default function SocialAuthButtons({
           VK ID
         </Button>
 
-        <div id="telegram-login-container" className="flex justify-center"></div>
+        <div id="telegram-login-container" className="flex justify-center w-full"></div>
       </div>
 
       <div className="mt-4 text-center">
