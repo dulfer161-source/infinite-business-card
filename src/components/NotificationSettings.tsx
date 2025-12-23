@@ -14,7 +14,6 @@ const NotificationSettings = () => {
     newLeads: true,
     newViews: false,
     payments: true,
-    referrals: true,
     weeklyReports: true,
     subscriptionAlerts: true
   });
@@ -101,13 +100,7 @@ const NotificationSettings = () => {
       icon: 'CreditCard',
       color: 'text-purple-500'
     },
-    {
-      key: 'referrals' as const,
-      title: 'Реферальные бонусы',
-      description: 'Когда вы получаете награду за приглашённых друзей',
-      icon: 'Gift',
-      color: 'text-orange'
-    },
+
     {
       key: 'weeklyReports' as const,
       title: 'Еженедельные отчёты',

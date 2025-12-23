@@ -8,7 +8,7 @@ import BusinessCardTab from './dashboard/BusinessCardTab';
 import EditTab from './dashboard/EditTab';
 import DesignTab from './dashboard/DesignTab';
 import AnalyticsTab from './dashboard/AnalyticsTab';
-import ReferralTab from './dashboard/ReferralTab';
+
 import TemplatesTab from './dashboard/TemplatesTab';
 import IntegrationsTab from './dashboard/IntegrationsTab';
 import TeamManagementTab from './dashboard/TeamManagementTab';
@@ -65,12 +65,12 @@ const DemoDashboard = ({ onExit, plan }: DemoDashboardProps) => {
     basic: {
       name: 'Базовый', 
       color: 'green',
-      tabs: ['card', 'edit', 'templates', 'design', 'analytics', 'portfolio', 'leads', 'reviews', 'referral']
+      tabs: ['card', 'edit', 'templates', 'design', 'analytics', 'portfolio', 'leads', 'reviews']
     },
     pro: {
       name: 'Профессиональный',
       color: 'blue',
-      tabs: ['card', 'edit', 'templates', 'design', 'analytics', 'integrations', 'team', 'portfolio', 'leads', 'reviews', 'referral']
+      tabs: ['card', 'edit', 'templates', 'design', 'analytics', 'integrations', 'team', 'portfolio', 'leads', 'reviews']
     }
   };
 
@@ -146,7 +146,7 @@ const DemoDashboard = ({ onExit, plan }: DemoDashboardProps) => {
             <TabTriggerWithLock value="leads" icon="Inbox" label="Лиды" locked={!isTabAvailable('leads')} />
             <TabTriggerWithLock value="portfolio" icon="Briefcase" label="Портфолио" locked={!isTabAvailable('portfolio')} />
             <TabTriggerWithLock value="reviews" icon="Star" label="Отзывы" locked={!isTabAvailable('reviews')} />
-            <TabTriggerWithLock value="referral" icon="Gift" label="Реферал" locked={!isTabAvailable('referral')} />
+
           </TabsList>
 
           <TabsContent value="card" className="space-y-6">
@@ -213,13 +213,7 @@ const DemoDashboard = ({ onExit, plan }: DemoDashboardProps) => {
             )}
           </TabsContent>
 
-          <TabsContent value="referral" className="space-y-6">
-            {isTabAvailable('referral') ? (
-              <ReferralTab />
-            ) : (
-              <LockedFeature feature="Реферальная программа" />
-            )}
-          </TabsContent>
+
         </Tabs>
       </main>
 

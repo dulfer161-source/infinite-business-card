@@ -9,7 +9,7 @@ import MyCardsTab from './dashboard/MyCardsTab';
 import EditTab from './dashboard/EditTab';
 import DesignTab from './dashboard/DesignTab';
 import AnalyticsTab from './dashboard/AnalyticsTab';
-import ReferralTab from './dashboard/ReferralTab';
+
 import TemplatesTab from './dashboard/TemplatesTab';
 import IntegrationsTab from './dashboard/IntegrationsTab';
 import TeamManagementTab from './dashboard/TeamManagementTab';
@@ -177,10 +177,7 @@ const Dashboard = ({ onLogout }: DashboardProps) => {
               <Icon name="Sparkles" size={18} />
               <span className="ml-2">Подписка</span>
             </TabsTrigger>
-            <TabsTrigger value="referral" className="flex-shrink-0">
-              <Icon name="Gift" size={18} />
-              <span className="ml-2">Реферал</span>
-            </TabsTrigger>
+
             <TabsTrigger value="settings" className="flex-shrink-0">
               <Icon name="Settings" size={18} />
               <span className="ml-2">Настройки</span>
@@ -242,9 +239,7 @@ const Dashboard = ({ onLogout }: DashboardProps) => {
             <SubscriptionTab />
           </TabsContent>
 
-          <TabsContent value="referral" className="space-y-6">
-            <ReferralTab />
-          </TabsContent>
+
 
           <TabsContent value="settings" className="space-y-6">
             <SettingsTab />
