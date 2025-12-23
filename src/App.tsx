@@ -23,6 +23,7 @@ import YandexCallback from "./pages/YandexCallback";
 import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
 import TestFunctions from "./pages/TestFunctions";
+import DatabaseAdmin from "./pages/DatabaseAdmin";
 import NotFound from "./pages/NotFound";
 
 const future = {
@@ -58,6 +59,7 @@ const App = () => (
                 <Route path="/forgot-password" element={<ForgotPassword />} />
                 <Route path="/reset-password" element={<ResetPassword />} />
                 <Route path="/test-functions" element={<TestFunctions />} />
+                <Route path="/database-admin" element={<DatabaseAdmin />} />
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                 <Route path="*" element={<NotFound />} />
               </Routes>
