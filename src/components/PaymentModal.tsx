@@ -137,6 +137,28 @@ const PaymentModal = ({
     return cleaned;
   };
 
+  const formatPhone = (value: string) => {
+    const cleaned = value.replace(/\D/g, '');
+    
+    if (cleaned.length === 0) return '';
+    
+    let formatted = '+7';
+    if (cleaned.length > 1) {
+      formatted += ' (' + cleaned.substring(1, 4);
+    }
+    if (cleaned.length >= 5) {
+      formatted += ') ' + cleaned.substring(4, 7);
+    }
+    if (cleaned.length >= 8) {
+      formatted += '-' + cleaned.substring(7, 9);
+    }
+    if (cleaned.length >= 10) {
+      formatted += '-' + cleaned.substring(9, 11);
+    }
+    
+    return formatted;
+  };
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-md">
@@ -211,7 +233,11 @@ const PaymentModal = ({
                     type="tel"
                     placeholder="+7 (999) 123-45-67"
                     value={userDetails.phone}
-                    onChange={(e) => setUserDetails({ ...userDetails, phone: e.target.value })}
+                    onChange={(e) => {
+                      const formatted = formatPhone(e.target.value);
+                      setUserDetails({ ...userDetails, phone: formatted });
+                    }}
+                    maxLength={18}
                   />
                 </div>
               </div>

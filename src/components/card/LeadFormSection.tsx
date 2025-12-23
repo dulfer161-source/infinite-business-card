@@ -15,6 +15,28 @@ const LeadFormSection = ({ cardId }: LeadFormSectionProps) => {
   const [leadForm, setLeadForm] = useState({ name: '', email: '', phone: '', message: '' });
   const [submittingLead, setSubmittingLead] = useState(false);
 
+  const formatPhone = (value: string) => {
+    const cleaned = value.replace(/\D/g, '');
+    
+    if (cleaned.length === 0) return '';
+    
+    let formatted = '+7';
+    if (cleaned.length > 1) {
+      formatted += ' (' + cleaned.substring(1, 4);
+    }
+    if (cleaned.length >= 5) {
+      formatted += ') ' + cleaned.substring(4, 7);
+    }
+    if (cleaned.length >= 8) {
+      formatted += '-' + cleaned.substring(7, 9);
+    }
+    if (cleaned.length >= 10) {
+      formatted += '-' + cleaned.substring(9, 11);
+    }
+    
+    return formatted;
+  };
+
   const handleSubmitLead = async (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -103,8 +125,12 @@ const LeadFormSection = ({ cardId }: LeadFormSectionProps) => {
                 <Input
                   type="tel"
                   value={leadForm.phone}
-                  onChange={(e) => setLeadForm({...leadForm, phone: e.target.value})}
+                  onChange={(e) => {
+                    const formatted = formatPhone(e.target.value);
+                    setLeadForm({...leadForm, phone: formatted});
+                  }}
                   placeholder="+7 (900) 123-45-67"
+                  maxLength={18}
                 />
               </div>
 

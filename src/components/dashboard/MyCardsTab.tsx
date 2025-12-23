@@ -40,6 +40,28 @@ const MyCardsTab = () => {
   const [creating, setCreating] = useState(false);
   const [deleting, setDeleting] = useState(false);
 
+  const formatPhone = (value: string) => {
+    const cleaned = value.replace(/\D/g, '');
+    
+    if (cleaned.length === 0) return '';
+    
+    let formatted = '+7';
+    if (cleaned.length > 1) {
+      formatted += ' (' + cleaned.substring(1, 4);
+    }
+    if (cleaned.length >= 5) {
+      formatted += ') ' + cleaned.substring(4, 7);
+    }
+    if (cleaned.length >= 8) {
+      formatted += '-' + cleaned.substring(7, 9);
+    }
+    if (cleaned.length >= 10) {
+      formatted += '-' + cleaned.substring(9, 11);
+    }
+    
+    return formatted;
+  };
+
   useEffect(() => {
     loadCards();
   }, []);
@@ -376,8 +398,12 @@ const MyCardsTab = () => {
               <Input
                 type="tel"
                 value={newCard.phone}
-                onChange={(e) => setNewCard({ ...newCard, phone: e.target.value })}
+                onChange={(e) => {
+                  const formatted = formatPhone(e.target.value);
+                  setNewCard({ ...newCard, phone: formatted });
+                }}
                 placeholder="+7 (900) 123-45-67"
+                maxLength={18}
               />
             </div>
 

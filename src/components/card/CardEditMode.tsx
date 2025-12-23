@@ -32,6 +32,28 @@ const CardEditMode = ({ editForm, saving, onEditFormChange, onSave, onCancel }: 
   const [uploadingImage, setUploadingImage] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  const formatPhone = (value: string) => {
+    const cleaned = value.replace(/\D/g, '');
+    
+    if (cleaned.length === 0) return '';
+    
+    let formatted = '+7';
+    if (cleaned.length > 1) {
+      formatted += ' (' + cleaned.substring(1, 4);
+    }
+    if (cleaned.length >= 5) {
+      formatted += ') ' + cleaned.substring(4, 7);
+    }
+    if (cleaned.length >= 8) {
+      formatted += '-' + cleaned.substring(7, 9);
+    }
+    if (cleaned.length >= 10) {
+      formatted += '-' + cleaned.substring(9, 11);
+    }
+    
+    return formatted;
+  };
+
   const handleImageClick = () => {
     fileInputRef.current?.click();
   };
@@ -211,8 +233,12 @@ const CardEditMode = ({ editForm, saving, onEditFormChange, onSave, onCancel }: 
                 <Input
                   type="tel"
                   value={editForm.phone || ''}
-                  onChange={(e) => onEditFormChange('phone', e.target.value)}
+                  onChange={(e) => {
+                    const formatted = formatPhone(e.target.value);
+                    onEditFormChange('phone', formatted);
+                  }}
                   placeholder="+7 (900) 123-45-67"
+                  maxLength={18}
                 />
               </div>
 
