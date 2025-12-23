@@ -237,7 +237,7 @@ def handle_verify(body_data: Dict[str, Any]) -> Dict[str, Any]:
     password_escaped = new_password.replace("'", "''")
     
     cur.execute(
-        f"UPDATE t_p18253922_infinite_business_ca.users SET password = '{password_escaped}' WHERE id = {user_id}"
+        f"UPDATE t_p18253922_infinite_business_ca.users SET password_hash = '{password_escaped}' WHERE id = {user_id}"
     )
     
     cur.execute(
