@@ -18,8 +18,7 @@ import YooKassaSetup from "./pages/YooKassaSetup";
 import TestAI from "./pages/TestAI";
 import VKCallback from "./pages/VKCallback";
 import VKDiagnostics from "./pages/VKDiagnostics";
-import GoogleCallback from "./pages/GoogleCallback";
-import YandexCallback from "./pages/YandexCallback";
+
 import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
 import TestFunctions from "./pages/TestFunctions";
@@ -54,8 +53,7 @@ const App = () => (
                 <Route path="/yookassa-setup" element={<YooKassaSetup />} />
                 <Route path="/test-ai" element={<TestAI />} />
                 <Route path="/auth/vk" element={<VKCallback />} />
-                <Route path="/auth/google" element={<GoogleCallback />} />
-                <Route path="/auth/yandex" element={<YandexCallback />} />
+
                 <Route path="/vk-diagnostics" element={<VKDiagnostics />} />
                 <Route path="/forgot-password" element={<ForgotPassword />} />
                 <Route path="/reset-password" element={<ResetPassword />} />

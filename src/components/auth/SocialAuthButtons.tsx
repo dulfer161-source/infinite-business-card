@@ -3,15 +3,11 @@ import Icon from '@/components/ui/icon';
 
 interface SocialAuthButtonsProps {
   onVKAuth: () => void;
-  onGoogleAuth: () => void;
-  onYandexAuth: () => void;
   onDemoAccountsOpen: () => void;
 }
 
 export default function SocialAuthButtons({ 
-  onVKAuth, 
-  onGoogleAuth, 
-  onYandexAuth,
+  onVKAuth,
   onDemoAccountsOpen 
 }: SocialAuthButtonsProps) {
   return (
@@ -34,26 +30,6 @@ export default function SocialAuthButtons({
         >
           <Icon name="Mail" className="mr-2" size={18} />
           VK ID
-        </Button>
-
-        <Button
-          type="button"
-          variant="outline"
-          onClick={onGoogleAuth}
-          className="w-full"
-        >
-          <Icon name="Mail" className="mr-2" size={18} />
-          Google
-        </Button>
-
-        <Button
-          type="button"
-          variant="outline"
-          onClick={onYandexAuth}
-          className="w-full"
-        >
-          <Icon name="Mail" className="mr-2" size={18} />
-          Яндекс ID
         </Button>
 
         <div id="telegram-login-container" className="flex justify-center"></div>

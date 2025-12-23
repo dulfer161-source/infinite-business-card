@@ -18,20 +18,22 @@ export default function ForgotPassword() {
 
     setLoading(true);
     try {
-      const response = await fetch('https://functions.poehali.dev/063b09be-f07e-478c-a626-807980d111e1', {
+      const response = await fetch('https://functions.poehali.dev/af64e807-c8f1-475d-b790-dd5179abb17c', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action: 'forgot_password', email })
+        body: JSON.stringify({ action: 'request', email })
       });
+
+      const data = await response.json();
 
       if (response.ok) {
         setSent(true);
         toast.success('Инструкции отправлены на почту');
       } else {
-        throw new Error('Failed');
+        toast.error(data.error || 'Ошибка отправки');
       }
     } catch (error) {
-      toast.error('Ошибка отправки');
+      toast.error('Ошибка сети');
     } finally {
       setLoading(false);
     }

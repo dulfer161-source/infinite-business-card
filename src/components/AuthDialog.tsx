@@ -143,49 +143,7 @@ const AuthDialog = ({ open, onOpenChange, onSuccess }: AuthDialogProps) => {
     }
   };
 
-  const handleGoogleAuth = async () => {
-    try {
-      const redirectUri = window.location.origin + '/auth/google';
-      const response = await fetch(`https://functions.poehali.dev/2faff2e2-9012-406b-bd38-07f4be72099b?action=login&redirect_uri=${encodeURIComponent(redirectUri)}`);
-      
-      if (!response.ok) {
-        throw new Error('Ошибка подключения к Google');
-      }
-      
-      const data = await response.json();
-      if (data.auth_url) {
-        window.location.href = data.auth_url;
-      }
-    } catch (error: any) {
-      toast({
-        title: 'Ошибка',
-        description: error.message || 'Не удалось подключиться к Google',
-        variant: 'destructive',
-      });
-    }
-  };
 
-  const handleYandexAuth = async () => {
-    try {
-      const redirectUri = window.location.origin + '/auth/yandex';
-      const response = await fetch(`https://functions.poehali.dev/6fc83860-fe65-4faa-9951-577ec8b00f94?action=login&redirect_uri=${encodeURIComponent(redirectUri)}`);
-      
-      if (!response.ok) {
-        throw new Error('Ошибка подключения к Яндекс');
-      }
-      
-      const data = await response.json();
-      if (data.auth_url) {
-        window.location.href = data.auth_url;
-      }
-    } catch (error: any) {
-      toast({
-        title: 'Ошибка',
-        description: error.message || 'Не удалось подключиться к Яндекс',
-        variant: 'destructive',
-      });
-    }
-  };
 
   const handleTelegramAuth = async (userData: any) => {
     try {
@@ -268,8 +226,6 @@ const AuthDialog = ({ open, onOpenChange, onSuccess }: AuthDialogProps) => {
             />
             <SocialAuthButtons
               onVKAuth={handleVKAuth}
-              onGoogleAuth={handleGoogleAuth}
-              onYandexAuth={handleYandexAuth}
               onDemoAccountsOpen={() => setDemoAccountsOpen(true)}
             />
           </TabsContent>
@@ -286,8 +242,6 @@ const AuthDialog = ({ open, onOpenChange, onSuccess }: AuthDialogProps) => {
             />
             <SocialAuthButtons
               onVKAuth={handleVKAuth}
-              onGoogleAuth={handleGoogleAuth}
-              onYandexAuth={handleYandexAuth}
               onDemoAccountsOpen={() => setDemoAccountsOpen(true)}
             />
           </TabsContent>
