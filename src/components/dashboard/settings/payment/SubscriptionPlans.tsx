@@ -1,10 +1,21 @@
+import { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import Icon from '@/components/ui/icon';
 import { toast } from 'sonner';
 import PaymentButton from '@/components/payment/PaymentButton';
+import QRPaymentDialog from '@/components/payment/QRPaymentDialog';
 
 const SubscriptionPlans = () => {
+  const [qrDialogOpen, setQrDialogOpen] = useState(false);
+  const [selectedPlan, setSelectedPlan] = useState<{ amount: number; description: string } | null>(null);
+
+  const handleQRPayment = (amount: number, description: string) => {
+    setSelectedPlan({ amount, description });
+    setQrDialogOpen(true);
+  };
+
   return (
     <Card>
       <CardHeader>
@@ -39,13 +50,23 @@ const SubscriptionPlans = () => {
                   Сбор лидов
                 </li>
               </ul>
-              <PaymentButton
-                amount={299}
-                description="Подписка на 1 месяц"
-                buttonText="Оплатить"
-                className="w-full"
-                onSuccess={() => toast.success('Оплата успешна!')}
-              />
+              <div className="space-y-2">
+                <PaymentButton
+                  amount={299}
+                  description="Подписка на 1 месяц"
+                  buttonText="Оплатить картой"
+                  className="w-full"
+                  onSuccess={() => toast.success('Оплата успешна!')}
+                />
+                <Button
+                  variant="outline"
+                  className="w-full"
+                  onClick={() => handleQRPayment(299, 'Подписка на 1 месяц')}
+                >
+                  <Icon name="QrCode" size={16} className="mr-2" />
+                  Оплатить по QR (СБП)
+                </Button>
+              </div>
             </CardContent>
           </Card>
 
@@ -80,13 +101,23 @@ const SubscriptionPlans = () => {
                   Экономия 138 ₽
                 </li>
               </ul>
-              <PaymentButton
-                amount={759}
-                description="Подписка на 3 месяца"
-                buttonText="Оплатить"
-                className="w-full bg-gold text-black hover:bg-gold/90"
-                onSuccess={() => toast.success('Оплата успешна!')}
-              />
+              <div className="space-y-2">
+                <PaymentButton
+                  amount={759}
+                  description="Подписка на 3 месяца"
+                  buttonText="Оплатить картой"
+                  className="w-full bg-gold text-black hover:bg-gold/90"
+                  onSuccess={() => toast.success('Оплата успешна!')}
+                />
+                <Button
+                  variant="outline"
+                  className="w-full"
+                  onClick={() => handleQRPayment(759, 'Подписка на 3 месяца')}
+                >
+                  <Icon name="QrCode" size={16} className="mr-2" />
+                  Оплатить по QR (СБП)
+                </Button>
+              </div>
             </CardContent>
           </Card>
 
@@ -118,16 +149,34 @@ const SubscriptionPlans = () => {
                   Экономия 897 ₽
                 </li>
               </ul>
-              <PaymentButton
-                amount={2691}
-                description="Подписка на 12 месяцев"
-                buttonText="Оплатить"
-                className="w-full"
-                onSuccess={() => toast.success('Оплата успешна!')}
-              />
+              <div className="space-y-2">
+                <PaymentButton
+                  amount={2691}
+                  description="Подписка на 12 месяцев"
+                  buttonText="Оплатить картой"
+                  className="w-full"
+                  onSuccess={() => toast.success('Оплата успешна!')}
+                />
+                <Button
+                  variant="outline"
+                  className="w-full"
+                  onClick={() => handleQRPayment(2691, 'Подписка на 12 месяцев')}
+                >
+                  <Icon name="QrCode" size={16} className="mr-2" />
+                  Оплатить по QR (СБП)
+                </Button>
+              </div>
             </CardContent>
           </Card>
         </div>
+
+        <QRPaymentDialog
+          open={qrDialogOpen}
+          onOpenChange={setQrDialogOpen}
+          amount={selectedPlan?.amount || 0}
+          description={selectedPlan?.description || ''}
+          onSuccess={() => toast.success('Оплата успешна!')}
+        />
 
         <div className="bg-blue-50 dark:bg-blue-950 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
           <div className="flex gap-3">

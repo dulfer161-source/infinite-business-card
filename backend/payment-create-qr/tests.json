@@ -1,0 +1,23 @@
+{
+  "tests": [
+    {
+      "name": "Create QR payment - unauthorized",
+      "method": "POST",
+      "path": "/",
+      "body": {
+        "amount": 100
+      },
+      "expectedStatus": 401,
+      "expectedBody": {
+        "error": "string"
+      },
+      "bodyMatcher": "partial"
+    },
+    {
+      "name": "OPTIONS preflight",
+      "method": "OPTIONS",
+      "path": "/",
+      "expectedStatus": 200
+    }
+  ]
+}
