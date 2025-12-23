@@ -6,6 +6,7 @@ import { Textarea } from '@/components/ui/textarea';
 import Icon from '@/components/ui/icon';
 import Logo from '@/components/Logo';
 import { toast } from 'sonner';
+import { compressImage } from '@/lib/imageCompression';
 
 interface CardData {
   id: number;
@@ -74,29 +75,24 @@ const CardEditMode = ({ editForm, saving, onEditFormChange, onSave, onCancel }: 
 
     setUploadingImage(true);
     try {
-      const reader = new FileReader();
-      reader.readAsDataURL(file);
+      const base64 = await compressImage(file, 800, 800, 0.85);
       
-      reader.onload = async () => {
-        const base64 = (reader.result as string).split(',')[1];
-        
-        const response = await fetch('https://functions.poehali.dev/50fdddd4-e611-4c44-a602-fc0d45e26445', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            image: base64,
-            content_type: file.type
-          })
-        });
+      const response = await fetch('https://functions.poehali.dev/50fdddd4-e611-4c44-a602-fc0d45e26445', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          image: base64,
+          content_type: 'image/jpeg'
+        })
+      });
 
-        if (!response.ok) {
-          throw new Error('Ошибка загрузки');
-        }
+      if (!response.ok) {
+        throw new Error('Ошибка загрузки');
+      }
 
-        const data = await response.json();
-        onEditFormChange('logo_url', data.url);
-        toast.success('Фото загружено!');
-      };
+      const data = await response.json();
+      onEditFormChange('logo_url', data.url);
+      toast.success('Фото загружено!');
     } catch (error) {
       toast.error('Не удалось загрузить фото');
     } finally {
