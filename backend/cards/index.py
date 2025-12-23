@@ -135,6 +135,7 @@ def handler(event, context):
             email = body.get('email', '').replace("'", "''")
             website = body.get('website', '').replace("'", "''")
             description = body.get('description', '').replace("'", "''")
+            logo_url = body.get('logo_url', '').replace("'", "''")
             
             # Get next sequence value explicitly
             cur.execute("SELECT COALESCE(MAX(id), 0) + 1 as next_id FROM t_p18253922_infinite_business_ca.business_cards")
