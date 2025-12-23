@@ -35,6 +35,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             'SMTP_HOST': bool(os.environ.get('SMTP_HOST')),
             'SMTP_PORT': bool(os.environ.get('SMTP_PORT')),
             'SMTP_USER': bool(os.environ.get('SMTP_USER')),
+            'SMTP_PASSWORD': bool(os.environ.get('SMTP_PASSWORD')),
             'ADMIN_EMAIL': bool(os.environ.get('ADMIN_EMAIL'))
         },
         'oauth': {

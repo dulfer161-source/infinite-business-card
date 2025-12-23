@@ -24,6 +24,7 @@ import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
 import TestFunctions from "./pages/TestFunctions";
 import DatabaseAdmin from "./pages/DatabaseAdmin";
+import QuickEmailTest from "./pages/QuickEmailTest";
 import NotFound from "./pages/NotFound";
 
 const future = {
@@ -60,6 +61,7 @@ const App = () => (
                 <Route path="/reset-password" element={<ResetPassword />} />
                 <Route path="/test-functions" element={<TestFunctions />} />
                 <Route path="/database-admin" element={<DatabaseAdmin />} />
+                <Route path="/quick-email-test" element={<QuickEmailTest />} />
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                 <Route path="*" element={<NotFound />} />
               </Routes>
