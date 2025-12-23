@@ -1,4 +1,3 @@
-import { notificationService } from './notifications';
 import { toast } from 'sonner';
 
 export interface SubscriptionLimits {
@@ -57,7 +56,6 @@ class SubscriptionMonitor {
     const alreadyNotified = localStorage.getItem(notifiedKey) === 'true';
 
     if (daysLeft <= 7 && daysLeft > 0 && !alreadyNotified) {
-      notificationService.showSubscriptionExpiring(daysLeft);
       toast.warning(`Подписка заканчивается через ${daysLeft} дней`, {
         description: 'Продлите подписку, чтобы не потерять доступ к функциям',
         duration: 10000
@@ -122,14 +120,6 @@ class SubscriptionMonitor {
     const alreadyNotified = localStorage.getItem(reachedKey) === 'true';
 
     if (resource.used >= resource.limit && !alreadyNotified) {
-      notificationService.show({
-        title: '🚫 Лимит исчерпан',
-        body: `Достигнут лимит ${label}. Улучшите тариф для продолжения.`,
-        tag: `limit-reached-${type}`,
-        requireInteraction: true,
-        data: { type: 'limit', resource: type }
-      });
-
       toast.error(`Лимит ${label} исчерпан`, {
         description: 'Улучшите тариф для продолжения использования',
         action: {

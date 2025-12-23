@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import Icon from '@/components/ui/icon';
 import { toast } from 'sonner';
-import NotificationSettings from '../NotificationSettings';
+
 import PrivacySettings from './settings/PrivacySettings';
 import ProfileSettings from './settings/ProfileSettings';
 import ApiKeysSettings from './settings/ApiKeysSettings';
@@ -43,12 +43,8 @@ const SettingsTab = () => {
 
   return (
     <div className="space-y-6">
-      <Tabs defaultValue="notifications" className="w-full">
-        <TabsList className="grid w-full grid-cols-2 md:grid-cols-3 lg:grid-cols-7">
-          <TabsTrigger value="notifications">
-            <Icon name="Bell" className="mr-2" size={16} />
-            <span className="hidden sm:inline">Уведомления</span>
-          </TabsTrigger>
+      <Tabs defaultValue="privacy" className="w-full">
+        <TabsList className="grid w-full grid-cols-2 md:grid-cols-3 lg:grid-cols-6">
           <TabsTrigger value="privacy">
             <Icon name="Lock" className="mr-2" size={16} />
             <span className="hidden sm:inline">Приватность</span>
@@ -74,10 +70,6 @@ const SettingsTab = () => {
             <span className="hidden sm:inline">Оплата</span>
           </TabsTrigger>
         </TabsList>
-
-        <TabsContent value="notifications" className="space-y-6">
-          <NotificationSettings />
-        </TabsContent>
 
         <TabsContent value="privacy" className="space-y-6">
           <PrivacySettings settings={settings} onSettingsChange={saveSettings} />
