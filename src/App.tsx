@@ -22,6 +22,7 @@ import GoogleCallback from "./pages/GoogleCallback";
 import YandexCallback from "./pages/YandexCallback";
 import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
+import TestFunctions from "./pages/TestFunctions";
 import NotFound from "./pages/NotFound";
 
 const future = {
@@ -56,6 +57,7 @@ const App = () => (
                 <Route path="/vk-diagnostics" element={<VKDiagnostics />} />
                 <Route path="/forgot-password" element={<ForgotPassword />} />
                 <Route path="/reset-password" element={<ResetPassword />} />
+                <Route path="/test-functions" element={<TestFunctions />} />
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                 <Route path="*" element={<NotFound />} />
               </Routes>
