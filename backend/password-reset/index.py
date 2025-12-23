@@ -3,6 +3,7 @@ import os
 import psycopg2
 import secrets
 import smtplib
+import bcrypt
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from datetime import datetime, timedelta
@@ -234,10 +235,12 @@ def handle_verify(body_data: Dict[str, Any]) -> Dict[str, Any]:
         }
     
     user_id = result[0]
-    password_escaped = new_password.replace("'", "''")
+    
+    password_hash = bcrypt.hashpw(new_password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
+    password_hash_escaped = password_hash.replace("'", "''")
     
     cur.execute(
-        f"UPDATE t_p18253922_infinite_business_ca.users SET password_hash = '{password_escaped}' WHERE id = {user_id}"
+        f"UPDATE t_p18253922_infinite_business_ca.users SET password_hash = '{password_hash_escaped}' WHERE id = {user_id}"
     )
     
     cur.execute(
