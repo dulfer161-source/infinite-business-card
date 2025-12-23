@@ -3,6 +3,7 @@ import os
 import jwt
 import hashlib
 import hmac
+import psycopg2
 from datetime import datetime, timedelta
 from typing import Dict, Any
 
@@ -75,13 +76,55 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 'body': json.dumps({'error': 'Invalid hash signature'})
             }
         
+        conn = psycopg2.connect(os.environ['DATABASE_URL'])
+        cur = conn.cursor()
+        
+        telegram_id_escaped = str(telegram_id).replace("'", "''")
+        cur.execute(
+            f"SELECT id, name, email FROM users WHERE telegram_id = '{telegram_id_escaped}'"
+        )
+        existing_user = cur.fetchone()
+        
+        if existing_user:
+            user_id, user_name, user_email = existing_user
+        else:
+            full_name = f"{first_name} {last_name}".strip()
+            full_name_escaped = full_name.replace("'", "''")
+            username_escaped = username.replace("'", "''") if username else ''
+            photo_escaped = photo_url.replace("'", "''") if photo_url else ''
+            
+            email = f"telegram_{telegram_id}@visitka.site"
+            email_escaped = email.replace("'", "''")
+            
+            cur.execute(
+                f"INSERT INTO users (name, email, telegram_id, avatar, provider) "
+                f"VALUES ('{full_name_escaped}', '{email_escaped}', '{telegram_id_escaped}', '{photo_escaped}', 'telegram') "
+                f"RETURNING id, name, email"
+            )
+            result = cur.fetchone()
+            conn.commit()
+            
+            if not result:
+                cur.close()
+                conn.close()
+                return {
+                    'statusCode': 500,
+                    'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+                    'isBase64Encoded': False,
+                    'body': json.dumps({'error': 'Failed to create user'})
+                }
+            
+            user_id, user_name, user_email = result
+        
+        cur.close()
+        conn.close()
+        
         jwt_secret = os.environ.get('JWT_SECRET', 'default_secret_change_me')
-        full_name = f"{first_name} {last_name}".strip()
         
         jwt_token = jwt.encode({
-            'user_id': str(telegram_id),
-            'name': full_name,
-            'username': username,
+            'user_id': user_id,
+            'name': user_name,
+            'email': user_email,
             'picture': photo_url,
             'provider': 'telegram',
             'exp': datetime.utcnow() + timedelta(days=30)
@@ -97,9 +140,9 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             'body': json.dumps({
                 'token': jwt_token,
                 'user': {
-                    'id': str(telegram_id),
-                    'name': full_name,
-                    'username': username,
+                    'id': user_id,
+                    'name': user_name,
+                    'email': user_email,
                     'picture': photo_url
                 }
             })
