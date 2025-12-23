@@ -187,14 +187,20 @@ const AuthDialog = ({ open, onOpenChange, onSuccess }: AuthDialogProps) => {
     }
   };
 
-  const handleTelegramAuth = (userData: any) => {
-    fetch('https://functions.poehali.dev/1f1f10e9-7be0-4c16-91b6-f53673e8b2ea', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(userData)
-    })
-    .then(res => res.json())
-    .then(data => {
+  const handleTelegramAuth = async (userData: any) => {
+    try {
+      const response = await fetch('https://functions.poehali.dev/1f1f10e9-7be0-4c16-91b6-f53673e8b2ea', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(userData)
+      });
+      
+      if (!response.ok) {
+        throw new Error('Ошибка авторизации');
+      }
+      
+      const data = await response.json();
+      
       if (data.token) {
         localStorage.setItem('token', data.token);
         localStorage.setItem('user', JSON.stringify(data.user));
@@ -206,23 +212,22 @@ const AuthDialog = ({ open, onOpenChange, onSuccess }: AuthDialogProps) => {
         onOpenChange(false);
         window.location.reload();
       }
-    })
-    .catch(error => {
+    } catch (error: any) {
       toast({
         title: 'Ошибка',
-        description: 'Не удалось войти через Telegram',
+        description: error.message || 'Не удалось войти через Telegram',
         variant: 'destructive',
       });
-    });
+    }
   };
 
   useEffect(() => {
-    if (open && typeof window !== 'undefined' && (window as any).Telegram) {
+    if (open && typeof window !== 'undefined') {
       const container = document.getElementById('telegram-login-container');
       if (container && !container.hasChildNodes()) {
         const script = document.createElement('script');
         script.src = 'https://telegram.org/js/telegram-widget.js?22';
-        script.setAttribute('data-telegram-login', 'YOUR_BOT_USERNAME');
+        script.setAttribute('data-telegram-login', 'infinitecardbot');
         script.setAttribute('data-size', 'large');
         script.setAttribute('data-radius', '8');
         script.setAttribute('data-onauth', 'handleTelegramAuth(user)');

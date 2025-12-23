@@ -1,0 +1,31 @@
+{
+  "tests": [
+    {
+      "name": "Request without email",
+      "method": "POST",
+      "path": "/",
+      "body": {
+        "action": "request"
+      },
+      "expectedStatus": 400,
+      "expectedBody": {
+        "error": "string"
+      },
+      "bodyMatcher": "partial"
+    },
+    {
+      "name": "Verify without token",
+      "method": "POST",
+      "path": "/",
+      "body": {
+        "action": "verify",
+        "password": "newpassword123"
+      },
+      "expectedStatus": 400,
+      "expectedBody": {
+        "error": "string"
+      },
+      "bodyMatcher": "partial"
+    }
+  ]
+}
