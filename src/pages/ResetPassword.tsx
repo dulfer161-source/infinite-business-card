@@ -14,7 +14,7 @@ export default function ResetPassword() {
   useEffect(() => {
     if (!token) {
       toast.error('Неверная ссылка');
-      navigate('/login');
+      navigate('/');
     }
   }, [token, navigate]);
 

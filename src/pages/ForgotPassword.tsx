@@ -51,7 +51,7 @@ export default function ForgotPassword() {
             Мы отправили инструкции по восстановлению пароля на <strong>{email}</strong>
           </p>
           <Link
-            to="/login"
+            to="/"
             className="inline-flex items-center gap-2 text-indigo-600 hover:text-indigo-700 font-medium"
           >
             <Icon name="ArrowLeft" size={20} />
@@ -97,7 +97,7 @@ export default function ForgotPassword() {
 
           <div className="text-center">
             <Link
-              to="/login"
+              to="/"
               className="inline-flex items-center gap-2 text-gray-600 hover:text-gray-900 text-sm"
             >
               <Icon name="ArrowLeft" size={16} />
