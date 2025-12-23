@@ -78,7 +78,7 @@ def handle_request(body_data: Dict[str, Any]) -> Dict[str, Any]:
     email_escaped = email.replace("'", "''")
     
     cur.execute(
-        f"SELECT id, name FROM users WHERE email = '{email_escaped}'"
+        f"SELECT id, name FROM t_p18253922_infinite_business_ca.users WHERE email = '{email_escaped}'"
     )
     user = cur.fetchone()
     
@@ -103,7 +103,7 @@ def handle_request(body_data: Dict[str, Any]) -> Dict[str, Any]:
     )
     
     cur.execute(
-        f"INSERT INTO password_reset_tokens (user_id, token, expires_at) VALUES ({user_id}, '{reset_code_escaped}', '{expires_at}')"
+        f"INSERT INTO t_p18253922_infinite_business_ca.password_reset_tokens (user_id, token, expires_at) VALUES ({user_id}, '{reset_code_escaped}', '{expires_at}')"
     )
     
     conn.commit()
@@ -219,7 +219,7 @@ def handle_verify(body_data: Dict[str, Any]) -> Dict[str, Any]:
     now = datetime.now().isoformat()
     
     cur.execute(
-        f"SELECT user_id FROM password_reset_tokens WHERE token = '{token_escaped}' AND expires_at > '{now}'"
+        f"SELECT user_id FROM t_p18253922_infinite_business_ca.password_reset_tokens WHERE token = '{token_escaped}' AND expires_at > '{now}'"
     )
     result = cur.fetchone()
     
@@ -237,11 +237,11 @@ def handle_verify(body_data: Dict[str, Any]) -> Dict[str, Any]:
     password_escaped = new_password.replace("'", "''")
     
     cur.execute(
-        f"UPDATE users SET password = '{password_escaped}' WHERE id = {user_id}"
+        f"UPDATE t_p18253922_infinite_business_ca.users SET password = '{password_escaped}' WHERE id = {user_id}"
     )
     
     cur.execute(
-        f"DELETE FROM password_reset_tokens WHERE user_id = {user_id}"
+        f"DELETE FROM t_p18253922_infinite_business_ca.password_reset_tokens WHERE user_id = {user_id}"
     )
     
     conn.commit()

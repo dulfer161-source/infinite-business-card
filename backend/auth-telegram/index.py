@@ -81,7 +81,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
         
         telegram_id_escaped = str(telegram_id).replace("'", "''")
         cur.execute(
-            f"SELECT id, name, email FROM users WHERE telegram_id = '{telegram_id_escaped}'"
+            f"SELECT id, name, email FROM t_p18253922_infinite_business_ca.users WHERE telegram_id = '{telegram_id_escaped}'"
         )
         existing_user = cur.fetchone()
         
@@ -97,7 +97,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             email_escaped = email.replace("'", "''")
             
             cur.execute(
-                f"INSERT INTO users (name, email, telegram_id, avatar, provider) "
+                f"INSERT INTO t_p18253922_infinite_business_ca.users (name, email, telegram_id, avatar, provider) "
                 f"VALUES ('{full_name_escaped}', '{email_escaped}', '{telegram_id_escaped}', '{photo_escaped}', 'telegram') "
                 f"RETURNING id, name, email"
             )
