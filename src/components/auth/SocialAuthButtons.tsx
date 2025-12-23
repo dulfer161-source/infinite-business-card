@@ -18,7 +18,7 @@ export default function SocialAuthButtons({
     if (container && !container.hasChildNodes()) {
       const script = document.createElement('script');
       script.src = 'https://telegram.org/js/telegram-widget.js?22';
-      script.setAttribute('data-telegram-login', 'infinitecardbot');
+      script.setAttribute('data-telegram-login', 'Visitka_sitebot');
       script.setAttribute('data-size', 'large');
       script.setAttribute('data-radius', '8');
       script.setAttribute('data-onauth', 'onTelegramAuthCallback(user)');
