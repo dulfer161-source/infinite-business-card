@@ -13,11 +13,11 @@
     {
       "name": "Get public card by ID",
       "method": "GET",
-      "path": "/?id=8",
+      "path": "/?id=2",
       "expectedStatus": 200,
       "expectedBody": {
         "card": {
-          "id": 8
+          "id": 2
         }
       },
       "bodyMatcher": "partial"

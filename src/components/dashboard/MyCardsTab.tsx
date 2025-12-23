@@ -215,7 +215,8 @@ const MyCardsTab = () => {
           phone: card.phone || '',
           email: card.email || '',
           website: card.website || '',
-          description: card.description || ''
+          description: card.description || '',
+          logo_url: card.logo_url || ''
         })
       });
 

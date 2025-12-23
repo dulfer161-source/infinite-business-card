@@ -143,8 +143,8 @@ def handler(event, context):
             cur.execute(
                 f"""
                 INSERT INTO t_p18253922_infinite_business_ca.business_cards 
-                (id, user_id, name, position, company, phone, email, website, description)
-                VALUES ({next_id}, {int(user_id)}, '{name}', '{position}', '{company}', '{phone}', '{email}', '{website}', '{description}')
+                (id, user_id, name, position, company, phone, email, website, description, logo_url)
+                VALUES ({next_id}, {int(user_id)}, '{name}', '{position}', '{company}', '{phone}', '{email}', '{website}', '{description}', '{logo_url}')
                 RETURNING *
                 """
             )
@@ -177,12 +177,14 @@ def handler(event, context):
             email = body.get('email', '').replace("'", "''")
             website = body.get('website', '').replace("'", "''")
             description = body.get('description', '').replace("'", "''")
+            logo_url = body.get('logo_url', '').replace("'", "''")
             
             cur.execute(
                 f"""
                 UPDATE t_p18253922_infinite_business_ca.business_cards 
                 SET name = '{name}', position = '{position}', company = '{company}', phone = '{phone}', 
-                    email = '{email}', website = '{website}', description = '{description}', updated_at = CURRENT_TIMESTAMP
+                    email = '{email}', website = '{website}', description = '{description}', logo_url = '{logo_url}', 
+                    updated_at = CURRENT_TIMESTAMP
                 WHERE id = {int(card_id)} AND user_id = {int(user_id)}
                 RETURNING *
                 """
