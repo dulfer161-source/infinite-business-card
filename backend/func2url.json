@@ -1,4 +1,7 @@
 {
+  "payment-status": "https://functions.poehali.dev/feb266c6-ab71-4e77-891f-1cac9cd9df97",
+  "payment-webhook": "https://functions.poehali.dev/8a157dc3-1107-459c-8a50-def96da65372",
+  "payment-create": "https://functions.poehali.dev/f59b90f0-92f3-449d-a3fa-95873b623166",
   "password-reset": "https://functions.poehali.dev/af64e807-c8f1-475d-b790-dd5179abb17c",
   "check-secrets": "https://functions.poehali.dev/2676ce6b-3746-4d35-be91-a469ea700d28",
   "auth-telegram": "https://functions.poehali.dev/1f1f10e9-7be0-4c16-91b6-f53673e8b2ea",

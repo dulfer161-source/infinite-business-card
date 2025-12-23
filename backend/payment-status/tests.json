@@ -1,0 +1,33 @@
+{
+  "tests": [
+    {
+      "name": "Get payment status - unauthorized",
+      "method": "GET",
+      "path": "/?payment_id=1",
+      "expectedStatus": 401,
+      "expectedBody": {
+        "error": "string"
+      },
+      "bodyMatcher": "partial"
+    },
+    {
+      "name": "Get payment status - missing ID",
+      "method": "GET",
+      "path": "/",
+      "headers": {
+        "X-Auth-Token": "test-token"
+      },
+      "expectedStatus": 401,
+      "expectedBody": {
+        "error": "string"
+      },
+      "bodyMatcher": "partial"
+    },
+    {
+      "name": "OPTIONS preflight",
+      "method": "OPTIONS",
+      "path": "/",
+      "expectedStatus": 200
+    }
+  ]
+}
