@@ -147,6 +147,17 @@ const Pricing = ({ onSelectPlan }: PricingProps) => {
               </CardContent>
 
               <CardFooter>
+                <Button
+                  onClick={() => onSelectPlan(plan.name, plan.price)}
+                  className={`w-full ${
+                    plan.popular
+                      ? 'bg-gold text-black hover:bg-gold/90'
+                      : 'bg-muted hover:bg-muted/80'
+                  }`}
+                >
+                  {plan.cta}
+                </Button>
+              </CardFooter>
                 <Button 
                   className={`w-full font-semibold transition-all duration-300 ${
                     plan.popular 
