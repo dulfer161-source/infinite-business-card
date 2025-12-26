@@ -9,6 +9,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import Icon from '@/components/ui/icon';
 import { api } from '@/lib/api';
 import { useToast } from '@/hooks/use-toast';
+import TemplatePromptLibrary from './TemplatePromptLibrary';
 
 interface TemplatesManagerProps {
   cardId: number;
@@ -162,9 +163,11 @@ const TemplatesManager = ({ cardId }: TemplatesManagerProps) => {
           </TabsList>
 
           <TabsContent value="generate" className="space-y-4">
+            <TemplatePromptLibrary onSelectPrompt={(prompt) => setAiPrompt(prompt)} />
+            
             <div className="space-y-4 p-4 bg-gradient-to-br from-primary/5 to-primary/10 rounded-lg border border-primary/20">
               <div className="space-y-2">
-                <Label htmlFor="ai-prompt">Опишите макет визитки</Label>
+                <Label htmlFor="ai-prompt">Или опишите свой макет</Label>
                 <Textarea
                   id="ai-prompt"
                   placeholder="Пример: Современная визитка для IT-специалиста в синих тонах с минималистичным дизайном"
