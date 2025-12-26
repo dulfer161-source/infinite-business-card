@@ -43,7 +43,7 @@ const Index = () => {
     setAuthDialogOpen(true);
   };
 
-  const handleSelectPlan = (planName: string, price: string) => {
+  const handleSelectPlan = async (planName: string, price: string) => {
     if (!isLoggedIn) {
       setAuthDialogOpen(true);
       return;
@@ -54,8 +54,18 @@ const Index = () => {
       return;
     }
 
-    setSelectedPlan({ name: planName, price });
-    setPaymentDialogOpen(true);
+    // Get subscription ID by plan name
+    try {
+      const { plans } = await api.getSubscriptionPlans();
+      const plan = plans.find((p: any) => p.name === planName);
+      
+      setSelectedPlan({ name: planName, price, subscriptionId: plan?.id });
+      setPaymentDialogOpen(true);
+    } catch (error) {
+      console.error('Failed to load plans:', error);
+      setSelectedPlan({ name: planName, price });
+      setPaymentDialogOpen(true);
+    }
   };
 
   const handlePayment = async () => {
@@ -67,7 +77,8 @@ const Index = () => {
       const response = await api.createPayment(
         priceNumber,
         selectedPlan.name,
-        `${window.location.origin}/payment/success`
+        `${window.location.origin}/payment/success`,
+        (selectedPlan as any).subscriptionId
       );
 
       if (response.confirmation_url) {

@@ -65,6 +65,7 @@ def handler(event, context):
         body = json.loads(event.get('body', '{}'))
         amount = body.get('amount')
         description = body.get('description', 'Оплата подписки')
+        subscription_id = body.get('subscription_id')
         return_url = body.get('return_url', 'https://infinite-business-cards.poehali.app/dashboard')
         
         if not amount:
@@ -103,7 +104,8 @@ def handler(event, context):
             'capture': True,
             'description': description,
             'metadata': {
-                'user_id': user_id
+                'user_id': user_id,
+                'subscription_id': subscription_id
             }
         }
         
@@ -132,7 +134,11 @@ def handler(event, context):
         cur.execute("SELECT COALESCE(MAX(id), 0) + 1 as next_id FROM t_p18253922_infinite_business_ca.payments")
         next_id = cur.fetchone()['next_id']
         
-        metadata_json = json.dumps({'description': description, 'idempotence_key': idempotence_key}).replace("'", "''")
+        metadata_json = json.dumps({
+            'description': description, 
+            'idempotence_key': idempotence_key,
+            'subscription_id': subscription_id
+        }).replace("'", "''")
         
         cur.execute(
             f"""

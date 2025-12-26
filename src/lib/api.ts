@@ -191,18 +191,53 @@ class ApiService {
     return await response.json();
   }
 
-  async createPayment(amount: number, paymentType: string, returnUrl?: string): Promise<{ payment: any; confirmation_url: string }> {
+  async createPayment(amount: number, paymentType: string, returnUrl?: string, subscriptionId?: number): Promise<{ payment: any; confirmation_url: string }> {
     const response = await this.fetchWithRetry(API_URLS.payments, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         ...this.getAuthHeaders(),
       },
-      body: JSON.stringify({ amount, payment_type: paymentType, return_url: returnUrl }),
+      body: JSON.stringify({ 
+        amount, 
+        payment_type: paymentType, 
+        return_url: returnUrl,
+        subscription_id: subscriptionId 
+      }),
     });
 
     if (!response.ok) {
       throw new Error('Failed to create payment');
+    }
+
+    return await response.json();
+  }
+
+  // Subscriptions
+  async getSubscriptionPlans() {
+    const response = await this.fetchWithRetry(`${API_URLS.auth}/plans`, {
+      method: 'GET',
+      headers: { 'Content-Type': 'application/json' },
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to get subscription plans');
+    }
+
+    return await response.json();
+  }
+
+  async getUserSubscriptions() {
+    const response = await this.fetchWithRetry(`${API_URLS.auth}/subscriptions`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        ...this.getAuthHeaders(),
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to get user subscriptions');
     }
 
     return await response.json();

@@ -47,6 +47,7 @@ def handler(event, context):
         
         provider_payment_id = payment_object.get('id')
         status = payment_object.get('status')
+        metadata = payment_object.get('metadata', {})
         
         if not provider_payment_id:
             return {
@@ -80,6 +81,29 @@ def handler(event, context):
                 'body': json.dumps({'error': 'Payment not found'}),
                 'isBase64Encoded': False
             }
+        
+        # Activate subscription if payment succeeded
+        if status == 'succeeded':
+            user_id = metadata.get('user_id') or payment.get('user_id')
+            subscription_id = metadata.get('subscription_id')
+            
+            if user_id and subscription_id:
+                # Get subscription details
+                cur.execute(f"SELECT duration_days FROM t_p18253922_infinite_business_ca.subscriptions WHERE id = {int(subscription_id)}")
+                subscription = cur.fetchone()
+                
+                if subscription:
+                    duration_days = subscription['duration_days']
+                    
+                    # Create user subscription
+                    cur.execute("SELECT COALESCE(MAX(id), 0) + 1 as next_id FROM t_p18253922_infinite_business_ca.user_subscriptions")
+                    next_id = cur.fetchone()['next_id']
+                    
+                    cur.execute(f"""
+                        INSERT INTO t_p18253922_infinite_business_ca.user_subscriptions 
+                        (id, user_id, subscription_id, starts_at, expires_at, is_active)
+                        VALUES ({next_id}, {int(user_id)}, {int(subscription_id)}, NOW(), NOW() + INTERVAL '{int(duration_days)} days', TRUE)
+                    """)
         
         conn.commit()
         
