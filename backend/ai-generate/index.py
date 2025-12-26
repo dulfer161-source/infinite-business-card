@@ -103,10 +103,13 @@ def handler(event, context):
         # Получаем access token GigaChat
         gigachat_api_key = os.environ.get('GIGACHAT_API_KEY')
         
+        # GIGACHAT_API_KEY уже в формате Base64, просто добавляем Basic
+        auth_header = gigachat_api_key if gigachat_api_key.startswith('Basic ') else f'Basic {gigachat_api_key}'
+        
         auth_response = requests.post(
             'https://ngw.devices.sberbank.ru:9443/api/v2/oauth',
             headers={
-                'Authorization': f'Basic {gigachat_api_key}',
+                'Authorization': auth_header,
                 'RqUID': str(uuid.uuid4()),
                 'Content-Type': 'application/x-www-form-urlencoded'
             },
