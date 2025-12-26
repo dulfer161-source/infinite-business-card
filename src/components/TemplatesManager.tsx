@@ -22,6 +22,8 @@ const TemplatesManager = ({ cardId }: TemplatesManagerProps) => {
   const [templateUrl, setTemplateUrl] = useState('');
   const [aiPrompt, setAiPrompt] = useState('');
   const [generatedPreview, setGeneratedPreview] = useState('');
+  const [generationsLeft, setGenerationsLeft] = useState(5);
+  const [resetTime, setResetTime] = useState<number | null>(null);
   const { toast } = useToast();
 
   const loadTemplates = async () => {
@@ -43,6 +45,21 @@ const TemplatesManager = ({ cardId }: TemplatesManagerProps) => {
   useEffect(() => {
     loadTemplates();
   }, [cardId]);
+
+  useEffect(() => {
+    if (resetTime && resetTime > 0) {
+      const interval = setInterval(() => {
+        setResetTime(prev => {
+          if (!prev || prev <= 1) {
+            setGenerationsLeft(5);
+            return null;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+      return () => clearInterval(interval);
+    }
+  }, [resetTime]);
 
   const handleUploadTemplate = async () => {
     if (!templateUrl.trim()) {
@@ -87,10 +104,24 @@ const TemplatesManager = ({ cardId }: TemplatesManagerProps) => {
         body: JSON.stringify({ prompt }),
       });
 
+      if (response.status === 429) {
+        const retryAfter = response.headers.get('Retry-After');
+        const data = await response.json();
+        setResetTime(retryAfter ? parseInt(retryAfter) : 300);
+        setGenerationsLeft(0);
+        toast({
+          title: 'Лимит исчерпан',
+          description: `Превышен лимит генераций (5 в 5 минут). Попробуйте через ${retryAfter || 300} секунд.`,
+          variant: 'destructive',
+        });
+        return;
+      }
+
       const data = await response.json();
       
       if (data.image_url) {
         setGeneratedPreview(data.image_url);
+        setGenerationsLeft(prev => Math.max(0, prev - 1));
         toast({
           title: 'Готово!',
           description: 'Макет сгенерирован. Проверьте и сохраните.',
@@ -98,10 +129,10 @@ const TemplatesManager = ({ cardId }: TemplatesManagerProps) => {
       } else {
         throw new Error('No image URL');
       }
-    } catch (error) {
+    } catch (error: any) {
       toast({
         title: 'Ошибка',
-        description: 'Не удалось сгенерировать макет',
+        description: error?.message || 'Не удалось сгенерировать макет',
         variant: 'destructive',
       });
     } finally {
@@ -177,6 +208,23 @@ const TemplatesManager = ({ cardId }: TemplatesManagerProps) => {
           </TabsList>
 
           <TabsContent value="generate" className="space-y-4">
+            <div className="flex items-center justify-between p-3 bg-muted/50 rounded-lg border">
+              <div className="flex items-center gap-2">
+                <Icon name="Zap" size={18} className="text-primary" />
+                <span className="text-sm font-medium">Осталось генераций:</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <Badge variant={generationsLeft > 2 ? 'default' : generationsLeft > 0 ? 'secondary' : 'destructive'}>
+                  {generationsLeft} / 5
+                </Badge>
+                {generationsLeft === 0 && resetTime && (
+                  <span className="text-xs text-muted-foreground">
+                    (~{Math.ceil(resetTime / 60)} мин)
+                  </span>
+                )}
+              </div>
+            </div>
+
             <TemplatePromptLibrary 
               onSelectPrompt={(prompt) => setAiPrompt(prompt)}
               onRandomGenerate={handleRandomGenerate}
@@ -199,7 +247,7 @@ const TemplatesManager = ({ cardId }: TemplatesManagerProps) => {
               </div>
               <Button 
                 onClick={handleGenerateTemplate} 
-                disabled={generating || !aiPrompt.trim()} 
+                disabled={generating || !aiPrompt.trim() || generationsLeft === 0} 
                 className="w-full relative overflow-hidden"
               >
                 {generating ? (
