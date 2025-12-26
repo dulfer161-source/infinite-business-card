@@ -183,24 +183,29 @@ def handler(event, context):
             'isBase64Encoded': False
         }
     
-    except requests.exceptions.Timeout:
+    except requests.exceptions.Timeout as e:
+        print(f'Timeout error: {str(e)}')
         return {
             'statusCode': 504,
             'headers': {'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json'},
             'body': json.dumps({'error': 'AI service timeout'}),
             'isBase64Encoded': False
         }
-    except requests.exceptions.RequestException:
+    except requests.exceptions.RequestException as e:
+        print(f'Request error: {str(e)}')
         return {
             'statusCode': 502,
             'headers': {'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json'},
-            'body': json.dumps({'error': 'AI service unavailable'}),
+            'body': json.dumps({'error': f'AI service unavailable: {str(e)}'}),
             'isBase64Encoded': False
         }
-    except Exception:
+    except Exception as e:
+        print(f'General error: {str(e)}')
+        import traceback
+        traceback.print_exc()
         return {
             'statusCode': 500,
             'headers': {'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json'},
-            'body': json.dumps({'error': 'Image generation failed'}),
+            'body': json.dumps({'error': f'Image generation failed: {str(e)}'}),
             'isBase64Encoded': False
         }
