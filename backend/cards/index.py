@@ -147,15 +147,23 @@ def handler(event, context):
             next_id = cur.fetchone()['next_id']
             
             # Check user subscription for branding permissions
-            cur.execute(f"""
-                SELECT s.can_remove_branding 
-                FROM t_p18253922_infinite_business_ca.user_subscriptions us
-                JOIN t_p18253922_infinite_business_ca.subscriptions s ON us.subscription_id = s.id
-                WHERE us.user_id = {int(user_id)} AND us.is_active = TRUE AND us.expires_at > NOW()
-                ORDER BY us.expires_at DESC LIMIT 1
-            """)
-            subscription = cur.fetchone()
-            can_remove_branding = subscription['can_remove_branding'] if subscription else False
+            # Note: user_subscriptions table uses plan_id, not subscription_id
+            can_remove_branding = False
+            try:
+                cur.execute(f"""
+                    SELECT s.can_remove_branding 
+                    FROM t_p18253922_infinite_business_ca.user_subscriptions us
+                    JOIN t_p18253922_infinite_business_ca.subscriptions s ON us.plan_id = s.id
+                    WHERE us.user_id = {int(user_id)} 
+                      AND us.status = 'active' 
+                      AND (us.expires_at IS NULL OR us.expires_at > NOW())
+                    ORDER BY us.expires_at DESC NULLS FIRST LIMIT 1
+                """)
+                subscription = cur.fetchone()
+                can_remove_branding = subscription['can_remove_branding'] if subscription else False
+            except Exception as sub_error:
+                print(f"Subscription check error: {sub_error}")
+                can_remove_branding = False
             
             custom_branding = body.get('custom_branding', {})
             hide_platform_branding = body.get('hide_platform_branding', False) and can_remove_branding
@@ -206,15 +214,22 @@ def handler(event, context):
             logo_url = body.get('logo_url', '').replace("'", "''")
             
             # Check branding permissions if trying to hide platform branding
-            cur.execute(f"""
-                SELECT s.can_remove_branding 
-                FROM t_p18253922_infinite_business_ca.user_subscriptions us
-                JOIN t_p18253922_infinite_business_ca.subscriptions s ON us.subscription_id = s.id
-                WHERE us.user_id = {int(user_id)} AND us.is_active = TRUE AND us.expires_at > NOW()
-                ORDER BY us.expires_at DESC LIMIT 1
-            """)
-            subscription = cur.fetchone()
-            can_remove_branding = subscription['can_remove_branding'] if subscription else False
+            can_remove_branding = False
+            try:
+                cur.execute(f"""
+                    SELECT s.can_remove_branding 
+                    FROM t_p18253922_infinite_business_ca.user_subscriptions us
+                    JOIN t_p18253922_infinite_business_ca.subscriptions s ON us.plan_id = s.id
+                    WHERE us.user_id = {int(user_id)} 
+                      AND us.status = 'active' 
+                      AND (us.expires_at IS NULL OR us.expires_at > NOW())
+                    ORDER BY us.expires_at DESC NULLS FIRST LIMIT 1
+                """)
+                subscription = cur.fetchone()
+                can_remove_branding = subscription['can_remove_branding'] if subscription else False
+            except Exception as sub_error:
+                print(f"Subscription check error (PUT): {sub_error}")
+                can_remove_branding = False
             
             custom_branding = body.get('custom_branding', {})
             hide_platform_branding = body.get('hide_platform_branding', False) and can_remove_branding
