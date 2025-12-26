@@ -18,8 +18,7 @@ const TemplatesAndAdsTab = () => {
   const loadCards = async () => {
     try {
       setLoading(true);
-      const response = await api.getCards();
-      const userCards = response.cards || [];
+      const userCards = await api.getCards();
       setCards(userCards);
       
       if (userCards.length > 0 && !selectedCardId) {
