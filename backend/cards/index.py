@@ -21,6 +21,8 @@ def handler(event, context):
     path_params = event.get('pathParams', {})
     card_id = path_params.get('id')
     
+    print(f"DEBUG: path={event.get('path', '')}, url={event.get('url', '')}, httpPath={event.get('httpPath', '')}")
+    
     if method == 'OPTIONS':
         return {
             'statusCode': 200,
