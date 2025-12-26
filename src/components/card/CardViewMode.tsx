@@ -15,6 +15,13 @@ interface CardData {
   description?: string;
   logo_url?: string;
   view_count: number;
+  custom_branding?: {
+    enabled: boolean;
+    logo_url?: string;
+    brand_color?: string;
+    brand_name?: string;
+  };
+  hide_platform_branding?: boolean;
 }
 
 interface CardViewModeProps {
@@ -26,13 +33,33 @@ interface CardViewModeProps {
 }
 
 const CardViewMode = ({ card, isOwner, onEditToggle, onContact, onShare }: CardViewModeProps) => {
+  const brandColor = card.custom_branding?.enabled ? card.custom_branding.brand_color : '#FFD700';
+  const showPlatformBranding = !card.hide_platform_branding;
+  
   return (
     <>
       {/* Header */}
       <div className="text-center mb-4 md:mb-6">
-        <div className="flex items-center justify-center mb-3 md:mb-4">
-          <Logo size="md" />
-        </div>
+        {showPlatformBranding ? (
+          <div className="flex items-center justify-center mb-3 md:mb-4">
+            <Logo size="md" />
+          </div>
+        ) : card.custom_branding?.enabled && (card.custom_branding.logo_url || card.custom_branding.brand_name) ? (
+          <div className="flex items-center justify-center mb-3 md:mb-4 gap-2">
+            {card.custom_branding.logo_url && (
+              <img 
+                src={card.custom_branding.logo_url} 
+                alt={card.custom_branding.brand_name || 'Brand logo'} 
+                className="h-8 md:h-10 object-contain"
+              />
+            )}
+            {card.custom_branding.brand_name && (
+              <span className="text-lg md:text-xl font-semibold" style={{ color: brandColor }}>
+                {card.custom_branding.brand_name}
+              </span>
+            )}
+          </div>
+        ) : null}
         <div className="flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-3">
           <Badge variant="outline" className="border-gold/50 text-gold/80 text-xs">
             <Icon name="Eye" size={12} className="mr-1" />
@@ -55,8 +82,15 @@ const CardViewMode = ({ card, isOwner, onEditToggle, onContact, onShare }: CardV
       {/* Main Card */}
       <Card className="overflow-hidden border-2 border-gold/20 shadow-xl">
         <div className="relative">
-          {/* Gold accent bar */}
-          <div className="absolute top-0 left-0 right-0 h-2 bg-gradient-to-r from-gold via-yellow-400 to-gold"></div>
+          {/* Brand accent bar */}
+          <div 
+            className="absolute top-0 left-0 right-0 h-2"
+            style={{ 
+              background: card.custom_branding?.enabled 
+                ? `linear-gradient(to right, ${brandColor}, ${brandColor}dd, ${brandColor})` 
+                : 'linear-gradient(to right, #FFD700, #FCD34D, #FFD700)'
+            }}
+          ></div>
           
           <div className="p-4 md:p-8 pt-6 md:pt-10">
             {/* Logo / Avatar */}

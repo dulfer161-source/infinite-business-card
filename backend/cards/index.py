@@ -146,11 +146,26 @@ def handler(event, context):
             cur.execute("SELECT COALESCE(MAX(id), 0) + 1 as next_id FROM t_p18253922_infinite_business_ca.business_cards")
             next_id = cur.fetchone()['next_id']
             
+            # Check user subscription for branding permissions
+            cur.execute(f"""
+                SELECT s.can_remove_branding 
+                FROM t_p18253922_infinite_business_ca.user_subscriptions us
+                JOIN t_p18253922_infinite_business_ca.subscriptions s ON us.subscription_id = s.id
+                WHERE us.user_id = {int(user_id)} AND us.is_active = TRUE AND us.expires_at > NOW()
+                ORDER BY us.expires_at DESC LIMIT 1
+            """)
+            subscription = cur.fetchone()
+            can_remove_branding = subscription['can_remove_branding'] if subscription else False
+            
+            custom_branding = body.get('custom_branding', {})
+            hide_platform_branding = body.get('hide_platform_branding', False) and can_remove_branding
+            custom_branding_json = json.dumps(custom_branding).replace("'", "''")
+            
             cur.execute(
                 f"""
                 INSERT INTO t_p18253922_infinite_business_ca.business_cards 
-                (id, user_id, name, position, company, phone, email, website, description, logo_url)
-                VALUES ({next_id}, {int(user_id)}, '{name}', '{position}', '{company}', '{phone}', '{email}', '{website}', '{description}', '{logo_url}')
+                (id, user_id, name, position, company, phone, email, website, description, logo_url, custom_branding, hide_platform_branding)
+                VALUES ({next_id}, {int(user_id)}, '{name}', '{position}', '{company}', '{phone}', '{email}', '{website}', '{description}', '{logo_url}', '{custom_branding_json}', {hide_platform_branding})
                 RETURNING *
                 """
             )
@@ -185,11 +200,27 @@ def handler(event, context):
             description = body.get('description', '').replace("'", "''")
             logo_url = body.get('logo_url', '').replace("'", "''")
             
+            # Check branding permissions if trying to hide platform branding
+            cur.execute(f"""
+                SELECT s.can_remove_branding 
+                FROM t_p18253922_infinite_business_ca.user_subscriptions us
+                JOIN t_p18253922_infinite_business_ca.subscriptions s ON us.subscription_id = s.id
+                WHERE us.user_id = {int(user_id)} AND us.is_active = TRUE AND us.expires_at > NOW()
+                ORDER BY us.expires_at DESC LIMIT 1
+            """)
+            subscription = cur.fetchone()
+            can_remove_branding = subscription['can_remove_branding'] if subscription else False
+            
+            custom_branding = body.get('custom_branding', {})
+            hide_platform_branding = body.get('hide_platform_branding', False) and can_remove_branding
+            custom_branding_json = json.dumps(custom_branding).replace("'", "''")
+            
             cur.execute(
                 f"""
                 UPDATE t_p18253922_infinite_business_ca.business_cards 
                 SET name = '{name}', position = '{position}', company = '{company}', phone = '{phone}', 
                     email = '{email}', website = '{website}', description = '{description}', logo_url = '{logo_url}', 
+                    custom_branding = '{custom_branding_json}', hide_platform_branding = {hide_platform_branding},
                     updated_at = CURRENT_TIMESTAMP
                 WHERE id = {int(card_id)} AND user_id = {int(user_id)}
                 RETURNING *

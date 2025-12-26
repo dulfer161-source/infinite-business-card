@@ -22,10 +22,12 @@ const Pricing = ({ onSelectPlan }: PricingProps) => {
         'Шеринг в мессенджеры',
         'Просмотр статистики',
         'Загрузка макетов',
-        'Генерация макетов с ИИ'
+        'Генерация макетов с ИИ',
+        '❌ Брендинг платформы'
       ],
       cta: 'Начать бесплатно',
-      popular: false
+      popular: false,
+      canRemoveBranding: false
     },
     {
       name: 'Премиум',
@@ -35,13 +37,16 @@ const Pricing = ({ onSelectPlan }: PricingProps) => {
       features: [
         'Всё из Базового',
         'Безлимитные макеты с ИИ',
+        '✅ Персональный брендинг',
+        '✅ Отключение брендинга платформы',
         'Продажа рекламы на визитке',
         'Управление рекламными зонами',
         'Приоритетная поддержка',
         'Расширенная аналитика'
       ],
       cta: 'Подключить Премиум',
-      popular: true
+      popular: true,
+      canRemoveBranding: true
     },
     {
       name: 'Бизнес',
@@ -50,6 +55,7 @@ const Pricing = ({ onSelectPlan }: PricingProps) => {
       description: 'Для команд до 10 человек',
       features: [
         'Всё из Премиум',
+        '✅ Полный контроль брендинга',
         '10 визиток сотрудников',
         'Единый корп. стиль',
         'Командная панель управления',
@@ -57,7 +63,8 @@ const Pricing = ({ onSelectPlan }: PricingProps) => {
         'Приоритетная поддержка'
       ],
       cta: 'Для команды',
-      popular: false
+      popular: false,
+      canRemoveBranding: true
     },
     {
       name: 'Корпоративный',
@@ -74,7 +81,8 @@ const Pricing = ({ onSelectPlan }: PricingProps) => {
         'SLA 99.9%'
       ],
       cta: 'Связаться с нами',
-      popular: false
+      popular: false,
+      canRemoveBranding: true
     }
   ];
 

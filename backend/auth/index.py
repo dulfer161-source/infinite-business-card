@@ -29,9 +29,11 @@ def check_rate_limit(identifier: str, max_req: int = 5, window: int = 60) -> Tup
 
 def handler(event, context):
     '''
-    Аутентификация и регистрация пользователей
+    Аутентификация, регистрация и подписки пользователей
     POST /register - регистрация нового пользователя
     POST /login - вход в систему
+    GET /subscriptions - получить активные подписки пользователя
+    GET /plans - список всех доступных тарифов
     '''
     method = event.get('httpMethod', 'GET')
     
@@ -47,6 +49,77 @@ def handler(event, context):
             'body': '',
             'isBase64Encoded': False
         }
+    
+    # GET endpoints (public)
+    if method == 'GET':
+        conn = psycopg2.connect(os.environ['DATABASE_URL'])
+        cur = conn.cursor(cursor_factory=RealDictCursor)
+        
+        try:
+            # Get all subscription plans
+            if 'plans' in event.get('path', ''):
+                cur.execute("SELECT * FROM t_p18253922_infinite_business_ca.subscriptions ORDER BY price ASC")
+                plans = [dict(row) for row in cur.fetchall()]
+                
+                return {
+                    'statusCode': 200,
+                    'headers': {'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json'},
+                    'body': json.dumps({'plans': plans}, default=str),
+                    'isBase64Encoded': False
+                }
+            
+            # Get user subscriptions (requires auth)
+            if 'subscriptions' in event.get('path', ''):
+                headers = event.get('headers', {})
+                auth_token = headers.get('X-Auth-Token') or headers.get('x-auth-token')
+                
+                if not auth_token:
+                    return {
+                        'statusCode': 401,
+                        'headers': {'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json'},
+                        'body': json.dumps({'error': 'Unauthorized'}),
+                        'isBase64Encoded': False
+                    }
+                
+                cur.execute(f"SELECT user_id FROM t_p18253922_infinite_business_ca.auth_tokens WHERE token = '{auth_token}' AND expires_at > NOW()")
+                token_row = cur.fetchone()
+                
+                if not token_row:
+                    return {
+                        'statusCode': 401,
+                        'headers': {'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json'},
+                        'body': json.dumps({'error': 'Invalid token'}),
+                        'isBase64Encoded': False
+                    }
+                
+                user_id = token_row['user_id']
+                
+                cur.execute(f"""
+                    SELECT us.*, s.name, s.price, s.duration_days, s.features, s.can_remove_branding
+                    FROM t_p18253922_infinite_business_ca.user_subscriptions us
+                    JOIN t_p18253922_infinite_business_ca.subscriptions s ON us.subscription_id = s.id
+                    WHERE us.user_id = {int(user_id)} AND us.is_active = TRUE AND us.expires_at > NOW()
+                    ORDER BY us.expires_at DESC
+                """)
+                subscriptions = [dict(row) for row in cur.fetchall()]
+                
+                has_branding_access = any(sub.get('can_remove_branding') for sub in subscriptions)
+                
+                return {
+                    'statusCode': 200,
+                    'headers': {'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json'},
+                    'body': json.dumps({
+                        'subscriptions': subscriptions,
+                        'has_branding_access': has_branding_access
+                    }, default=str),
+                    'isBase64Encoded': False
+                }
+        
+        finally:
+            if cur:
+                cur.close()
+            if conn:
+                conn.close()
     
     if method != 'POST':
         return {
