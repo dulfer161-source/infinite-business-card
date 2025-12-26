@@ -55,18 +55,18 @@ const TemplatesAndAdsTab = () => {
   }
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
+    <div className="space-y-4 md:space-y-6">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h2 className="text-2xl font-bold gradient-text">Макеты и реклама</h2>
-          <p className="text-muted-foreground">Управляйте дизайном и монетизацией визиток</p>
+          <h2 className="text-xl md:text-2xl font-bold gradient-text">Макеты и реклама</h2>
+          <p className="text-sm md:text-base text-muted-foreground">Управляйте дизайном и монетизацией визиток</p>
         </div>
-        <div className="flex gap-2">
+        <div className="flex flex-wrap gap-2">
           {cards.map((card) => (
             <button
               key={card.id}
               onClick={() => setSelectedCardId(card.id)}
-              className={`px-4 py-2 rounded-lg border transition-all ${
+              className={`px-3 md:px-4 py-2 text-sm md:text-base rounded-lg border transition-all ${
                 selectedCardId === card.id
                   ? 'bg-green text-white border-green'
                   : 'bg-background border-border hover:border-green/50'
@@ -88,7 +88,7 @@ const TemplatesAndAdsTab = () => {
       </Alert>
 
       {selectedCardId && (
-        <div className="grid md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6">
           <TemplatesManager cardId={selectedCardId} />
           <AdZonesManager cardId={selectedCardId} />
         </div>

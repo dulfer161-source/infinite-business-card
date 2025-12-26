@@ -103,15 +103,16 @@ const CardEditMode = ({ editForm, saving, onEditFormChange, onSave, onCancel }: 
   return (
     <>
       {/* Header */}
-      <div className="text-center mb-6">
-        <div className="flex items-center justify-center mb-4">
+      <div className="text-center mb-4 md:mb-6">
+        <div className="flex items-center justify-center mb-3 md:mb-4">
           <Logo size="md" />
         </div>
-        <div className="flex items-center justify-center gap-3">
+        <div className="flex items-center justify-center gap-2 md:gap-3">
           <Button 
             variant="destructive"
             size="sm"
             onClick={onCancel}
+            className="text-xs md:text-sm"
           >
             <Icon name="X" size={14} className="mr-1" />
             Отменить
@@ -121,7 +122,7 @@ const CardEditMode = ({ editForm, saving, onEditFormChange, onSave, onCancel }: 
             size="sm"
             onClick={onSave}
             disabled={saving}
-            className="bg-gold text-black hover:bg-gold/90"
+            className="bg-gold text-black hover:bg-gold/90 text-xs md:text-sm"
           >
             {saving ? (
               <>
@@ -144,9 +145,9 @@ const CardEditMode = ({ editForm, saving, onEditFormChange, onSave, onCancel }: 
           {/* Gold accent bar */}
           <div className="absolute top-0 left-0 right-0 h-2 bg-gradient-to-r from-gold via-yellow-400 to-gold"></div>
           
-          <div className="p-8 pt-10">
+          <div className="p-4 md:p-8 pt-6 md:pt-10">
             {/* Logo / Avatar with Upload */}
-            <div className="mb-6 flex flex-col items-center gap-3">
+            <div className="mb-4 md:mb-6 flex flex-col items-center gap-3">
               <input
                 ref={fileInputRef}
                 type="file"
@@ -160,22 +161,22 @@ const CardEditMode = ({ editForm, saving, onEditFormChange, onSave, onCancel }: 
                 className="relative cursor-pointer group"
               >
                 {editForm.logo_url ? (
-                  <div className="w-32 h-32 rounded-full overflow-hidden border-4 border-gold/20 shadow-lg">
+                  <div className="w-24 h-24 md:w-32 md:h-32 rounded-full overflow-hidden border-4 border-gold/20 shadow-lg">
                     <img src={editForm.logo_url} alt={editForm.name} className="w-full h-full object-cover" />
                     <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                       {uploadingImage ? (
-                        <Icon name="Loader2" size={32} className="text-white animate-spin" />
+                        <Icon name="Loader2" size={28} className="md:w-8 md:h-8 text-white animate-spin" />
                       ) : (
-                        <Icon name="Camera" size={32} className="text-white" />
+                        <Icon name="Camera" size={28} className="md:w-8 md:h-8 text-white" />
                       )}
                     </div>
                   </div>
                 ) : (
-                  <div className="w-32 h-32 rounded-full bg-gradient-to-br from-gold/20 to-gold/5 flex items-center justify-center border-4 border-gold/20 shadow-lg group-hover:border-gold/40 transition-colors">
+                  <div className="w-24 h-24 md:w-32 md:h-32 rounded-full bg-gradient-to-br from-gold/20 to-gold/5 flex items-center justify-center border-4 border-gold/20 shadow-lg group-hover:border-gold/40 transition-colors">
                     {uploadingImage ? (
-                      <Icon name="Loader2" size={48} className="text-gold/60 animate-spin" />
+                      <Icon name="Loader2" size={40} className="md:w-12 md:h-12 text-gold/60 animate-spin" />
                     ) : (
-                      <Icon name="Camera" size={48} className="text-gold/60" />
+                      <Icon name="Camera" size={40} className="md:w-12 md:h-12 text-gold/60" />
                     )}
                   </div>
                 )}
@@ -195,7 +196,7 @@ const CardEditMode = ({ editForm, saving, onEditFormChange, onSave, onCancel }: 
             </div>
 
             {/* Edit Form */}
-            <div className="space-y-4">
+            <div className="space-y-3 md:space-y-4">
               <div>
                 <label className="block text-sm font-medium mb-2">Имя *</label>
                 <Input

@@ -195,7 +195,7 @@ const PublicCard = () => {
         {card.logo_url && <meta property="og:image" content={card.logo_url} />}
       </Helmet>
 
-      <div className="min-h-screen bg-gradient-to-br from-background via-background to-gold/5 py-8 px-4">
+      <div className="min-h-screen bg-gradient-to-br from-background via-background to-gold/5 py-4 md:py-8 px-4">
         <div className="container max-w-2xl mx-auto">
           {isEditMode && editForm ? (
             <CardEditMode

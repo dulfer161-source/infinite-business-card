@@ -151,22 +151,23 @@ const TemplatesManager = ({ cardId }: TemplatesManagerProps) => {
     <Card>
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
-          <Icon name="FileImage" size={24} />
-          Макеты визитки
+          <Icon name="FileImage" size={20} className="md:w-6 md:h-6" />
+          <span className="text-lg md:text-xl">Макеты визитки</span>
         </CardTitle>
-        <CardDescription>
+        <CardDescription className="text-sm">
           Загружайте свои макеты или генерируйте с помощью ИИ
         </CardDescription>
       </CardHeader>
-      <CardContent className="space-y-6">
+      <CardContent className="space-y-4 md:space-y-6">
         <Tabs defaultValue="generate">
           <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="generate">
-              <Icon name="Sparkles" size={16} className="mr-2" />
-              Генерация ИИ
+            <TabsTrigger value="generate" className="text-sm md:text-base">
+              <Icon name="Sparkles" size={16} className="mr-1 md:mr-2" />
+              <span className="hidden sm:inline">Генерация ИИ</span>
+              <span className="sm:hidden">ИИ</span>
             </TabsTrigger>
-            <TabsTrigger value="upload">
-              <Icon name="Upload" size={16} className="mr-2" />
+            <TabsTrigger value="upload" className="text-sm md:text-base">
+              <Icon name="Upload" size={16} className="mr-1 md:mr-2" />
               Загрузка
             </TabsTrigger>
           </TabsList>
@@ -177,7 +178,7 @@ const TemplatesManager = ({ cardId }: TemplatesManagerProps) => {
               onRandomGenerate={handleRandomGenerate}
             />
             
-            <div className="space-y-4 p-4 bg-gradient-to-br from-primary/5 to-primary/10 rounded-lg border border-primary/20">
+            <div className="space-y-3 md:space-y-4 p-3 md:p-4 bg-gradient-to-br from-primary/5 to-primary/10 rounded-lg border border-primary/20">
               <div className="space-y-2">
                 <Label htmlFor="ai-prompt">Или опишите свой макет</Label>
                 <Textarea
@@ -195,24 +196,27 @@ const TemplatesManager = ({ cardId }: TemplatesManagerProps) => {
               <Button 
                 onClick={handleGenerateTemplate} 
                 disabled={generating || !aiPrompt.trim()} 
-                className="w-full"
+                className="w-full relative overflow-hidden"
               >
                 {generating ? (
                   <>
+                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent animate-pulse" />
                     <Icon name="Loader2" size={18} className="mr-2 animate-spin" />
-                    Генерация...
+                    <span className="hidden sm:inline">Генерация макета...</span>
+                    <span className="sm:hidden">Генерация...</span>
                   </>
                 ) : (
                   <>
                     <Icon name="Sparkles" size={18} className="mr-2" />
-                    Сгенерировать макет
+                    <span className="hidden sm:inline">Сгенерировать макет</span>
+                    <span className="sm:hidden">Генерировать</span>
                   </>
                 )}
               </Button>
             </div>
 
             {generatedPreview && (
-              <div className="space-y-3 p-4 bg-muted/50 rounded-lg">
+              <div className="space-y-3 p-3 md:p-4 bg-muted/50 rounded-lg animate-in fade-in slide-in-from-bottom-4 duration-500">
                 <div className="flex items-center justify-between">
                   <h4 className="font-semibold">Предпросмотр</h4>
                   <Badge variant="outline" className="bg-primary/10">
@@ -225,7 +229,7 @@ const TemplatesManager = ({ cardId }: TemplatesManagerProps) => {
                   alt="Generated template"
                   className="w-full rounded-lg border"
                 />
-                <div className="flex gap-2">
+                <div className="flex flex-col sm:flex-row gap-2">
                   <Button onClick={handleSaveGenerated} disabled={loading} className="flex-1">
                     <Icon name="Save" size={18} className="mr-2" />
                     Сохранить
@@ -244,7 +248,7 @@ const TemplatesManager = ({ cardId }: TemplatesManagerProps) => {
           </TabsContent>
 
           <TabsContent value="upload" className="space-y-4">
-            <div className="space-y-4 p-4 bg-muted/50 rounded-lg">
+            <div className="space-y-3 md:space-y-4 p-3 md:p-4 bg-muted/50 rounded-lg">
               <div className="space-y-2">
                 <Label htmlFor="template-url">URL макета</Label>
                 <Input
@@ -263,7 +267,7 @@ const TemplatesManager = ({ cardId }: TemplatesManagerProps) => {
         </Tabs>
 
         <div className="space-y-3">
-          <h4 className="font-semibold">Мои макеты ({templates.length})</h4>
+          <h4 className="font-semibold text-sm md:text-base">Мои макеты ({templates.length})</h4>
           {loading && <p className="text-muted-foreground text-sm">Загрузка...</p>}
           {!loading && templates.length === 0 && (
             <p className="text-muted-foreground text-sm">Макетов пока нет</p>
@@ -271,13 +275,13 @@ const TemplatesManager = ({ cardId }: TemplatesManagerProps) => {
           {!loading && templates.map((template) => (
             <div
               key={template.id}
-              className="flex items-center justify-between p-3 bg-muted/30 rounded-lg hover:bg-muted/50 transition-colors"
+              className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 p-3 bg-muted/30 rounded-lg hover:bg-muted/50 transition-all hover:shadow-md"
             >
               <div className="flex items-center gap-3">
                 <img
                   src={template.preview_url || template.template_url}
                   alt="Template preview"
-                  className="w-16 h-16 object-cover rounded border"
+                  className="w-20 h-20 sm:w-16 sm:h-16 object-cover rounded border"
                 />
                 <div>
                   <div className="flex items-center gap-2">
@@ -296,7 +300,7 @@ const TemplatesManager = ({ cardId }: TemplatesManagerProps) => {
                   </p>
                 </div>
               </div>
-              <Badge variant={template.is_active ? 'default' : 'secondary'}>
+              <Badge variant={template.is_active ? 'default' : 'secondary'} className="text-xs">
                 {template.is_active ? 'Активен' : 'Неактивен'}
               </Badge>
             </div>
