@@ -11,6 +11,7 @@ import DesignTab from './dashboard/DesignTab';
 import AnalyticsTab from './dashboard/AnalyticsTab';
 
 import TemplatesTab from './dashboard/TemplatesTab';
+import TemplatesAndAdsTab from './dashboard/TemplatesAndAdsTab';
 import IntegrationsTab from './dashboard/IntegrationsTab';
 import TeamManagementTab from './dashboard/TeamManagementTab';
 import PortfolioTab from './dashboard/PortfolioTab';
@@ -145,6 +146,13 @@ const Dashboard = ({ onLogout }: DashboardProps) => {
               <Icon name="LayoutTemplate" size={18} />
               <span className="ml-2">Шаблоны</span>
             </TabsTrigger>
+            <TabsTrigger value="templates-ads" className="flex-shrink-0">
+              <Icon name="FileImage" size={18} />
+              <span className="ml-2 flex items-center gap-1">
+                Макеты
+                <Badge className="ml-1 text-xs bg-green/20 text-green">NEW</Badge>
+              </span>
+            </TabsTrigger>
             <TabsTrigger value="design" className="flex-shrink-0">
               <Icon name="Palette" size={18} />
               <span className="ml-2">Дизайн</span>
@@ -213,6 +221,10 @@ const Dashboard = ({ onLogout }: DashboardProps) => {
               localStorage.setItem('design_completed', 'true');
               alert(`Применён шаблон: ${template.name}`);
             }} />
+          </TabsContent>
+
+          <TabsContent value="templates-ads" className="space-y-6">
+            <TemplatesAndAdsTab />
           </TabsContent>
 
           <TabsContent value="integrations" className="space-y-6">

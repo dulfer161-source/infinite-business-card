@@ -5,12 +5,17 @@ from psycopg2.extras import RealDictCursor
 
 def handler(event, context):
     '''
-    Управление визитками пользователя
+    Управление визитками, макетами и рекламой
     GET / - получить визитки пользователя
-    GET /{id} - публичный просмотр визитки
-    POST / - создать новую визитку
-    POST /{id}/view - записать просмотр визитки
+    GET /?id=X - публичный просмотр визитки
+    POST / - создать визитку
+    POST /?id=X - записать просмотр
     PUT / - обновить визитку
+    GET /templates?card_id=X - макеты визитки
+    POST /templates - создать макет
+    GET /ad-zones?card_id=X - рекламные зоны
+    POST /ad-zones - создать зону
+    POST /ad-placements - создать размещение
     '''
     method = event.get('httpMethod', 'GET')
     path_params = event.get('pathParams', {})
@@ -209,6 +214,80 @@ def handler(event, context):
                 'body': json.dumps({'card': card}, default=str),
                 'isBase64Encoded': False
             }
+        
+        # --- TEMPLATES ---
+        elif method == 'GET' and query_params and 'templates' in event.get('path', ''):
+            card_id = query_params.get('card_id')
+            if not card_id:
+                return {'statusCode': 400, 'headers': {'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json'}, 'body': json.dumps({'error': 'card_id required'}), 'isBase64Encoded': False}
+            
+            cur.execute(f"SELECT * FROM t_p18253922_infinite_business_ca.card_templates WHERE card_id = {int(card_id)} ORDER BY created_at DESC")
+            templates = [dict(row) for row in cur.fetchall()]
+            return {'statusCode': 200, 'headers': {'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json'}, 'body': json.dumps({'templates': templates}, default=str), 'isBase64Encoded': False}
+        
+        elif method == 'POST' and 'templates' in event.get('path', ''):
+            body = json.loads(event.get('body', '{}'))
+            card_id = body.get('card_id')
+            template_url = body.get('template_url', '').replace("'", "''")
+            template_type = body.get('template_type', 'uploaded')
+            
+            if not card_id or not template_url:
+                return {'statusCode': 400, 'headers': {'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json'}, 'body': json.dumps({'error': 'card_id and template_url required'}), 'isBase64Encoded': False}
+            
+            cur.execute(f"SELECT id FROM t_p18253922_infinite_business_ca.business_cards WHERE id = {int(card_id)} AND user_id = {int(user_id)}")
+            if not cur.fetchone():
+                return {'statusCode': 403, 'headers': {'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json'}, 'body': json.dumps({'error': 'Access denied'}), 'isBase64Encoded': False}
+            
+            cur.execute("SELECT COALESCE(MAX(id), 0) + 1 as next_id FROM t_p18253922_infinite_business_ca.card_templates")
+            next_id = cur.fetchone()['next_id']
+            cur.execute(f"INSERT INTO t_p18253922_infinite_business_ca.card_templates (id, user_id, card_id, template_type, template_url) VALUES ({next_id}, {int(user_id)}, {int(card_id)}, '{template_type}', '{template_url}') RETURNING *")
+            template = dict(cur.fetchone())
+            conn.commit()
+            return {'statusCode': 200, 'headers': {'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json'}, 'body': json.dumps({'template': template}, default=str), 'isBase64Encoded': False}
+        
+        # --- AD ZONES ---
+        elif method == 'GET' and query_params and 'ad-zones' in event.get('path', ''):
+            card_id = query_params.get('card_id')
+            if not card_id:
+                return {'statusCode': 400, 'headers': {'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json'}, 'body': json.dumps({'error': 'card_id required'}), 'isBase64Encoded': False}
+            
+            cur.execute(f"SELECT * FROM t_p18253922_infinite_business_ca.ad_zones WHERE card_id = {int(card_id)} ORDER BY created_at DESC")
+            zones = [dict(row) for row in cur.fetchall()]
+            return {'statusCode': 200, 'headers': {'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json'}, 'body': json.dumps({'zones': zones}, default=str), 'isBase64Encoded': False}
+        
+        elif method == 'POST' and 'ad-zones' in event.get('path', ''):
+            body = json.loads(event.get('body', '{}'))
+            card_id = body.get('card_id')
+            zone_name = body.get('zone_name', '').replace("'", "''")
+            zone_position = body.get('zone_position', 'content')
+            
+            cur.execute(f"SELECT id FROM t_p18253922_infinite_business_ca.business_cards WHERE id = {int(card_id)} AND user_id = {int(user_id)}")
+            if not cur.fetchone():
+                return {'statusCode': 403, 'headers': {'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json'}, 'body': json.dumps({'error': 'Access denied'}), 'isBase64Encoded': False}
+            
+            cur.execute("SELECT COALESCE(MAX(id), 0) + 1 as next_id FROM t_p18253922_infinite_business_ca.ad_zones")
+            next_id = cur.fetchone()['next_id']
+            cur.execute(f"INSERT INTO t_p18253922_infinite_business_ca.ad_zones (id, card_id, zone_name, zone_position) VALUES ({next_id}, {int(card_id)}, '{zone_name}', '{zone_position}') RETURNING *")
+            zone = dict(cur.fetchone())
+            conn.commit()
+            return {'statusCode': 200, 'headers': {'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json'}, 'body': json.dumps({'zone': zone}, default=str), 'isBase64Encoded': False}
+        
+        # --- AD PLACEMENTS ---
+        elif method == 'POST' and 'ad-placements' in event.get('path', ''):
+            body = json.loads(event.get('body', '{}'))
+            ad_zone_id = body.get('ad_zone_id')
+            advertiser_name = body.get('advertiser_name', '').replace("'", "''")
+            advertiser_email = body.get('advertiser_email', '').replace("'", "''")
+            ad_content = body.get('ad_content', '').replace("'", "''")
+            ad_image_url = body.get('ad_image_url', '').replace("'", "''")
+            price_per_month = body.get('price_per_month', 0)
+            
+            cur.execute("SELECT COALESCE(MAX(id), 0) + 1 as next_id FROM t_p18253922_infinite_business_ca.ad_placements")
+            next_id = cur.fetchone()['next_id']
+            cur.execute(f"INSERT INTO t_p18253922_infinite_business_ca.ad_placements (id, ad_zone_id, advertiser_name, advertiser_email, ad_content, ad_image_url, price_per_month, status) VALUES ({next_id}, {int(ad_zone_id)}, '{advertiser_name}', '{advertiser_email}', '{ad_content}', '{ad_image_url}', {float(price_per_month)}, 'pending') RETURNING *")
+            placement = dict(cur.fetchone())
+            conn.commit()
+            return {'statusCode': 200, 'headers': {'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json'}, 'body': json.dumps({'placement': placement}, default=str), 'isBase64Encoded': False}
         
         else:
             return {

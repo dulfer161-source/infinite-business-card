@@ -215,6 +215,98 @@ class ApiService {
   getUserId(): number | null {
     return this.userId ? parseInt(this.userId, 10) : null;
   }
+
+  // Templates
+  async getCardTemplates(cardId: number) {
+    const response = await this.fetchWithRetry(`${API_URLS.cards}/templates?card_id=${cardId}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        ...this.getAuthHeaders(),
+      },
+    });
+    
+    if (!response.ok) {
+      throw new Error('Failed to get templates');
+    }
+    
+    return await response.json();
+  }
+
+  async createCardTemplate(cardId: number, templateUrl: string, templateType: 'uploaded' | 'generated' = 'uploaded') {
+    const response = await this.fetchWithRetry(`${API_URLS.cards}/templates`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        ...this.getAuthHeaders(),
+      },
+      body: JSON.stringify({ card_id: cardId, template_url: templateUrl, template_type: templateType }),
+    });
+    
+    if (!response.ok) {
+      throw new Error('Failed to create template');
+    }
+    
+    return await response.json();
+  }
+
+  // Ad Zones
+  async getAdZones(cardId: number) {
+    const response = await this.fetchWithRetry(`${API_URLS.cards}/ad-zones?card_id=${cardId}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        ...this.getAuthHeaders(),
+      },
+    });
+    
+    if (!response.ok) {
+      throw new Error('Failed to get ad zones');
+    }
+    
+    return await response.json();
+  }
+
+  async createAdZone(cardId: number, zoneName: string, zonePosition: 'header' | 'footer' | 'sidebar' | 'content') {
+    const response = await this.fetchWithRetry(`${API_URLS.cards}/ad-zones`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        ...this.getAuthHeaders(),
+      },
+      body: JSON.stringify({ card_id: cardId, zone_name: zoneName, zone_position: zonePosition }),
+    });
+    
+    if (!response.ok) {
+      throw new Error('Failed to create ad zone');
+    }
+    
+    return await response.json();
+  }
+
+  async createAdPlacement(adZoneId: number, advertiserName: string, advertiserEmail: string, adContent: string, adImageUrl: string, pricePerMonth: number) {
+    const response = await this.fetchWithRetry(`${API_URLS.cards}/ad-placements`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        ...this.getAuthHeaders(),
+      },
+      body: JSON.stringify({ 
+        ad_zone_id: adZoneId, 
+        advertiser_name: advertiserName, 
+        advertiser_email: advertiserEmail, 
+        ad_content: adContent, 
+        ad_image_url: adImageUrl, 
+        price_per_month: pricePerMonth 
+      }),
+    });
+    
+    if (!response.ok) {
+      throw new Error('Failed to create ad placement');
+    }
+    
+    return await response.json();
+  }
 }
 
 export const api = new ApiService();
