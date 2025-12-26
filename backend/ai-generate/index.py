@@ -111,7 +111,7 @@ def handler(event, context):
                 'Content-Type': 'application/x-www-form-urlencoded'
             },
             data={'scope': 'GIGACHAT_API_PERS'},
-            verify=True,
+            verify=False,
             timeout=10
         )
         
@@ -136,7 +136,7 @@ def handler(event, context):
                 ],
                 'function_call': 'text2image'
             },
-            verify=True,
+            verify=False,
             timeout=30
         )
         
