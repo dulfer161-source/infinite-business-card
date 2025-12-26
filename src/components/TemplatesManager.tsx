@@ -77,9 +77,13 @@ const TemplatesManager = ({ cardId }: TemplatesManagerProps) => {
   const generateWithPrompt = async (prompt: string) => {
     try {
       setGenerating(true);
-      const response = await fetch('https://functions.yandexcloud.net/d4eo6b4i1hqhsl4lf9nm', {
+      const userId = api.getUserId();
+      const response = await fetch('https://functions.poehali.dev/72ff8548-9116-4284-8a41-2cb3d308cfc5', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'X-User-Id': userId ? userId.toString() : ''
+        },
         body: JSON.stringify({ prompt }),
       });
 
