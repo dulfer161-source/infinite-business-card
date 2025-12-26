@@ -109,32 +109,36 @@ def create_payment(event: Dict[str, Any], headers: Dict[str, str]) -> Dict[str, 
         'description': description,
         'metadata': {
             'order_id': str(uuid.uuid4())
-        }
-    }
-    
-    if user_email:
-        payment_data['receipt'] = {
+        },
+        'receipt': {
             'customer': {
-                'email': user_email
+                'email': user_email or 'noreply@visitka.site'
             },
             'items': [{
-                'description': description,
+                'description': description[:128],
                 'quantity': '1',
                 'amount': {
                     'value': str(amount),
                     'currency': 'RUB'
                 },
-                'vat_code': 1
+                'vat_code': 1,
+                'payment_subject': 'commodity',
+                'payment_mode': 'full_payment'
             }]
         }
+    }
     
     try:
+        print(f'Creating payment: {payment_data}')
         response = requests.post(
             'https://api.yookassa.ru/v3/payments',
             headers=headers,
             json=payment_data,
             timeout=10
         )
+        
+        print(f'YooKassa response status: {response.status_code}')
+        print(f'YooKassa response body: {response.text}')
         
         if response.status_code in [200, 201]:
             payment_response = response.json()
@@ -154,6 +158,7 @@ def create_payment(event: Dict[str, Any], headers: Dict[str, str]) -> Dict[str, 
                 'isBase64Encoded': False
             }
         else:
+            error_data = response.json() if response.text else {}
             return {
                 'statusCode': response.status_code,
                 'headers': {
@@ -162,7 +167,7 @@ def create_payment(event: Dict[str, Any], headers: Dict[str, str]) -> Dict[str, 
                 },
                 'body': json.dumps({
                     'error': 'Payment creation failed',
-                    'details': response.text
+                    'details': error_data
                 }),
                 'isBase64Encoded': False
             }

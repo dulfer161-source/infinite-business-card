@@ -96,13 +96,28 @@ def handler(event, context):
                 'currency': 'RUB'
             },
             'confirmation': {
-                'type': 'qr',
-                'return_url': 'https://infinite-business-cards.poehali.app/dashboard'
+                'type': 'qr'
             },
             'capture': True,
             'description': description,
             'metadata': {
                 'user_id': user_id
+            },
+            'receipt': {
+                'customer': {
+                    'email': 'noreply@visitka.site'
+                },
+                'items': [{
+                    'description': description[:128],
+                    'quantity': '1',
+                    'amount': {
+                        'value': str(amount),
+                        'currency': 'RUB'
+                    },
+                    'vat_code': 1,
+                    'payment_subject': 'commodity',
+                    'payment_mode': 'full_payment'
+                }]
             }
         }
         
