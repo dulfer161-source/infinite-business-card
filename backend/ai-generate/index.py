@@ -104,14 +104,16 @@ def handler(event, context):
         gigachat_api_key = os.environ.get('GIGACHAT_API_KEY')
         
         if not gigachat_api_key:
-            raise Exception('GIGACHAT_API_KEY not configured')
+            return {
+                'statusCode': 500,
+                'headers': {'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json'},
+                'body': json.dumps({'error': 'GIGACHAT_API_KEY не настроен. Обратитесь к администратору для добавления ключа.'}),
+                'isBase64Encoded': False
+            }
         
-        print(f'Key length: {len(gigachat_api_key)}, starts with Basic: {gigachat_api_key.startswith("Basic")}')
-        
-        # GIGACHAT_API_KEY уже в формате Base64, просто добавляем Basic если нужно
+        # GigaChat API требует Authorization в формате: Basic base64(client_id:client_secret)
+        # Проверяем формат ключа
         auth_header = gigachat_api_key if gigachat_api_key.startswith('Basic ') else f'Basic {gigachat_api_key}'
-        
-        print(f'Auth header: {auth_header[:50]}...')
         
         auth_response = requests.post(
             'https://ngw.devices.sberbank.ru:9443/api/v2/oauth',
@@ -125,12 +127,27 @@ def handler(event, context):
             timeout=10
         )
         
-        print(f'Auth status: {auth_response.status_code}')
+        if auth_response.status_code != 200:
+            return {
+                'statusCode': 500,
+                'headers': {'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json'},
+                'body': json.dumps({
+                    'error': 'Ошибка авторизации GigaChat. GIGACHAT_API_KEY некорректен.',
+                    'details': 'Ключ должен быть в формате: base64(client_id:client_secret)',
+                    'gigachat_error': auth_response.json()
+                }),
+                'isBase64Encoded': False
+            }
+        
         auth_data = auth_response.json()
-        print(f'Auth response: {auth_data}')
         
         if 'access_token' not in auth_data:
-            raise Exception(f'No access_token in response: {auth_data}')
+            return {
+                'statusCode': 500,
+                'headers': {'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json'},
+                'body': json.dumps({'error': 'GigaChat не вернул токен доступа'}),
+                'isBase64Encoded': False
+            }
         
         access_token = auth_data['access_token']
         
