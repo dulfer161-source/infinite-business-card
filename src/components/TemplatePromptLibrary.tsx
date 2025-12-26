@@ -113,16 +113,41 @@ const promptTemplates: PromptTemplate[] = [
 
 interface TemplatePromptLibraryProps {
   onSelectPrompt: (prompt: string) => void;
+  onRandomGenerate?: () => void;
 }
 
-const TemplatePromptLibrary = ({ onSelectPrompt }: TemplatePromptLibraryProps) => {
+export const getRandomPrompt = (): string => {
+  const randomIndex = Math.floor(Math.random() * promptTemplates.length);
+  return promptTemplates[randomIndex].prompt;
+};
+
+const TemplatePromptLibrary = ({ onSelectPrompt, onRandomGenerate }: TemplatePromptLibraryProps) => {
   const categories = Array.from(new Set(promptTemplates.map(t => t.category)));
+
+  const handleRandomClick = () => {
+    if (onRandomGenerate) {
+      onRandomGenerate();
+    }
+  };
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center gap-2 text-sm text-muted-foreground">
-        <Icon name="Lightbulb" size={16} />
-        <span>Выберите готовый шаблон или создайте свой</span>
+      <div className="flex items-center justify-between gap-2">
+        <div className="flex items-center gap-2 text-sm text-muted-foreground">
+          <Icon name="Lightbulb" size={16} />
+          <span>Выберите готовый шаблон или создайте свой</span>
+        </div>
+        {onRandomGenerate && (
+          <Button 
+            variant="outline" 
+            size="sm"
+            onClick={handleRandomClick}
+            className="gap-2"
+          >
+            <Icon name="Shuffle" size={16} />
+            Случайный макет
+          </Button>
+        )}
       </div>
 
       {categories.map(category => (

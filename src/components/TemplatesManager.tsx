@@ -9,7 +9,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import Icon from '@/components/ui/icon';
 import { api } from '@/lib/api';
 import { useToast } from '@/hooks/use-toast';
-import TemplatePromptLibrary from './TemplatePromptLibrary';
+import TemplatePromptLibrary, { getRandomPrompt } from './TemplatePromptLibrary';
 
 interface TemplatesManagerProps {
   cardId: number;
@@ -74,22 +74,13 @@ const TemplatesManager = ({ cardId }: TemplatesManagerProps) => {
     }
   };
 
-  const handleGenerateTemplate = async () => {
-    if (!aiPrompt.trim()) {
-      toast({
-        title: 'Ошибка',
-        description: 'Опишите, какой макет вы хотите создать',
-        variant: 'destructive',
-      });
-      return;
-    }
-
+  const generateWithPrompt = async (prompt: string) => {
     try {
       setGenerating(true);
       const response = await fetch('https://functions.yandexcloud.net/d4eo6b4i1hqhsl4lf9nm', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ prompt: aiPrompt }),
+        body: JSON.stringify({ prompt }),
       });
 
       const data = await response.json();
@@ -112,6 +103,24 @@ const TemplatesManager = ({ cardId }: TemplatesManagerProps) => {
     } finally {
       setGenerating(false);
     }
+  };
+
+  const handleGenerateTemplate = async () => {
+    if (!aiPrompt.trim()) {
+      toast({
+        title: 'Ошибка',
+        description: 'Опишите, какой макет вы хотите создать',
+        variant: 'destructive',
+      });
+      return;
+    }
+    await generateWithPrompt(aiPrompt);
+  };
+
+  const handleRandomGenerate = async () => {
+    const randomPrompt = getRandomPrompt();
+    setAiPrompt(randomPrompt);
+    await generateWithPrompt(randomPrompt);
   };
 
   const handleSaveGenerated = async () => {
@@ -163,7 +172,10 @@ const TemplatesManager = ({ cardId }: TemplatesManagerProps) => {
           </TabsList>
 
           <TabsContent value="generate" className="space-y-4">
-            <TemplatePromptLibrary onSelectPrompt={(prompt) => setAiPrompt(prompt)} />
+            <TemplatePromptLibrary 
+              onSelectPrompt={(prompt) => setAiPrompt(prompt)}
+              onRandomGenerate={handleRandomGenerate}
+            />
             
             <div className="space-y-4 p-4 bg-gradient-to-br from-primary/5 to-primary/10 rounded-lg border border-primary/20">
               <div className="space-y-2">
