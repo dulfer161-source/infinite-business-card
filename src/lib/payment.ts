@@ -42,7 +42,8 @@ class PaymentService {
 
     if (!response.ok) {
       const error = await response.json();
-      throw new Error(error.message || 'Ошибка создания платежа');
+      console.error('Payment creation error:', error);
+      throw new Error(error.error || error.message || 'Ошибка создания платежа');
     }
 
     return response.json();
