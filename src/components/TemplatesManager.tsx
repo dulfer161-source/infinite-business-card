@@ -119,6 +119,18 @@ const TemplatesManager = ({ cardId }: TemplatesManagerProps) => {
 
       const data = await response.json();
       
+      // Проверка на ошибки от сервера
+      if (!response.ok) {
+        const errorMessage = data.error || data.details || 'Ошибка сервера';
+        console.error('AI generation error:', data);
+        toast({
+          title: 'Ошибка генерации',
+          description: errorMessage,
+          variant: 'destructive',
+        });
+        return;
+      }
+      
       if (data.image_url) {
         setGeneratedPreview(data.image_url);
         setGenerationsLeft(prev => Math.max(0, prev - 1));
@@ -130,6 +142,7 @@ const TemplatesManager = ({ cardId }: TemplatesManagerProps) => {
         throw new Error('No image URL');
       }
     } catch (error: any) {
+      console.error('Generation error:', error);
       toast({
         title: 'Ошибка',
         description: error?.message || 'Не удалось сгенерировать макет',
