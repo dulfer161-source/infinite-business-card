@@ -161,7 +161,8 @@ const MyCardsTab = () => {
   };
 
   const openCard = (id: number) => {
-    window.open(`/card/${id}`, '_blank');
+    // Trigger edit tab switch with card ID
+    window.dispatchEvent(new CustomEvent('editCard', { detail: { cardId: id } }));
   };
 
   const handleDeleteClick = (card: CardData) => {

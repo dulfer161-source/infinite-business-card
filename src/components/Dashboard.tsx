@@ -76,12 +76,25 @@ const Dashboard = ({ onLogout }: DashboardProps) => {
   const [showOnboarding, setShowOnboarding] = useState(false);
   const [showTour, setShowTour] = useState(false);
   const [showVideo, setShowVideo] = useState(false);
+  const [activeTab, setActiveTab] = useState('my-cards');
+  const [selectedCardId, setSelectedCardId] = useState<number | null>(null);
 
   useEffect(() => {
     const onboardingCompleted = localStorage.getItem('onboarding_completed');
     if (!onboardingCompleted) {
       setShowOnboarding(true);
     }
+  }, []);
+
+  useEffect(() => {
+    const handleEditCard = (event: CustomEvent) => {
+      const { cardId } = event.detail;
+      setSelectedCardId(cardId);
+      setActiveTab('edit');
+    };
+
+    window.addEventListener('editCard', handleEditCard as EventListener);
+    return () => window.removeEventListener('editCard', handleEditCard as EventListener);
   }, []);
 
   useEffect(() => {
@@ -130,7 +143,7 @@ const Dashboard = ({ onLogout }: DashboardProps) => {
 
         <ProgressTracker userInfo={userInfo} />
 
-        <Tabs defaultValue="my-cards" className="space-y-6">
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
           <TabsList className="flex flex-wrap justify-start gap-2 h-auto w-full bg-muted/50 p-2">
             <TabsTrigger value="my-cards" className="flex-shrink-0">
               <Icon name="FolderOpen" size={18} />
@@ -207,7 +220,7 @@ const Dashboard = ({ onLogout }: DashboardProps) => {
           </TabsContent>
 
           <TabsContent value="edit" className="space-y-6">
-            <EditTab userInfo={userInfo} setUserInfo={setUserInfo} />
+            <EditTab userInfo={userInfo} setUserInfo={setUserInfo} selectedCardId={selectedCardId} />
           </TabsContent>
 
           <TabsContent value="design" className="space-y-6">
