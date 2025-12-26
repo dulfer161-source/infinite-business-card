@@ -243,6 +243,36 @@ class ApiService {
     return await response.json();
   }
 
+  // White-Label
+  async getWhiteLabelByDomain(domain: string) {
+    const response = await this.fetchWithRetry(`${API_URLS.auth}/white-label?domain=${domain}`, {
+      method: 'GET',
+      headers: { 'Content-Type': 'application/json' },
+    });
+
+    if (!response.ok) {
+      return null;
+    }
+
+    return await response.json();
+  }
+
+  async getMyWhiteLabel() {
+    const response = await this.fetchWithRetry(`${API_URLS.auth}/white-label/my`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        ...this.getAuthHeaders(),
+      },
+    });
+
+    if (!response.ok) {
+      return null;
+    }
+
+    return await response.json();
+  }
+
   isAuthenticated(): boolean {
     return !!this.token && !!this.userId;
   }

@@ -25,6 +25,7 @@ import ResetPassword from "./pages/ResetPassword";
 import TestFunctions from "./pages/TestFunctions";
 import DatabaseAdmin from "./pages/DatabaseAdmin";
 import QuickEmailTest from "./pages/QuickEmailTest";
+import WhiteLabelB2B from "./pages/WhiteLabelB2B";
 import NotFound from "./pages/NotFound";
 
 const future = {
@@ -62,6 +63,7 @@ const App = () => (
                 <Route path="/test-functions" element={<TestFunctions />} />
                 <Route path="/database-admin" element={<DatabaseAdmin />} />
                 <Route path="/quick-email-test" element={<QuickEmailTest />} />
+                <Route path="/white-label-b2b" element={<WhiteLabelB2B />} />
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                 <Route path="*" element={<NotFound />} />
               </Routes>

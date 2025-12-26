@@ -5,10 +5,10 @@ from psycopg2.extras import RealDictCursor
 
 def handler(event, context):
     '''
-    Управление визитками, макетами и рекламой
-    GET / - получить визитки пользователя
+    Управление визитками, макетами, рекламой и white-label
+    GET / - получить визитки пользователя (с учетом white-label клиента)
     GET /?id=X - публичный просмотр визитки
-    POST / - создать визитку
+    POST / - создать визитку (автоматически привязывается к white-label клиенту)
     POST /?id=X - записать просмотр
     PUT / - обновить визитку
     GET /templates?card_id=X - макеты визитки
@@ -161,11 +161,16 @@ def handler(event, context):
             hide_platform_branding = body.get('hide_platform_branding', False) and can_remove_branding
             custom_branding_json = json.dumps(custom_branding).replace("'", "''")
             
+            # Get white-label client ID from user
+            cur.execute(f"SELECT white_label_client_id FROM t_p18253922_infinite_business_ca.users WHERE id = {int(user_id)}")
+            user_row = cur.fetchone()
+            white_label_client_id = user_row['white_label_client_id'] if user_row and user_row['white_label_client_id'] else 'NULL'
+            
             cur.execute(
                 f"""
                 INSERT INTO t_p18253922_infinite_business_ca.business_cards 
-                (id, user_id, name, position, company, phone, email, website, description, logo_url, custom_branding, hide_platform_branding)
-                VALUES ({next_id}, {int(user_id)}, '{name}', '{position}', '{company}', '{phone}', '{email}', '{website}', '{description}', '{logo_url}', '{custom_branding_json}', {hide_platform_branding})
+                (id, user_id, name, position, company, phone, email, website, description, logo_url, custom_branding, hide_platform_branding, white_label_client_id)
+                VALUES ({next_id}, {int(user_id)}, '{name}', '{position}', '{company}', '{phone}', '{email}', '{website}', '{description}', '{logo_url}', '{custom_branding_json}', {hide_platform_branding}, {white_label_client_id})
                 RETURNING *
                 """
             )

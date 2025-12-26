@@ -29,11 +29,13 @@ def check_rate_limit(identifier: str, max_req: int = 5, window: int = 60) -> Tup
 
 def handler(event, context):
     '''
-    Аутентификация, регистрация и подписки пользователей
+    Аутентификация, регистрация, подписки и white-label
     POST /register - регистрация нового пользователя
     POST /login - вход в систему
     GET /subscriptions - получить активные подписки пользователя
     GET /plans - список всех доступных тарифов
+    GET /white-label - получить настройки white-label клиента по домену
+    GET /white-label/my - получить white-label данные текущего пользователя
     '''
     method = event.get('httpMethod', 'GET')
     
@@ -114,6 +116,85 @@ def handler(event, context):
                     }, default=str),
                     'isBase64Encoded': False
                 }
+            
+            # Get white-label client info by domain (public)
+            if 'white-label' in event.get('path', ''):
+                query_params = event.get('queryStringParameters', {})
+                domain = query_params.get('domain') if query_params else None
+                
+                # Get white-label for current user
+                if 'my' in event.get('path', ''):
+                    headers = event.get('headers', {})
+                    auth_token = headers.get('X-Auth-Token') or headers.get('x-auth-token')
+                    
+                    if not auth_token:
+                        return {
+                            'statusCode': 401,
+                            'headers': {'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json'},
+                            'body': json.dumps({'error': 'Unauthorized'}),
+                            'isBase64Encoded': False
+                        }
+                    
+                    cur.execute(f"SELECT user_id FROM t_p18253922_infinite_business_ca.auth_tokens WHERE token = '{auth_token}' AND expires_at > NOW()")
+                    token_row = cur.fetchone()
+                    
+                    if not token_row:
+                        return {
+                            'statusCode': 401,
+                            'headers': {'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json'},
+                            'body': json.dumps({'error': 'Invalid token'}),
+                            'isBase64Encoded': False
+                        }
+                    
+                    user_id = token_row['user_id']
+                    
+                    cur.execute(f"""
+                        SELECT wl.* 
+                        FROM t_p18253922_infinite_business_ca.white_label_clients wl
+                        JOIN t_p18253922_infinite_business_ca.users u ON u.white_label_client_id = wl.id
+                        WHERE u.id = {int(user_id)} AND wl.is_active = TRUE
+                    """)
+                    client = cur.fetchone()
+                    
+                    if client:
+                        return {
+                            'statusCode': 200,
+                            'headers': {'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json'},
+                            'body': json.dumps({'client': dict(client)}, default=str),
+                            'isBase64Encoded': False
+                        }
+                    else:
+                        return {
+                            'statusCode': 200,
+                            'headers': {'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json'},
+                            'body': json.dumps({'client': None}),
+                            'isBase64Encoded': False
+                        }
+                
+                # Get white-label by domain (public)
+                if domain:
+                    domain_escaped = domain.replace("'", "''")
+                    cur.execute(f"""
+                        SELECT * FROM t_p18253922_infinite_business_ca.white_label_clients 
+                        WHERE (subdomain = '{domain_escaped}' OR custom_domain = '{domain_escaped}') 
+                        AND is_active = TRUE
+                    """)
+                    client = cur.fetchone()
+                    
+                    if client:
+                        return {
+                            'statusCode': 200,
+                            'headers': {'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json'},
+                            'body': json.dumps({'client': dict(client)}, default=str),
+                            'isBase64Encoded': False
+                        }
+                    else:
+                        return {
+                            'statusCode': 404,
+                            'headers': {'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json'},
+                            'body': json.dumps({'error': 'White-label client not found'}),
+                            'isBase64Encoded': False
+                        }
         
         finally:
             if cur:
