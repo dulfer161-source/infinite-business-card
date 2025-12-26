@@ -10,6 +10,7 @@ import Footer from '@/components/Footer';
 import AuthDialog from '@/components/AuthDialog';
 import HelpCenter from '@/components/HelpCenter';
 import Logo from '@/components/Logo';
+import ThemeToggle from '@/components/ThemeToggle';
 import { Button } from '@/components/ui/button';
 import { api } from '@/lib/api';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
@@ -120,6 +121,7 @@ const Index = () => {
             <a href="#contacts" className="hover:text-green transition-colors font-medium">Контакты</a>
           </div>
           <div className="hidden md:flex items-center gap-4">
+            <ThemeToggle />
             <Button variant="ghost" className="hover:text-blue" onClick={handleOpenDemoDialog}>
               <Icon name="PlayCircle" className="mr-2" size={18} />
               Демо

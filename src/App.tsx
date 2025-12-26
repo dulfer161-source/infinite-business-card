@@ -5,6 +5,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { Suspense } from "react";
 import { HelmetProvider } from "react-helmet-async";
+import { ThemeProvider } from "./contexts/ThemeContext";
 import InstallPrompt from "./components/InstallPrompt";
 import ErrorBoundary from "./components/ErrorBoundary";
 import PageLoader from "./components/PageLoader";
@@ -36,14 +37,15 @@ const queryClient = new QueryClient();
 const App = () => (
   <ErrorBoundary>
     <HelmetProvider>
-      <QueryClientProvider client={queryClient}>
-        <TooltipProvider>
-          <Toaster />
-          <Sonner />
-          <InstallPrompt />
-          <FeedbackWidget />
-          <BugReportWidget />
-          <BrowserRouter future={future}>
+      <ThemeProvider>
+        <QueryClientProvider client={queryClient}>
+          <TooltipProvider>
+            <Toaster />
+            <Sonner />
+            <InstallPrompt />
+            <FeedbackWidget />
+            <BugReportWidget />
+            <BrowserRouter future={future}>
             <Suspense fallback={<PageLoader />}>
               <Routes>
                 <Route path="/" element={<Index />} />
@@ -67,6 +69,7 @@ const App = () => (
           </BrowserRouter>
         </TooltipProvider>
       </QueryClientProvider>
+      </ThemeProvider>
     </HelmetProvider>
   </ErrorBoundary>
 );

@@ -4,6 +4,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import Icon from '@/components/ui/icon';
 import Logo from './Logo';
+import ThemeToggle from './ThemeToggle';
 import BusinessCardTab from './dashboard/BusinessCardTab';
 import MyCardsTab from './dashboard/MyCardsTab';
 import EditTab from './dashboard/EditTab';
@@ -103,16 +104,17 @@ const Dashboard = ({ onLogout }: DashboardProps) => {
       <header className="border-b border-green/20 bg-background/90 backdrop-blur-lg sticky top-0 z-50">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
           <Logo size="md" />
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2 md:gap-4">
+            <ThemeToggle />
             <HelpButton 
               onStartTour={() => setShowTour(true)}
               onWatchVideo={() => setShowVideo(true)}
               onViewAnalytics={() => setAnalyticsOpen(true)}
             />
-            <Badge variant="outline" className="border-green text-green font-semibold">Базовый тариф</Badge>
+            <Badge variant="outline" className="border-green text-green font-semibold hidden sm:flex">Базовый тариф</Badge>
             <Button variant="ghost" className="hover:text-green" onClick={onLogout}>
-              <Icon name="LogOut" className="mr-2" size={18} />
-              Выйти
+              <Icon name="LogOut" className="mr-0 sm:mr-2" size={18} />
+              <span className="hidden sm:inline">Выйти</span>
             </Button>
           </div>
         </div>
