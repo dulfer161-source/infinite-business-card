@@ -115,7 +115,13 @@ def handler(event, context):
             timeout=10
         )
         
-        access_token = auth_response.json()['access_token']
+        auth_data = auth_response.json()
+        print(f'Auth response: {auth_data}')
+        
+        if 'access_token' not in auth_data:
+            raise Exception(f'No access_token in response: {auth_data}')
+        
+        access_token = auth_data['access_token']
         
         # Генерируем изображение через GigaChat
         enhanced_prompt = f"Профессиональный бизнес логотип: {prompt}. Современный, чистый дизайн, высокое качество."
