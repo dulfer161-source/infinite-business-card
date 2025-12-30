@@ -257,6 +257,30 @@ const EditTab = ({ userInfo, setUserInfo, selectedCardId }: EditTabProps) => {
             />
           </div>
 
+          {selectedCardId && cardData && (
+            <div className="space-y-2">
+              <Label htmlFor="logo">Аватар / Логотип</Label>
+              <div className="flex items-center gap-4">
+                {cardData.logo_url && (
+                  <img 
+                    src={cardData.logo_url} 
+                    alt="Logo" 
+                    className="w-16 h-16 rounded-full object-cover border-2 border-gold/20"
+                  />
+                )}
+                <Input
+                  id="logo"
+                  placeholder="https://example.com/logo.png"
+                  value={cardData.logo_url || ''}
+                  onChange={(e) => updateData('logo_url', e.target.value)}
+                />
+              </div>
+              <p className="text-xs text-muted-foreground">
+                Вставьте ссылку на изображение
+              </p>
+            </div>
+          )}
+
           <Button className="w-full md:w-auto bg-gold text-black hover:bg-gold/90" onClick={handleSave}>
             <Icon name="Save" className="mr-2" size={18} />
             Сохранить изменения
