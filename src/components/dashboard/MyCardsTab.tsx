@@ -160,9 +160,14 @@ const MyCardsTab = () => {
     toast.success('Ссылка скопирована!');
   };
 
-  const openCard = (id: number) => {
+  const editCard = (id: number) => {
     // Trigger edit tab switch with card ID
     window.dispatchEvent(new CustomEvent('editCard', { detail: { cardId: id } }));
+  };
+
+  const previewCard = (id: number) => {
+    // Open card in new tab for preview
+    window.open(`/card/${id}`, '_blank');
   };
 
   const handleDeleteClick = (card: CardData) => {
@@ -278,7 +283,8 @@ const MyCardsTab = () => {
             <CardItem
               key={card.id}
               card={card}
-              onOpen={openCard}
+              onEdit={editCard}
+              onPreview={previewCard}
               onCopyLink={copyCardLink}
               onDuplicate={handleDuplicateCard}
               onDelete={handleDeleteClick}

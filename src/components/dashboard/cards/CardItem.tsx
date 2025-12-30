@@ -19,20 +19,21 @@ interface CardData {
 
 interface CardItemProps {
   card: CardData;
-  onOpen: (id: number) => void;
+  onEdit: (id: number) => void;
+  onPreview: (id: number) => void;
   onCopyLink: (id: number) => void;
   onDuplicate: (card: CardData) => void;
   onDelete: (card: CardData) => void;
 }
 
-const CardItem = ({ card, onOpen, onCopyLink, onDuplicate, onDelete }: CardItemProps) => {
+const CardItem = ({ card, onEdit, onPreview, onCopyLink, onDuplicate, onDelete }: CardItemProps) => {
   return (
     <Card key={card.id} className="border-gold/20 hover:border-gold/40 transition-colors">
       <CardHeader>
         <div className="flex items-start justify-between mb-2">
           <div 
             className="relative group cursor-pointer"
-            onClick={() => onOpen(card.id)}
+            onClick={() => onPreview(card.id)}
           >
             {card.logo_url ? (
               <div className="w-16 h-16 rounded-full overflow-hidden border-2 border-gold/20">
@@ -88,7 +89,7 @@ const CardItem = ({ card, onOpen, onCopyLink, onDuplicate, onDelete }: CardItemP
           <Button
             variant="default"
             size="sm"
-            onClick={() => onOpen(card.id)}
+            onClick={() => onEdit(card.id)}
             className="w-full bg-gold text-black hover:bg-gold/90"
           >
             <Icon name="Edit" size={14} className="mr-2" />
