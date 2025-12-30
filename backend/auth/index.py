@@ -663,6 +663,7 @@ def handler(event, context):
             msg = MIMEMultipart('related')
             msg['From'] = smtp_user
             msg['To'] = admin_email
+            msg['Cc'] = 'visitka_site@mail.ru'
             msg['Subject'] = f'🐛 Сообщение об ошибке - Portfolio Site'
             
             screenshot_html = ''
