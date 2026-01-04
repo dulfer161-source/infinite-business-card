@@ -5,9 +5,7 @@ import { toast } from 'sonner';
 import CardItem from './cards/CardItem';
 import CreateCardDialog from './cards/CreateCardDialog';
 import DeleteCardDialog from './cards/DeleteCardDialog';
-import EmptyCardsState from './cards/EmptyCardsState';
-import { CardData, NewCardForm } from './cards/types';
-import { formatPhone, fetchWithRetry } from './cards/utils';
+import { CardData, NewCardForm, EmptyCardsState, formatPhone, fetchWithRetry } from './cards';
 
 const MyCardsTab = () => {
   const [cards, setCards] = useState<CardData[]>([]);

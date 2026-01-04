@@ -7,10 +7,7 @@ import PricingComparison from '../PricingComparison';
 import PaymentModal from '../PaymentModal';
 import SubscriptionNotifications from './SubscriptionNotifications';
 import { subscriptionMonitor } from '@/lib/subscriptionMonitor';
-import CurrentPlanCard from './subscription/CurrentPlanCard';
-import UsageStatsCard from './subscription/UsageStatsCard';
-import InvoiceHistory from './subscription/InvoiceHistory';
-import { SubscriptionData, Invoice, SelectedPlan } from './subscription/types';
+import { SubscriptionData, Invoice, SelectedPlan, CurrentPlanCard, UsageStatsCard, InvoiceHistory } from './subscription';
 
 const SubscriptionTab = () => {
   const navigate = useNavigate();

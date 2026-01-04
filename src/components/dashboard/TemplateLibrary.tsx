@@ -3,9 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import Icon from '@/components/ui/icon';
-import { CardTemplate, templates, categories } from './templates/templateData';
-import TemplateCard from './templates/TemplateCard';
-import TemplatePreviewDialog from './templates/TemplatePreviewDialog';
+import { CardTemplate, templates, categories, TemplateCard, TemplatePreviewDialog } from './templates';
 
 interface TemplateLibraryProps {
   open: boolean;

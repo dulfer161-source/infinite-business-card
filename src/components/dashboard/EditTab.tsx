@@ -5,10 +5,7 @@ import { toast } from 'sonner';
 import TemplateLibrary from './TemplateLibrary';
 import AITemplateGenerator from './AITemplateGenerator';
 import CustomTemplateUpload from './CustomTemplateUpload';
-import DesignSection from './edit/DesignSection';
-import DataEditForm from './edit/DataEditForm';
-import BrandingSection from './edit/BrandingSection';
-import { UserInfo, CardData, TargetSection, TemplateType } from './edit/types';
+import { UserInfo, CardData, TargetSection, TemplateType, DesignSection, DataEditForm, BrandingSection } from './edit';
 
 interface EditTabProps {
   userInfo: UserInfo;

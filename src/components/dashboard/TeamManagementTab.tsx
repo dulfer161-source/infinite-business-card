@@ -3,10 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import Icon from '@/components/ui/icon';
-import TeamStatsGrid from './team/TeamStatsGrid';
-import TeamMemberCard from './team/TeamMemberCard';
-import { TeamMember, TeamStats } from './team/types';
-import { mockTeamMembers } from './team/mockData';
+import { TeamMember, TeamStats, TeamStatsGrid, TeamMemberCard, mockTeamMembers } from './team';
 
 const TeamManagementTab = () => {
   const [searchQuery, setSearchQuery] = useState('');

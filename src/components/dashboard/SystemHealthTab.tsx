@@ -3,18 +3,14 @@ import Icon from '@/components/ui/icon';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { useToast } from '@/hooks/use-toast';
 import func2url from '../../../backend/func2url.json';
-import SecretsCard from './health/SecretsCard';
-import FunctionsCard from './health/FunctionsCard';
-import NotificationsCard from './health/NotificationsCard';
-import { SecretStatus, CloudFunction } from './health/types';
-import { initialSecrets, initialFunctions } from './health/mockData';
+import { SecretStatus, CloudFunction, SecretsCard, FunctionsCard, NotificationsCard, mockSecrets, mockFunctions } from './health';
 
 const SystemHealthTab = () => {
   const { toast } = useToast();
   const [notificationsEnabled, setNotificationsEnabled] = useState(false);
   const [isSending, setIsSending] = useState(false);
-  const [secrets, setSecrets] = useState<SecretStatus[]>(initialSecrets);
-  const [functions, setFunctions] = useState<CloudFunction[]>(initialFunctions);
+  const [secrets, setSecrets] = useState<SecretStatus[]>(mockSecrets);
+  const [functions, setFunctions] = useState<CloudFunction[]>(mockFunctions);
 
   useEffect(() => {
     checkSystemHealth();
