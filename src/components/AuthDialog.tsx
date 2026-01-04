@@ -7,7 +7,6 @@ import PrivacyPolicy from './PrivacyPolicy';
 import DemoAccountsDialog from './DemoAccountsDialog';
 import LoginForm from './auth/LoginForm';
 import RegisterForm from './auth/RegisterForm';
-import SocialAuthButtons from './auth/SocialAuthButtons';
 
 interface AuthDialogProps {
   open: boolean;
@@ -111,74 +110,6 @@ const AuthDialog = ({ open, onOpenChange, onSuccess }: AuthDialogProps) => {
     }
   };
 
-  const handleVKAuth = async () => {
-    try {
-      const redirectUri = window.location.origin + '/auth/vk';
-      console.log('VK Auth: redirect_uri =', redirectUri);
-      
-      const response = await fetch('https://functions.poehali.dev/74d0ac96-7cc9-4254-86f4-508ca9a70f55?redirect_uri=' + encodeURIComponent(redirectUri));
-      
-      if (!response.ok) {
-        const errorData = await response.json();
-        console.error('VK Auth Error:', errorData);
-        throw new Error(errorData.error || 'Ошибка подключения к VK');
-      }
-      
-      const data = await response.json();
-      console.log('VK Auth response:', data);
-      
-      if (data.auth_url) {
-        console.log('Redirecting to VK:', data.auth_url);
-        window.location.href = data.auth_url;
-      } else {
-        throw new Error('Не получен URL авторизации от VK');
-      }
-    } catch (error: any) {
-      console.error('VK Auth error:', error);
-      toast({
-        title: 'Ошибка',
-        description: error.message || 'Не удалось подключиться к VK',
-        variant: 'destructive',
-      });
-    }
-  };
-
-
-
-  const handleTelegramAuth = async (userData: any) => {
-    try {
-      const response = await fetch('https://functions.poehali.dev/1f1f10e9-7be0-4c16-91b6-f53673e8b2ea', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(userData)
-      });
-      
-      if (!response.ok) {
-        throw new Error('Ошибка авторизации');
-      }
-      
-      const data = await response.json();
-      
-      if (data.token) {
-        localStorage.setItem('token', data.token);
-        localStorage.setItem('user', JSON.stringify(data.user));
-        toast({
-          title: 'Вход выполнен',
-          description: `Добро пожаловать, ${data.user.name}!`,
-        });
-        onSuccess();
-        onOpenChange(false);
-        window.location.reload();
-      }
-    } catch (error: any) {
-      toast({
-        title: 'Ошибка',
-        description: error.message || 'Не удалось войти через Telegram',
-        variant: 'destructive',
-      });
-    }
-  };
-
 
 
   return (
@@ -207,11 +138,6 @@ const AuthDialog = ({ open, onOpenChange, onSuccess }: AuthDialogProps) => {
               onSubmit={handleLogin}
               isLoading={isLoading}
             />
-            <SocialAuthButtons
-              onVKAuth={handleVKAuth}
-              onDemoAccountsOpen={() => setDemoAccountsOpen(true)}
-              onTelegramAuth={handleTelegramAuth}
-            />
           </TabsContent>
 
           <TabsContent value="register">
@@ -223,11 +149,6 @@ const AuthDialog = ({ open, onOpenChange, onSuccess }: AuthDialogProps) => {
               agreedToPolicy={agreedToPolicy}
               setAgreedToPolicy={setAgreedToPolicy}
               onPrivacyOpen={() => setPrivacyOpen(true)}
-            />
-            <SocialAuthButtons
-              onVKAuth={handleVKAuth}
-              onDemoAccountsOpen={() => setDemoAccountsOpen(true)}
-              onTelegramAuth={handleTelegramAuth}
             />
           </TabsContent>
         </Tabs>
