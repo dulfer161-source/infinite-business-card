@@ -7,6 +7,7 @@ import { Textarea } from '@/components/ui/textarea';
 import Icon from '@/components/ui/icon';
 import { toast } from 'sonner';
 import BrandingSettings from './cards/BrandingSettings';
+import TemplateLibrary from './TemplateLibrary';
 
 interface UserInfo {
   name: string;
@@ -42,6 +43,8 @@ const EditTab = ({ userInfo, setUserInfo, selectedCardId }: EditTabProps) => {
   const [loadingCard, setLoadingCard] = useState(false);
   const [cardData, setCardData] = useState<CardData | null>(null);
   const [canRemoveBranding, setCanRemoveBranding] = useState(false);
+  const [templateLibraryOpen, setTemplateLibraryOpen] = useState(false);
+  const [targetSection, setTargetSection] = useState<'hero' | 'about' | 'services' | 'contacts' | 'full'>('full');
 
   useEffect(() => {
     if (selectedCardId) {
@@ -175,6 +178,16 @@ const EditTab = ({ userInfo, setUserInfo, selectedCardId }: EditTabProps) => {
     }
   };
 
+  const handleOpenTemplates = (section: 'hero' | 'about' | 'services' | 'contacts' | 'full') => {
+    setTargetSection(section);
+    setTemplateLibraryOpen(true);
+  };
+
+  const handleApplyTemplate = (template: any) => {
+    toast.success(`Применён макет "${template.name}"`);
+    console.log('Applied template:', template, 'to section:', targetSection);
+  };
+
   return (
     <div className="space-y-6">
       {selectedCardId && (
@@ -183,6 +196,62 @@ const EditTab = ({ userInfo, setUserInfo, selectedCardId }: EditTabProps) => {
           Редактирование визитки #{selectedCardId}
         </div>
       )}
+
+      <Card className="border-gold/20 bg-gradient-to-br from-gold/5 to-transparent">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Icon name="LayoutTemplate" className="text-gold" size={24} />
+            Загрузить макет
+          </CardTitle>
+          <CardDescription>
+            Быстро оформите визитку с помощью готовых дизайнов
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
+            <Button
+              variant="outline"
+              className="h-auto flex-col gap-2 p-4 border-gold/30 hover:border-gold hover:bg-gold/5"
+              onClick={() => handleOpenTemplates('full')}
+            >
+              <Icon name="Maximize2" size={24} className="text-gold" />
+              <span className="text-xs font-semibold">Вся визитка</span>
+            </Button>
+            <Button
+              variant="outline"
+              className="h-auto flex-col gap-2 p-4 border-gold/30 hover:border-gold hover:bg-gold/5"
+              onClick={() => handleOpenTemplates('hero')}
+            >
+              <Icon name="Layout" size={24} className="text-gold" />
+              <span className="text-xs font-semibold">Шапка</span>
+            </Button>
+            <Button
+              variant="outline"
+              className="h-auto flex-col gap-2 p-4 border-gold/30 hover:border-gold hover:bg-gold/5"
+              onClick={() => handleOpenTemplates('about')}
+            >
+              <Icon name="User" size={24} className="text-gold" />
+              <span className="text-xs font-semibold">О себе</span>
+            </Button>
+            <Button
+              variant="outline"
+              className="h-auto flex-col gap-2 p-4 border-gold/30 hover:border-gold hover:bg-gold/5"
+              onClick={() => handleOpenTemplates('services')}
+            >
+              <Icon name="Briefcase" size={24} className="text-gold" />
+              <span className="text-xs font-semibold">Услуги</span>
+            </Button>
+            <Button
+              variant="outline"
+              className="h-auto flex-col gap-2 p-4 border-gold/30 hover:border-gold hover:bg-gold/5"
+              onClick={() => handleOpenTemplates('contacts')}
+            >
+              <Icon name="Mail" size={24} className="text-gold" />
+              <span className="text-xs font-semibold">Контакты</span>
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
 
       <Card className="border-gold/20">
         <CardHeader>
@@ -297,6 +366,13 @@ const EditTab = ({ userInfo, setUserInfo, selectedCardId }: EditTabProps) => {
           onSave={handleBrandingSave}
         />
       )}
+
+      <TemplateLibrary
+        open={templateLibraryOpen}
+        onOpenChange={setTemplateLibraryOpen}
+        onSelectTemplate={handleApplyTemplate}
+        targetSection={targetSection}
+      />
     </div>
   );
 };
