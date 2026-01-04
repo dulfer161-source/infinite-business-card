@@ -8,6 +8,8 @@ import Icon from '@/components/ui/icon';
 import { toast } from 'sonner';
 import BrandingSettings from './cards/BrandingSettings';
 import TemplateLibrary from './TemplateLibrary';
+import AITemplateGenerator from './AITemplateGenerator';
+import CustomTemplateUpload from './CustomTemplateUpload';
 
 interface UserInfo {
   name: string;
@@ -43,7 +45,10 @@ const EditTab = ({ userInfo, setUserInfo, selectedCardId }: EditTabProps) => {
   const [loadingCard, setLoadingCard] = useState(false);
   const [cardData, setCardData] = useState<CardData | null>(null);
   const [canRemoveBranding, setCanRemoveBranding] = useState(false);
+  const [isPremium, setIsPremium] = useState(false);
   const [templateLibraryOpen, setTemplateLibraryOpen] = useState(false);
+  const [aiGeneratorOpen, setAiGeneratorOpen] = useState(false);
+  const [uploadDialogOpen, setUploadDialogOpen] = useState(false);
   const [targetSection, setTargetSection] = useState<'hero' | 'about' | 'services' | 'contacts' | 'full'>('full');
 
   useEffect(() => {
@@ -53,7 +58,24 @@ const EditTab = ({ userInfo, setUserInfo, selectedCardId }: EditTabProps) => {
     } else {
       setCardData(null);
     }
+    checkPremiumAccess();
   }, [selectedCardId]);
+
+  const checkPremiumAccess = async () => {
+    try {
+      const authToken = localStorage.getItem('auth_token');
+      const response = await fetch('https://functions.poehali.dev/8a157dc3-1107-459c-8a50-def96da65372/subscriptions', {
+        headers: { 'X-Auth-Token': authToken || '' }
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        setIsPremium(data.has_premium_access || false);
+      }
+    } catch (error) {
+      console.error('Failed to check premium access:', error);
+    }
+  };
 
   const checkBrandingPermission = async () => {
     try {
@@ -178,14 +200,30 @@ const EditTab = ({ userInfo, setUserInfo, selectedCardId }: EditTabProps) => {
     }
   };
 
-  const handleOpenTemplates = (section: 'hero' | 'about' | 'services' | 'contacts' | 'full') => {
+  const handleOpenTemplates = (section: 'hero' | 'about' | 'services' | 'contacts' | 'full', type: 'library' | 'ai' | 'upload') => {
     setTargetSection(section);
-    setTemplateLibraryOpen(true);
+    if (type === 'library') {
+      setTemplateLibraryOpen(true);
+    } else if (type === 'ai') {
+      setAiGeneratorOpen(true);
+    } else if (type === 'upload') {
+      setUploadDialogOpen(true);
+    }
   };
 
   const handleApplyTemplate = (template: any) => {
     toast.success(`Применён макет "${template.name}"`);
     console.log('Applied template:', template, 'to section:', targetSection);
+  };
+
+  const handleAIGenerated = (html: string, css: string) => {
+    toast.success('AI макет применён к визитке!');
+    console.log('AI generated:', { html, css, section: targetSection });
+  };
+
+  const handleTemplateUploaded = (html: string, css: string, image?: string) => {
+    toast.success('Ваш макет загружен и применён!');
+    console.log('Uploaded:', { html, css, image, section: targetSection });
   };
 
   return (
@@ -201,53 +239,92 @@ const EditTab = ({ userInfo, setUserInfo, selectedCardId }: EditTabProps) => {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Icon name="LayoutTemplate" className="text-gold" size={24} />
-            Загрузить макет
+            Дизайн визитки
           </CardTitle>
           <CardDescription>
-            Быстро оформите визитку с помощью готовых дизайнов
+            Выберите раздел и способ оформления
           </CardDescription>
         </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
+        <CardContent className="space-y-6">
+          <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
             <Button
               variant="outline"
-              className="h-auto flex-col gap-2 p-4 border-gold/30 hover:border-gold hover:bg-gold/5"
-              onClick={() => handleOpenTemplates('full')}
+              className="h-auto flex-col gap-2 p-3 border-gold/30 hover:border-gold hover:bg-gold/5"
             >
-              <Icon name="Maximize2" size={24} className="text-gold" />
+              <Icon name="Maximize2" size={20} className="text-gold" />
               <span className="text-xs font-semibold">Вся визитка</span>
             </Button>
             <Button
               variant="outline"
-              className="h-auto flex-col gap-2 p-4 border-gold/30 hover:border-gold hover:bg-gold/5"
-              onClick={() => handleOpenTemplates('hero')}
+              className="h-auto flex-col gap-2 p-3 border-gold/30 hover:border-gold hover:bg-gold/5"
             >
-              <Icon name="Layout" size={24} className="text-gold" />
+              <Icon name="Layout" size={20} className="text-gold" />
               <span className="text-xs font-semibold">Шапка</span>
             </Button>
             <Button
               variant="outline"
-              className="h-auto flex-col gap-2 p-4 border-gold/30 hover:border-gold hover:bg-gold/5"
-              onClick={() => handleOpenTemplates('about')}
+              className="h-auto flex-col gap-2 p-3 border-gold/30 hover:border-gold hover:bg-gold/5"
             >
-              <Icon name="User" size={24} className="text-gold" />
+              <Icon name="User" size={20} className="text-gold" />
               <span className="text-xs font-semibold">О себе</span>
             </Button>
             <Button
               variant="outline"
-              className="h-auto flex-col gap-2 p-4 border-gold/30 hover:border-gold hover:bg-gold/5"
-              onClick={() => handleOpenTemplates('services')}
+              className="h-auto flex-col gap-2 p-3 border-gold/30 hover:border-gold hover:bg-gold/5"
             >
-              <Icon name="Briefcase" size={24} className="text-gold" />
+              <Icon name="Briefcase" size={20} className="text-gold" />
               <span className="text-xs font-semibold">Услуги</span>
             </Button>
             <Button
               variant="outline"
-              className="h-auto flex-col gap-2 p-4 border-gold/30 hover:border-gold hover:bg-gold/5"
-              onClick={() => handleOpenTemplates('contacts')}
+              className="h-auto flex-col gap-2 p-3 border-gold/30 hover:border-gold hover:bg-gold/5"
             >
-              <Icon name="Mail" size={24} className="text-gold" />
+              <Icon name="Mail" size={20} className="text-gold" />
               <span className="text-xs font-semibold">Контакты</span>
+            </Button>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+            <Button
+              variant="outline"
+              className="h-auto flex-col gap-3 p-4 border-gold/30 hover:border-gold hover:bg-gold/10"
+              onClick={() => handleOpenTemplates('full', 'library')}
+            >
+              <Icon name="Library" size={28} className="text-gold" />
+              <div className="text-center">
+                <div className="font-semibold text-sm mb-1">Библиотека</div>
+                <div className="text-xs text-muted-foreground">36 готовых шаблонов</div>
+              </div>
+            </Button>
+
+            <Button
+              variant="outline"
+              className="h-auto flex-col gap-3 p-4 border-gold/30 hover:border-gold hover:bg-gold/10 relative"
+              onClick={() => handleOpenTemplates('full', 'ai')}
+            >
+              <Icon name="Sparkles" size={28} className="text-gold" />
+              <div className="text-center">
+                <div className="font-semibold text-sm mb-1 flex items-center justify-center gap-1">
+                  AI генератор
+                  <Icon name="Crown" size={12} className="text-gold" />
+                </div>
+                <div className="text-xs text-muted-foreground">Создать уникальный дизайн</div>
+              </div>
+            </Button>
+
+            <Button
+              variant="outline"
+              className="h-auto flex-col gap-3 p-4 border-gold/30 hover:border-gold hover:bg-gold/10 relative"
+              onClick={() => handleOpenTemplates('full', 'upload')}
+            >
+              <Icon name="Upload" size={28} className="text-gold" />
+              <div className="text-center">
+                <div className="font-semibold text-sm mb-1 flex items-center justify-center gap-1">
+                  Загрузить свой
+                  <Icon name="Crown" size={12} className="text-gold" />
+                </div>
+                <div className="text-xs text-muted-foreground">Изображение или код</div>
+              </div>
             </Button>
           </div>
         </CardContent>
@@ -372,6 +449,22 @@ const EditTab = ({ userInfo, setUserInfo, selectedCardId }: EditTabProps) => {
         onOpenChange={setTemplateLibraryOpen}
         onSelectTemplate={handleApplyTemplate}
         targetSection={targetSection}
+      />
+
+      <AITemplateGenerator
+        open={aiGeneratorOpen}
+        onOpenChange={setAiGeneratorOpen}
+        targetSection={targetSection}
+        onTemplateGenerated={handleAIGenerated}
+        isPremium={isPremium}
+      />
+
+      <CustomTemplateUpload
+        open={uploadDialogOpen}
+        onOpenChange={setUploadDialogOpen}
+        targetSection={targetSection}
+        onTemplateUploaded={handleTemplateUploaded}
+        isPremium={isPremium}
       />
     </div>
   );
