@@ -205,28 +205,56 @@ const AITemplateGenerator = ({
             )}
 
             {generatedPreview && (
-              <Card className="border-gold/30">
+              <Card className="border-gold/30 bg-gradient-to-br from-gold/5 to-transparent">
                 <CardHeader>
-                  <CardTitle className="text-base flex items-center gap-2">
-                    <Icon name="Eye" size={18} />
-                    Предварительный просмотр
-                  </CardTitle>
+                  <div className="flex items-center justify-between">
+                    <CardTitle className="text-base flex items-center gap-2">
+                      <Icon name="Eye" size={18} className="text-gold" />
+                      Предварительный просмотр
+                    </CardTitle>
+                    <div className="flex gap-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={handleGenerate}
+                        disabled={isGenerating}
+                        className="text-xs"
+                      >
+                        <Icon name="RefreshCw" size={14} className="mr-1" />
+                        Перегенерировать
+                      </Button>
+                    </div>
+                  </div>
                 </CardHeader>
-                <CardContent>
-                  <div 
-                    className="border rounded-lg p-4 bg-white min-h-[200px]"
-                    dangerouslySetInnerHTML={{ __html: generatedPreview.html }}
-                  />
+                <CardContent className="space-y-4">
+                  <div className="relative">
+                    <div className="absolute -top-2 -right-2 bg-gold text-black text-xs font-semibold px-2 py-1 rounded-full shadow-lg z-10">
+                      ✨ AI Generated
+                    </div>
+                    <div 
+                      className="border-2 border-gold/20 rounded-xl p-6 bg-white shadow-sm min-h-[300px] max-h-[500px] overflow-y-auto"
+                      dangerouslySetInnerHTML={{ __html: generatedPreview.html }}
+                    />
+                  </div>
+                  
                   {generatedPreview.css && (
-                    <details className="mt-4">
-                      <summary className="cursor-pointer text-sm font-semibold text-muted-foreground hover:text-foreground">
-                        Показать CSS
+                    <details className="group">
+                      <summary className="cursor-pointer text-sm font-semibold text-muted-foreground hover:text-foreground flex items-center gap-2">
+                        <Icon name="Code" size={16} className="group-open:rotate-90 transition-transform" />
+                        Дополнительный CSS
                       </summary>
-                      <pre className="mt-2 p-4 bg-muted rounded-lg text-xs overflow-x-auto">
+                      <pre className="mt-2 p-4 bg-muted/50 rounded-lg text-xs overflow-x-auto border border-gold/10">
                         {generatedPreview.css}
                       </pre>
                     </details>
                   )}
+                  
+                  <div className="flex items-start gap-2 p-3 bg-blue-50 rounded-lg border border-blue-200">
+                    <Icon name="Info" size={16} className="text-blue-600 mt-0.5 flex-shrink-0" />
+                    <p className="text-xs text-blue-800">
+                      Вы можете применить этот макет или перегенерировать с другим описанием
+                    </p>
+                  </div>
                 </CardContent>
               </Card>
             )}
@@ -238,12 +266,12 @@ const AITemplateGenerator = ({
                 <Button
                   onClick={handleGenerate}
                   disabled={!isPremium || isGenerating || !prompt.trim()}
-                  className="flex-1 bg-gold text-black hover:bg-gold/90"
+                  className="flex-1 bg-gradient-to-r from-gold to-yellow-500 text-black hover:from-gold/90 hover:to-yellow-500/90 shadow-lg hover:shadow-xl transition-all"
                 >
                   {isGenerating ? (
                     <>
                       <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-black mr-2" />
-                      Генерирую...
+                      Генерирую магию...
                     </>
                   ) : (
                     <>
@@ -263,17 +291,21 @@ const AITemplateGenerator = ({
               <>
                 <Button
                   onClick={handleApply}
-                  className="flex-1 bg-gold text-black hover:bg-gold/90"
+                  className="flex-1 bg-green-600 text-white hover:bg-green-700 shadow-lg hover:shadow-xl transition-all"
                 >
                   <Icon name="Check" className="mr-2" size={18} />
-                  Применить макет
+                  Применить к визитке
                 </Button>
                 <Button
                   variant="outline"
-                  onClick={() => setGeneratedPreview(null)}
+                  onClick={() => {
+                    setGeneratedPreview(null);
+                    setGenerationProgress(0);
+                  }}
+                  className="border-gray-300 hover:bg-gray-50"
                 >
-                  <Icon name="RefreshCw" className="mr-2" size={16} />
-                  Создать новый
+                  <Icon name="X" className="mr-2" size={16} />
+                  Отменить
                 </Button>
               </>
             )}
