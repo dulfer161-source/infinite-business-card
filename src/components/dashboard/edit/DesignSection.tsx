@@ -1,3 +1,4 @@
+import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import Icon from '@/components/ui/icon';
@@ -40,6 +41,16 @@ const templates = [
 ];
 
 const DesignSection = ({ onOpenTemplates }: DesignSectionProps) => {
+  const [selectedSection, setSelectedSection] = React.useState<TargetSection>('full');
+
+  const handleSectionSelect = (sectionId: TargetSection) => {
+    setSelectedSection(sectionId);
+  };
+
+  const handleTemplateClick = (templateType: TemplateType) => {
+    onOpenTemplates(selectedSection, templateType);
+  };
+
   return (
     <Card className="border-gold/20 bg-gradient-to-br from-gold/5 to-transparent">
       <CardHeader>
@@ -56,10 +67,15 @@ const DesignSection = ({ onOpenTemplates }: DesignSectionProps) => {
           {sections.map((section) => (
             <Button
               key={section.id}
-              variant="outline"
-              className="h-auto flex-col gap-2 p-3 border-gold/30 hover:border-gold hover:bg-gold/5"
+              variant={selectedSection === section.id ? 'default' : 'outline'}
+              className={`h-auto flex-col gap-2 p-3 ${
+                selectedSection === section.id 
+                  ? 'bg-gold text-black hover:bg-gold/90' 
+                  : 'border-gold/30 hover:border-gold hover:bg-gold/5'
+              }`}
+              onClick={() => handleSectionSelect(section.id)}
             >
-              <Icon name={section.icon as any} size={20} className="text-gold" />
+              <Icon name={section.icon as any} size={20} className={selectedSection === section.id ? 'text-black' : 'text-gold'} />
               <span className="text-xs font-semibold">{section.label}</span>
             </Button>
           ))}
@@ -71,7 +87,7 @@ const DesignSection = ({ onOpenTemplates }: DesignSectionProps) => {
               key={template.type}
               variant="outline"
               className="h-auto flex-col gap-3 p-4 border-gold/30 hover:border-gold hover:bg-gold/10 relative"
-              onClick={() => onOpenTemplates('full', template.type)}
+              onClick={() => handleTemplateClick(template.type)}
             >
               <Icon name={template.icon as any} size={28} className="text-gold" />
               <div className="text-center">
