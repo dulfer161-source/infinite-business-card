@@ -23,6 +23,37 @@ export default function RegisterForm({
   setAgreedToPolicy,
   onPrivacyOpen 
 }: RegisterFormProps) {
+  const handleNameInvalid = (e: React.InvalidEvent<HTMLInputElement>) => {
+    e.target.setCustomValidity('Пожалуйста, введите ваше имя');
+  };
+
+  const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    e.target.setCustomValidity('');
+    setRegisterData({ ...registerData, name: e.target.value });
+  };
+
+  const handleEmailInvalid = (e: React.InvalidEvent<HTMLInputElement>) => {
+    e.target.setCustomValidity('Пожалуйста, введите корректный email');
+  };
+
+  const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    e.target.setCustomValidity('');
+    setRegisterData({ ...registerData, email: e.target.value });
+  };
+
+  const handlePasswordInvalid = (e: React.InvalidEvent<HTMLInputElement>) => {
+    if (e.target.validity.valueMissing) {
+      e.target.setCustomValidity('Пожалуйста, введите пароль');
+    } else if (e.target.validity.tooShort) {
+      e.target.setCustomValidity('Пароль должен содержать минимум 6 символов');
+    }
+  };
+
+  const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    e.target.setCustomValidity('');
+    setRegisterData({ ...registerData, password: e.target.value });
+  };
+
   return (
     <form onSubmit={onSubmit} className="space-y-4">
       <div>
@@ -32,7 +63,8 @@ export default function RegisterForm({
           type="text"
           placeholder="Иван Петров"
           value={registerData.name}
-          onChange={(e) => setRegisterData({ ...registerData, name: e.target.value })}
+          onChange={handleNameChange}
+          onInvalid={handleNameInvalid}
           required
         />
       </div>
@@ -43,7 +75,8 @@ export default function RegisterForm({
           type="email"
           placeholder="ivan@company.ru"
           value={registerData.email}
-          onChange={(e) => setRegisterData({ ...registerData, email: e.target.value })}
+          onChange={handleEmailChange}
+          onInvalid={handleEmailInvalid}
           required
         />
       </div>
@@ -54,7 +87,8 @@ export default function RegisterForm({
           type="password"
           placeholder="••••••••"
           value={registerData.password}
-          onChange={(e) => setRegisterData({ ...registerData, password: e.target.value })}
+          onChange={handlePasswordChange}
+          onInvalid={handlePasswordInvalid}
           required
           minLength={6}
         />

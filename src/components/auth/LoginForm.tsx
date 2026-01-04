@@ -11,6 +11,24 @@ interface LoginFormProps {
 }
 
 export default function LoginForm({ loginData, setLoginData, onSubmit, isLoading }: LoginFormProps) {
+  const handleEmailInvalid = (e: React.InvalidEvent<HTMLInputElement>) => {
+    e.target.setCustomValidity('Пожалуйста, введите корректный email');
+  };
+
+  const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    e.target.setCustomValidity('');
+    setLoginData({ ...loginData, email: e.target.value });
+  };
+
+  const handlePasswordInvalid = (e: React.InvalidEvent<HTMLInputElement>) => {
+    e.target.setCustomValidity('Пожалуйста, введите пароль');
+  };
+
+  const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    e.target.setCustomValidity('');
+    setLoginData({ ...loginData, password: e.target.value });
+  };
+
   return (
     <form onSubmit={onSubmit} className="space-y-4">
       <div>
@@ -20,7 +38,8 @@ export default function LoginForm({ loginData, setLoginData, onSubmit, isLoading
           type="email"
           placeholder="ivan@company.ru"
           value={loginData.email}
-          onChange={(e) => setLoginData({ ...loginData, email: e.target.value })}
+          onChange={handleEmailChange}
+          onInvalid={handleEmailInvalid}
           required
         />
       </div>
@@ -36,7 +55,8 @@ export default function LoginForm({ loginData, setLoginData, onSubmit, isLoading
           type="password"
           placeholder="••••••••"
           value={loginData.password}
-          onChange={(e) => setLoginData({ ...loginData, password: e.target.value })}
+          onChange={handlePasswordChange}
+          onInvalid={handlePasswordInvalid}
           required
         />
       </div>
