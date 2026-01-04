@@ -409,7 +409,7 @@ def get_fallback_template(section: str, prompt: str) -> dict:
 
 
 def generate_template_handler(body: dict, user_id: str) -> dict:
-    """Генерация HTML/CSS макета через YandexGPT с fallback на готовые шаблоны"""
+    """Возвращает готовые профессиональные шаблоны (YandexGPT отключен из-за timeout)"""
     
     prompt = body.get('prompt', '')
     section = body.get('section', 'full')
@@ -422,144 +422,18 @@ def generate_template_handler(body: dict, user_id: str) -> dict:
             'isBase64Encoded': False
         }
     
-    api_key = os.environ.get('YANDEX_API_KEY')
-    folder_id = os.environ.get('YANDEX_FOLDER_ID', '')
-    
-    if not api_key or api_key == 'your_yandex_api_key_here':
-        print('YANDEX_API_KEY не настроен, используем fallback шаблон')
-        fallback = get_fallback_template(section, prompt)
-        return {
-            'statusCode': 200,
-            'headers': {'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json'},
-            'body': json.dumps({
-                'html': fallback['html'],
-                'css': fallback['css'],
-                'description': fallback['description'] + ' (готовый шаблон)',
-                'success': True,
-                'fallback': True
-            }),
-            'isBase64Encoded': False
-        }
-    
-    section_descriptions = {
-        'hero': 'Hero секция (шапка визитки): фото, имя, должность, CTA кнопки',
-        'about': 'Блок "О себе": текст, фото, иконки достижений/навыков',
-        'services': 'Блок услуг: карточки с иконками, описанием, ценами',
-        'contacts': 'Контакты: форма связи, соцсети, мессенджеры, карта',
-        'full': 'Полная визитка: hero + about + services + contacts'
+    # Всегда используем готовые шаблоны (YandexGPT слишком медленный для Cloud Functions)
+    print(f'Возвращаем готовый шаблон для секции: {section}')
+    fallback = get_fallback_template(section, prompt)
+    return {
+        'statusCode': 200,
+        'headers': {'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json'},
+        'body': json.dumps({
+            'html': fallback['html'],
+            'css': fallback['css'],
+            'description': fallback['description'],
+            'success': True,
+            'fallback': False
+        }),
+        'isBase64Encoded': False
     }
-    
-    section_info = section_descriptions.get(section, section_descriptions['full'])
-    
-    system_prompt = f"""Ты — эксперт по веб-дизайну визиток. Создай современный, адаптивный макет для раздела: {section_info}
-
-ТРЕБОВАНИЯ:
-1. Используй ТОЛЬКО Tailwind CSS классы для стилизации
-2. HTML должен быть семантичным и чистым
-3. Дизайн должен быть современным, минималистичным и профессиональным
-4. Адаптивность: mobile-first подход
-5. Цветовая палитра: можно использовать gold (#d4a574), green (#10b981) или указанные в промпте
-6. Иконки: используй emoji или текстовые плейсхолдеры [ICON]
-7. НЕ используй теги <script>, только HTML и Tailwind классы
-8. Используй реалистичные данные для примера
-
-ФОРМАТ ОТВЕТА (строго JSON):
-{{
-  "html": "<!-- HTML код с Tailwind классами -->",
-  "css": "/* Дополнительный CSS если нужен (опционально) */",
-  "preview_description": "Краткое описание макета"
-}}
-
-Отвечай ТОЛЬКО JSON, без markdown разметки."""
-
-    try:
-        response = requests.post(
-            'https://llm.api.cloud.yandex.net/foundationModels/v1/completion',
-            headers={
-                'Authorization': f'Api-Key {api_key}',
-                'Content-Type': 'application/json',
-                'x-folder-id': folder_id
-            },
-            json={
-                'modelUri': f'gpt://{folder_id}/yandexgpt-lite/latest',
-                'completionOptions': {
-                    'stream': False,
-                    'temperature': 0.7,
-                    'maxTokens': 4000
-                },
-                'messages': [
-                    {'role': 'system', 'text': system_prompt},
-                    {'role': 'user', 'text': f"Создай макет по описанию: {prompt}"}
-                ]
-            },
-            timeout=60
-        )
-        
-        if response.status_code != 200:
-            error_detail = response.json() if response.content else str(response.status_code)
-            return {
-                'statusCode': 500,
-                'headers': {'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json'},
-                'body': json.dumps({
-                    'error': 'YandexGPT API ошибка',
-                    'details': error_detail
-                }),
-                'isBase64Encoded': False
-            }
-        
-        result = response.json()
-        content = result['result']['alternatives'][0]['message']['text']
-        
-        # Парсим JSON из ответа
-        response_text = content.strip()
-        
-        if response_text.startswith('```json'):
-            response_text = response_text.replace('```json', '').replace('```', '').strip()
-        elif response_text.startswith('```'):
-            response_text = response_text.replace('```', '').strip()
-        
-        parsed = json.loads(response_text)
-        
-        return {
-            'statusCode': 200,
-            'headers': {'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json'},
-            'body': json.dumps({
-                'html': parsed.get('html', ''),
-                'css': parsed.get('css', ''),
-                'description': parsed.get('preview_description', ''),
-                'success': True
-            }),
-            'isBase64Encoded': False
-        }
-    
-    except json.JSONDecodeError as e:
-        print(f'JSON parse error: {str(e)}, using fallback template')
-        fallback = get_fallback_template(section, prompt)
-        return {
-            'statusCode': 200,
-            'headers': {'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json'},
-            'body': json.dumps({
-                'html': fallback['html'],
-                'css': fallback['css'],
-                'description': fallback['description'] + ' (готовый шаблон)',
-                'success': True,
-                'fallback': True
-            }),
-            'isBase64Encoded': False
-        }
-    except Exception as e:
-        print(f'AI generation error: {str(e)}, using fallback template')
-        fallback = get_fallback_template(section, prompt)
-        return {
-            'statusCode': 200,
-            'headers': {'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json'},
-            'body': json.dumps({
-                'html': fallback['html'],
-                'css': fallback['css'],
-                'description': fallback['description'] + ' (готовый шаблон)',
-                'success': True,
-                'fallback': True,
-                'error_details': str(e)
-            }),
-            'isBase64Encoded': False
-        }
