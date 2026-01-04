@@ -7,6 +7,12 @@ import uuid
 import time
 from typing import Dict, Tuple, Optional
 
+try:
+    import anthropic
+    ANTHROPIC_AVAILABLE = True
+except ImportError:
+    ANTHROPIC_AVAILABLE = False
+
 # In-memory rate limiting
 _rate_limit_store: Dict[str, list] = {}
 
@@ -57,6 +63,12 @@ def handler(event, context):
         headers = event.get('headers', {})
         user_id = headers.get('X-User-Id') or headers.get('x-user-id')
         
+        body = json.loads(event.get('body', '{}'))
+        action = body.get('action', 'generate_image')
+        
+        if action == 'generate_template':
+            return generate_template_handler(body, user_id)
+        
         if not user_id:
             return {
                 'statusCode': 401,
@@ -80,7 +92,6 @@ def handler(event, context):
                 'isBase64Encoded': False
             }
         
-        body = json.loads(event.get('body', '{}'))
         prompt = body.get('prompt')
         
         if not prompt:
@@ -241,5 +252,119 @@ def handler(event, context):
             'statusCode': 500,
             'headers': {'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json'},
             'body': json.dumps({'error': f'Image generation failed: {str(e)}'}),
+            'isBase64Encoded': False
+        }
+
+
+def generate_template_handler(body: dict, user_id: str) -> dict:
+    """Генерация HTML/CSS макета через Claude"""
+    
+    prompt = body.get('prompt', '')
+    section = body.get('section', 'full')
+    
+    if not prompt:
+        return {
+            'statusCode': 400,
+            'headers': {'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json'},
+            'body': json.dumps({'error': 'Prompt is required'}),
+            'isBase64Encoded': False
+        }
+    
+    if not ANTHROPIC_AVAILABLE:
+        return {
+            'statusCode': 500,
+            'headers': {'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json'},
+            'body': json.dumps({'error': 'Anthropic library not available'}),
+            'isBase64Encoded': False
+        }
+    
+    api_key = os.environ.get('ANTHROPIC_API_KEY')
+    if not api_key:
+        return {
+            'statusCode': 500,
+            'headers': {'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json'},
+            'body': json.dumps({'error': 'ANTHROPIC_API_KEY not configured'}),
+            'isBase64Encoded': False
+        }
+    
+    section_descriptions = {
+        'hero': 'Hero секция (шапка визитки): фото, имя, должность, CTA кнопки',
+        'about': 'Блок "О себе": текст, фото, иконки достижений/навыков',
+        'services': 'Блок услуг: карточки с иконками, описанием, ценами',
+        'contacts': 'Контакты: форма связи, соцсети, мессенджеры, карта',
+        'full': 'Полная визитка: hero + about + services + contacts'
+    }
+    
+    section_info = section_descriptions.get(section, section_descriptions['full'])
+    
+    system_prompt = f"""Ты — эксперт по веб-дизайну визиток. Создай современный, адаптивный макет для раздела: {section_info}
+
+ТРЕБОВАНИЯ:
+1. Используй ТОЛЬКО Tailwind CSS классы для стилизации
+2. HTML должен быть семантичным и чистым
+3. Дизайн должен быть современным, минималистичным и профессиональным
+4. Адаптивность: mobile-first подход
+5. Цветовая палитра: можно использовать gold (#d4a574), green (#10b981) или указанные в промпте
+6. Иконки: используй emoji или текстовые плейсхолдеры [ICON]
+7. НЕ используй теги <script>, только HTML и Tailwind классы
+8. Используй реалистичные данные для примера
+
+ФОРМАТ ОТВЕТА (строго JSON):
+{{
+  "html": "<!-- HTML код с Tailwind классами -->",
+  "css": "/* Дополнительный CSS если нужен (опционально) */",
+  "preview_description": "Краткое описание макета"
+}}
+
+Отвечай ТОЛЬКО JSON, без markdown разметки."""
+
+    try:
+        client = anthropic.Anthropic(api_key=api_key)
+        
+        message = client.messages.create(
+            model="claude-3-5-sonnet-20241022",
+            max_tokens=4000,
+            system=system_prompt,
+            messages=[
+                {
+                    "role": "user",
+                    "content": f"Создай макет по описанию: {prompt}"
+                }
+            ]
+        )
+        
+        response_text = message.content[0].text.strip()
+        
+        if response_text.startswith('```json'):
+            response_text = response_text.replace('```json', '').replace('```', '').strip()
+        elif response_text.startswith('```'):
+            response_text = response_text.replace('```', '').strip()
+        
+        result = json.loads(response_text)
+        
+        return {
+            'statusCode': 200,
+            'headers': {'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json'},
+            'body': json.dumps({
+                'html': result.get('html', ''),
+                'css': result.get('css', ''),
+                'description': result.get('preview_description', ''),
+                'success': True
+            }),
+            'isBase64Encoded': False
+        }
+    
+    except json.JSONDecodeError:
+        return {
+            'statusCode': 500,
+            'headers': {'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json'},
+            'body': json.dumps({'error': 'Failed to parse AI response'}),
+            'isBase64Encoded': False
+        }
+    except Exception as e:
+        return {
+            'statusCode': 500,
+            'headers': {'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json'},
+            'body': json.dumps({'error': f'AI generation failed: {str(e)}'}),
             'isBase64Encoded': False
         }

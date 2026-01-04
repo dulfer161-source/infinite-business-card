@@ -63,11 +63,21 @@ const AITemplateGenerator = ({
       }, 300);
 
       const authToken = localStorage.getItem('auth_token');
-      const response = await fetch('https://functions.poehali.dev/b5b5eaae-a9cb-46f3-8d5b-3c7e62ec2b75', {
+      const userStr = localStorage.getItem('user');
+      let userId = '';
+      if (userStr) {
+        try {
+          const user = JSON.parse(userStr);
+          userId = user.id || '';
+        } catch {}
+      }
+      
+      const response = await fetch('https://functions.poehali.dev/72ff8548-9116-4284-8a41-2cb3d308cfc5', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'X-Auth-Token': authToken || ''
+          'X-Auth-Token': authToken || '',
+          'X-User-Id': userId
         },
         body: JSON.stringify({
           action: 'generate_template',
