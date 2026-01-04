@@ -237,13 +237,51 @@ def handler(event, context):
             hide_platform_branding = body.get('hide_platform_branding', False) and can_remove_branding
             custom_branding_json = json.dumps(custom_branding).replace("'", "''")
             
+            # Handle HTML/CSS template fields
+            hero_html = body.get('hero_html', '').replace("'", "''") if 'hero_html' in body else None
+            hero_css = body.get('hero_css', '').replace("'", "''") if 'hero_css' in body else None
+            about_html = body.get('about_html', '').replace("'", "''") if 'about_html' in body else None
+            about_css = body.get('about_css', '').replace("'", "''") if 'about_css' in body else None
+            services_html = body.get('services_html', '').replace("'", "''") if 'services_html' in body else None
+            services_css = body.get('services_css', '').replace("'", "''") if 'services_css' in body else None
+            contacts_html = body.get('contacts_html', '').replace("'", "''") if 'contacts_html' in body else None
+            contacts_css = body.get('contacts_css', '').replace("'", "''") if 'contacts_css' in body else None
+            full_html = body.get('full_html', '').replace("'", "''") if 'full_html' in body else None
+            full_css = body.get('full_css', '').replace("'", "''") if 'full_css' in body else None
+            
+            # Build UPDATE query with optional template fields
+            update_parts = [
+                f"name = '{name}'", f"position = '{position}'", f"company = '{company}'", f"phone = '{phone}'",
+                f"email = '{email}'", f"website = '{website}'", f"description = '{description}'", f"logo_url = '{logo_url}'",
+                f"custom_branding = '{custom_branding_json}'", f"hide_platform_branding = {hide_platform_branding}",
+                "updated_at = CURRENT_TIMESTAMP"
+            ]
+            
+            if hero_html is not None:
+                update_parts.append(f"hero_html = '{hero_html}'")
+            if hero_css is not None:
+                update_parts.append(f"hero_css = '{hero_css}'")
+            if about_html is not None:
+                update_parts.append(f"about_html = '{about_html}'")
+            if about_css is not None:
+                update_parts.append(f"about_css = '{about_css}'")
+            if services_html is not None:
+                update_parts.append(f"services_html = '{services_html}'")
+            if services_css is not None:
+                update_parts.append(f"services_css = '{services_css}'")
+            if contacts_html is not None:
+                update_parts.append(f"contacts_html = '{contacts_html}'")
+            if contacts_css is not None:
+                update_parts.append(f"contacts_css = '{contacts_css}'")
+            if full_html is not None:
+                update_parts.append(f"full_html = '{full_html}'")
+            if full_css is not None:
+                update_parts.append(f"full_css = '{full_css}'")
+            
             cur.execute(
                 f"""
                 UPDATE t_p18253922_infinite_business_ca.business_cards 
-                SET name = '{name}', position = '{position}', company = '{company}', phone = '{phone}', 
-                    email = '{email}', website = '{website}', description = '{description}', logo_url = '{logo_url}', 
-                    custom_branding = '{custom_branding_json}', hide_platform_branding = {hide_platform_branding},
-                    updated_at = CURRENT_TIMESTAMP
+                SET {', '.join(update_parts)}
                 WHERE id = {int(card_id)} AND user_id = {int(user_id)}
                 RETURNING *
                 """

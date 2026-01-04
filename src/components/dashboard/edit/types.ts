@@ -20,6 +20,16 @@ export interface CardData {
   logo_url?: string;
   custom_branding?: any;
   hide_platform_branding?: boolean;
+  hero_html?: string;
+  hero_css?: string;
+  about_html?: string;
+  about_css?: string;
+  services_html?: string;
+  services_css?: string;
+  contacts_html?: string;
+  contacts_css?: string;
+  full_html?: string;
+  full_css?: string;
 }
 
 export type TargetSection = 'hero' | 'about' | 'services' | 'contacts' | 'full';

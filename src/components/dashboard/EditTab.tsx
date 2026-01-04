@@ -183,19 +183,57 @@ const EditTab = ({ userInfo, setUserInfo, selectedCardId }: EditTabProps) => {
     }
   };
 
+  const applyTemplateToCard = (html: string, css: string) => {
+    if (!cardData) return;
+
+    const sectionFieldMap: Record<TargetSection, string> = {
+      'hero': 'hero_html',
+      'about': 'about_html',
+      'services': 'services_html',
+      'contacts': 'contacts_html',
+      'full': 'full_html'
+    };
+
+    const fieldName = sectionFieldMap[targetSection];
+    
+    setCardData({
+      ...cardData,
+      [fieldName]: html,
+      [`${fieldName.replace('_html', '_css')}`]: css
+    });
+  };
+
   const handleApplyTemplate = (template: any) => {
-    toast.success(`Применён макет "${template.name}"`);
-    console.log('Applied template:', template, 'to section:', targetSection);
+    const html = template.html || template.content || '';
+    const css = template.css || template.styles || '';
+    
+    if (html) {
+      applyTemplateToCard(html, css);
+      toast.success(`Применён макет "${template.name}"`);
+    } else {
+      toast.error('Макет не содержит HTML код');
+    }
   };
 
   const handleAIGenerated = (html: string, css: string) => {
-    toast.success('AI макет применён к визитке!');
-    console.log('AI generated:', { html, css, section: targetSection });
+    if (html) {
+      applyTemplateToCard(html, css);
+      toast.success('AI макет применён к визитке!');
+    } else {
+      toast.error('Макет пустой, попробуйте снова');
+    }
   };
 
   const handleTemplateUploaded = (html: string, css: string, image?: string) => {
-    toast.success('Ваш макет загружен и применён!');
-    console.log('Uploaded:', { html, css, image, section: targetSection });
+    if (html || image) {
+      const finalHtml = image 
+        ? `<div class="w-full h-auto"><img src="${image}" alt="Uploaded template" class="w-full h-auto object-contain" /></div>`
+        : html;
+      applyTemplateToCard(finalHtml, css);
+      toast.success('Ваш макет загружен и применён!');
+    } else {
+      toast.error('Не удалось загрузить макет');
+    }
   };
 
   return (

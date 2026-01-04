@@ -252,8 +252,164 @@ def handler(event, context):
         }
 
 
+def get_fallback_template(section: str, prompt: str) -> dict:
+    """Возвращает готовый шаблон, если AI недоступен"""
+    
+    templates = {
+        'hero': {
+            'html': '''<section class="bg-gradient-to-br from-gray-900 to-gray-800 text-white py-20 px-6">
+  <div class="max-w-4xl mx-auto text-center">
+    <div class="w-32 h-32 bg-gold rounded-full mx-auto mb-6 flex items-center justify-center text-4xl">👤</div>
+    <h1 class="text-5xl font-bold mb-4">Иван Петров</h1>
+    <p class="text-xl text-gray-300 mb-8">Веб-дизайнер • UX/UI эксперт</p>
+    <div class="flex gap-4 justify-center flex-wrap">
+      <a href="#contacts" class="bg-gold text-black px-8 py-3 rounded-lg font-semibold hover:bg-yellow-500 transition">Связаться</a>
+      <a href="#portfolio" class="border-2 border-white px-8 py-3 rounded-lg font-semibold hover:bg-white hover:text-black transition">Портфолио</a>
+    </div>
+  </div>
+</section>''',
+            'css': '',
+            'description': 'Современная hero секция с фото, именем и CTA кнопками'
+        },
+        'about': {
+            'html': '''<section class="py-16 px-6 bg-white">
+  <div class="max-w-5xl mx-auto">
+    <div class="grid md:grid-cols-2 gap-12 items-center">
+      <div class="w-full h-96 bg-gradient-to-br from-gold to-yellow-600 rounded-2xl shadow-xl"></div>
+      <div>
+        <h2 class="text-4xl font-bold mb-6 text-gray-900">Обо мне</h2>
+        <p class="text-gray-600 mb-6 leading-relaxed">Создаю современные, удобные интерфейсы, которые работают на результат вашего бизнеса. Более 5 лет опыта в веб-дизайне.</p>
+        <div class="grid grid-cols-2 gap-4">
+          <div class="bg-gray-50 p-4 rounded-lg">
+            <div class="text-3xl mb-2">🏆</div>
+            <div class="font-semibold text-gray-900">50+ проектов</div>
+          </div>
+          <div class="bg-gray-50 p-4 rounded-lg">
+            <div class="text-3xl mb-2">⭐</div>
+            <div class="font-semibold text-gray-900">5.0 рейтинг</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>''',
+            'css': '',
+            'description': 'Блок "О себе" с фото, текстом и достижениями'
+        },
+        'services': {
+            'html': '''<section class="py-16 px-6 bg-gray-50">
+  <div class="max-w-6xl mx-auto">
+    <h2 class="text-4xl font-bold text-center mb-12 text-gray-900">Услуги</h2>
+    <div class="grid md:grid-cols-3 gap-8">
+      <div class="bg-white p-8 rounded-xl shadow-lg hover:shadow-2xl transition">
+        <div class="text-5xl mb-4">🎨</div>
+        <h3 class="text-2xl font-bold mb-3 text-gray-900">Дизайн визиток</h3>
+        <p class="text-gray-600 mb-6">Современный дизайн визитной карточки для вашего бизнеса</p>
+        <div class="text-3xl font-bold text-gold mb-4">от 5 000 ₽</div>
+        <button class="w-full bg-gray-900 text-white py-3 rounded-lg hover:bg-gray-800 transition">Заказать</button>
+      </div>
+      <div class="bg-white p-8 rounded-xl shadow-lg hover:shadow-2xl transition">
+        <div class="text-5xl mb-4">💼</div>
+        <h3 class="text-2xl font-bold mb-3 text-gray-900">Лендинг</h3>
+        <p class="text-gray-600 mb-6">Продающая посадочная страница под ключ</p>
+        <div class="text-3xl font-bold text-gold mb-4">от 15 000 ₽</div>
+        <button class="w-full bg-gray-900 text-white py-3 rounded-lg hover:bg-gray-800 transition">Заказать</button>
+      </div>
+      <div class="bg-white p-8 rounded-xl shadow-lg hover:shadow-2xl transition">
+        <div class="text-5xl mb-4">🚀</div>
+        <h3 class="text-2xl font-bold mb-3 text-gray-900">Корпоративный сайт</h3>
+        <p class="text-gray-600 mb-6">Полноценный сайт компании с админкой</p>
+        <div class="text-3xl font-bold text-gold mb-4">от 50 000 ₽</div>
+        <button class="w-full bg-gray-900 text-white py-3 rounded-lg hover:bg-gray-800 transition">Заказать</button>
+      </div>
+    </div>
+  </div>
+</section>''',
+            'css': '',
+            'description': 'Карточки услуг с иконками, ценами и кнопками'
+        },
+        'contacts': {
+            'html': '''<section class="py-16 px-6 bg-white">
+  <div class="max-w-4xl mx-auto">
+    <h2 class="text-4xl font-bold text-center mb-12 text-gray-900">Контакты</h2>
+    <div class="grid md:grid-cols-2 gap-12">
+      <div>
+        <h3 class="text-2xl font-semibold mb-6 text-gray-900">Напишите мне</h3>
+        <form class="space-y-4">
+          <input type="text" placeholder="Ваше имя" class="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-gold outline-none transition" />
+          <input type="email" placeholder="Email" class="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-gold outline-none transition" />
+          <textarea placeholder="Сообщение" rows="4" class="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-gold outline-none transition"></textarea>
+          <button type="submit" class="w-full bg-gold text-black font-semibold py-3 rounded-lg hover:bg-yellow-500 transition">Отправить</button>
+        </form>
+      </div>
+      <div>
+        <h3 class="text-2xl font-semibold mb-6 text-gray-900">Социальные сети</h3>
+        <div class="space-y-4">
+          <a href="#" class="flex items-center gap-4 p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition">
+            <div class="text-3xl">📱</div>
+            <div><div class="font-semibold text-gray-900">Telegram</div><div class="text-gray-600">@username</div></div>
+          </a>
+          <a href="#" class="flex items-center gap-4 p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition">
+            <div class="text-3xl">📧</div>
+            <div><div class="font-semibold text-gray-900">Email</div><div class="text-gray-600">hello@example.com</div></div>
+          </a>
+          <a href="#" class="flex items-center gap-4 p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition">
+            <div class="text-3xl">📞</div>
+            <div><div class="font-semibold text-gray-900">Телефон</div><div class="text-gray-600">+7 (999) 123-45-67</div></div>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>''',
+            'css': '',
+            'description': 'Форма обратной связи и контактная информация'
+        },
+        'full': {
+            'html': '''<div class="min-h-screen bg-white">
+  <section class="bg-gradient-to-br from-gray-900 to-gray-800 text-white py-20 px-6">
+    <div class="max-w-4xl mx-auto text-center">
+      <div class="w-32 h-32 bg-gold rounded-full mx-auto mb-6 flex items-center justify-center text-4xl">👤</div>
+      <h1 class="text-5xl font-bold mb-4">Ваше имя</h1>
+      <p class="text-xl text-gray-300 mb-8">Специалист • Профессия</p>
+      <a href="#contacts" class="inline-block bg-gold text-black px-8 py-3 rounded-lg font-semibold hover:bg-yellow-500 transition">Связаться</a>
+    </div>
+  </section>
+  
+  <section class="py-16 px-6">
+    <div class="max-w-4xl mx-auto text-center">
+      <h2 class="text-4xl font-bold mb-8 text-gray-900">Обо мне</h2>
+      <p class="text-xl text-gray-600 leading-relaxed">Краткая информация о вас, вашем опыте и подходе к работе. Расскажите, чем можете быть полезны клиентам.</p>
+    </div>
+  </section>
+  
+  <section id="contacts" class="py-16 px-6 bg-gray-50">
+    <div class="max-w-4xl mx-auto text-center">
+      <h2 class="text-4xl font-bold mb-8 text-gray-900">Контакты</h2>
+      <div class="flex gap-6 justify-center flex-wrap">
+        <a href="#" class="flex items-center gap-2 bg-white px-6 py-3 rounded-lg shadow hover:shadow-lg transition">
+          <span class="text-2xl">📱</span> <span class="font-semibold">Telegram</span>
+        </a>
+        <a href="#" class="flex items-center gap-2 bg-white px-6 py-3 rounded-lg shadow hover:shadow-lg transition">
+          <span class="text-2xl">📧</span> <span class="font-semibold">Email</span>
+        </a>
+        <a href="#" class="flex items-center gap-2 bg-white px-6 py-3 rounded-lg shadow hover:shadow-lg transition">
+          <span class="text-2xl">📞</span> <span class="font-semibold">Телефон</span>
+        </a>
+      </div>
+    </div>
+  </section>
+</div>''',
+            'css': '',
+            'description': 'Полная визитка с основными разделами'
+        }
+    }
+    
+    return templates.get(section, templates['full'])
+
+
 def generate_template_handler(body: dict, user_id: str) -> dict:
-    """Генерация HTML/CSS макета через YandexGPT"""
+    """Генерация HTML/CSS макета через YandexGPT с fallback на готовые шаблоны"""
     
     prompt = body.get('prompt', '')
     section = body.get('section', 'full')
@@ -269,11 +425,19 @@ def generate_template_handler(body: dict, user_id: str) -> dict:
     api_key = os.environ.get('YANDEX_API_KEY')
     folder_id = os.environ.get('YANDEX_FOLDER_ID', '')
     
-    if not api_key:
+    if not api_key or api_key == 'your_yandex_api_key_here':
+        print('YANDEX_API_KEY не настроен, используем fallback шаблон')
+        fallback = get_fallback_template(section, prompt)
         return {
-            'statusCode': 500,
+            'statusCode': 200,
             'headers': {'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json'},
-            'body': json.dumps({'error': 'YANDEX_API_KEY не настроен. Получите ключ на console.yandex.cloud'}),
+            'body': json.dumps({
+                'html': fallback['html'],
+                'css': fallback['css'],
+                'description': fallback['description'] + ' (готовый шаблон)',
+                'success': True,
+                'fallback': True
+            }),
             'isBase64Encoded': False
         }
     
@@ -368,17 +532,34 @@ def generate_template_handler(body: dict, user_id: str) -> dict:
             'isBase64Encoded': False
         }
     
-    except json.JSONDecodeError:
+    except json.JSONDecodeError as e:
+        print(f'JSON parse error: {str(e)}, using fallback template')
+        fallback = get_fallback_template(section, prompt)
         return {
-            'statusCode': 500,
+            'statusCode': 200,
             'headers': {'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json'},
-            'body': json.dumps({'error': 'Failed to parse AI response'}),
+            'body': json.dumps({
+                'html': fallback['html'],
+                'css': fallback['css'],
+                'description': fallback['description'] + ' (готовый шаблон)',
+                'success': True,
+                'fallback': True
+            }),
             'isBase64Encoded': False
         }
     except Exception as e:
+        print(f'AI generation error: {str(e)}, using fallback template')
+        fallback = get_fallback_template(section, prompt)
         return {
-            'statusCode': 500,
+            'statusCode': 200,
             'headers': {'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json'},
-            'body': json.dumps({'error': f'AI generation failed: {str(e)}'}),
+            'body': json.dumps({
+                'html': fallback['html'],
+                'css': fallback['css'],
+                'description': fallback['description'] + ' (готовый шаблон)',
+                'success': True,
+                'fallback': True,
+                'error_details': str(e)
+            }),
             'isBase64Encoded': False
         }
