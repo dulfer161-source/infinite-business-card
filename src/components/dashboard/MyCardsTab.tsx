@@ -1,25 +1,13 @@
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
 import Icon from '@/components/ui/icon';
 import { toast } from 'sonner';
 import CardItem from './cards/CardItem';
 import CreateCardDialog from './cards/CreateCardDialog';
 import DeleteCardDialog from './cards/DeleteCardDialog';
-
-interface CardData {
-  id: number;
-  name: string;
-  position?: string;
-  company?: string;
-  phone?: string;
-  email?: string;
-  website?: string;
-  description?: string;
-  logo_url?: string;
-  view_count: number;
-  created_at: string;
-}
+import EmptyCardsState from './cards/EmptyCardsState';
+import { CardData, NewCardForm } from './cards/types';
+import { formatPhone, fetchWithRetry } from './cards/utils';
 
 const MyCardsTab = () => {
   const [cards, setCards] = useState<CardData[]>([]);
@@ -27,7 +15,7 @@ const MyCardsTab = () => {
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [cardToDelete, setCardToDelete] = useState<CardData | null>(null);
-  const [newCard, setNewCard] = useState({
+  const [newCard, setNewCard] = useState<NewCardForm>({
     name: '',
     position: '',
     company: '',
@@ -40,48 +28,9 @@ const MyCardsTab = () => {
   const [creating, setCreating] = useState(false);
   const [deleting, setDeleting] = useState(false);
 
-  const formatPhone = (value: string) => {
-    const cleaned = value.replace(/\D/g, '');
-    
-    if (cleaned.length === 0) return '';
-    
-    let formatted = '+7';
-    if (cleaned.length > 1) {
-      formatted += ' (' + cleaned.substring(1, 4);
-    }
-    if (cleaned.length >= 5) {
-      formatted += ') ' + cleaned.substring(4, 7);
-    }
-    if (cleaned.length >= 8) {
-      formatted += '-' + cleaned.substring(7, 9);
-    }
-    if (cleaned.length >= 10) {
-      formatted += '-' + cleaned.substring(9, 11);
-    }
-    
-    return formatted;
-  };
-
   useEffect(() => {
     loadCards();
   }, []);
-
-  const fetchWithRetry = async (url: string, options: RequestInit, maxRetries = 3): Promise<Response> => {
-    for (let i = 0; i < maxRetries; i++) {
-      try {
-        const response = await fetch(url, options);
-        if (response.status === 503 && i < maxRetries - 1) {
-          await new Promise(resolve => setTimeout(resolve, 1000 * (i + 1)));
-          continue;
-        }
-        return response;
-      } catch (error) {
-        if (i === maxRetries - 1) throw error;
-        await new Promise(resolve => setTimeout(resolve, 1000 * (i + 1)));
-      }
-    }
-    throw new Error('Max retries reached');
-  };
 
   const loadCards = async () => {
     setLoading(true);
@@ -264,19 +213,7 @@ const MyCardsTab = () => {
 
       {/* Cards Grid */}
       {cards.length === 0 ? (
-        <Card className="border-2 border-dashed border-gold/30">
-          <CardContent className="flex flex-col items-center justify-center py-12">
-            <Icon name="CreditCard" size={64} className="text-gold/40 mb-4" />
-            <h3 className="text-xl font-bold mb-2">У вас пока нет визиток</h3>
-            <p className="text-muted-foreground mb-6 text-center">
-              Создайте свою первую цифровую визитку
-            </p>
-            <Button onClick={() => setCreateDialogOpen(true)} className="bg-gold text-black hover:bg-gold/90">
-              <Icon name="Plus" size={18} className="mr-2" />
-              Создать первую визитку
-            </Button>
-          </CardContent>
-        </Card>
+        <EmptyCardsState onCreateClick={() => setCreateDialogOpen(true)} />
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {cards.map((card) => (

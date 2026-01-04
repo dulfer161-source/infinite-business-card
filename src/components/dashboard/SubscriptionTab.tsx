@@ -1,25 +1,24 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Progress } from '@/components/ui/progress';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Input } from '@/components/ui/input';
 import Icon from '@/components/ui/icon';
 import PricingPlans from '../PricingPlans';
 import PricingComparison from '../PricingComparison';
 import PaymentModal from '../PaymentModal';
 import SubscriptionNotifications from './SubscriptionNotifications';
 import { subscriptionMonitor } from '@/lib/subscriptionMonitor';
+import CurrentPlanCard from './subscription/CurrentPlanCard';
+import UsageStatsCard from './subscription/UsageStatsCard';
+import InvoiceHistory from './subscription/InvoiceHistory';
+import { SubscriptionData, Invoice, SelectedPlan } from './subscription/types';
 
 const SubscriptionTab = () => {
   const navigate = useNavigate();
   const [showPayment, setShowPayment] = useState(false);
-  const [selectedPlan, setSelectedPlan] = useState({ name: '', price: 0, period: 'monthly' as 'monthly' | 'yearly' });
+  const [selectedPlan, setSelectedPlan] = useState<SelectedPlan>({ name: '', price: 0, period: 'monthly' });
   const [currentPlan] = useState('free');
 
-  const subscription = {
+  const subscription: SubscriptionData = {
     plan: 'Базовый',
     status: 'active',
     startDate: '2024-12-01',
@@ -56,114 +55,21 @@ const SubscriptionTab = () => {
     }
   };
 
-  const invoices = [
+  const invoices: Invoice[] = [
     { id: '1', date: '2024-11-01', amount: 490, status: 'paid', plan: 'Профессиональный' },
     { id: '2', date: '2024-10-01', amount: 490, status: 'paid', plan: 'Профессиональный' },
     { id: '3', date: '2024-09-01', amount: 490, status: 'paid', plan: 'Профессиональный' }
   ];
 
+  const handleUpgrade = () => {
+    console.log('Navigate to pricing plans');
+  };
+
   return (
     <div className="space-y-6">
       <div className="grid md:grid-cols-2 gap-6">
-        <Card>
-          <CardHeader>
-            <div className="flex items-center justify-between">
-              <div>
-                <CardTitle className="flex items-center gap-2">
-                  <Icon name="CreditCard" size={20} />
-                  Текущая подписка
-                </CardTitle>
-                <CardDescription>Ваш активный тарифный план</CardDescription>
-              </div>
-              <Badge className="gradient-bg text-white">
-                {subscription.plan}
-              </Badge>
-            </div>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="space-y-3">
-              <div className="flex items-center justify-between text-sm">
-                <span className="text-muted-foreground">Статус</span>
-                <Badge variant="outline" className="border-green text-green">
-                  <Icon name="Check" size={12} className="mr-1" />
-                  Активна
-                </Badge>
-              </div>
-              <div className="flex items-center justify-between text-sm">
-                <span className="text-muted-foreground">Начало подписки</span>
-                <span className="font-medium">
-                  {new Date(subscription.startDate).toLocaleDateString('ru-RU')}
-                </span>
-              </div>
-              <div className="flex items-center justify-between text-sm">
-                <span className="text-muted-foreground">Продление</span>
-                <span className="font-medium">Бессрочно</span>
-              </div>
-            </div>
-
-            <Button className="w-full gradient-bg text-white">
-              <Icon name="Sparkles" className="mr-2" size={18} />
-              Улучшить тариф
-            </Button>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Icon name="TrendingUp" size={20} />
-              Использование ресурсов
-            </CardTitle>
-            <CardDescription>Лимиты текущего тарифа</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div>
-              <div className="flex items-center justify-between text-sm mb-2">
-                <span className="text-muted-foreground">Визитки</span>
-                <span className="font-medium">
-                  {subscription.features.cards.used} / {subscription.features.cards.limit}
-                </span>
-              </div>
-              <Progress 
-                value={(subscription.features.cards.used / subscription.features.cards.limit) * 100} 
-              />
-            </div>
-
-            <div>
-              <div className="flex items-center justify-between text-sm mb-2">
-                <span className="text-muted-foreground">Просмотры (месяц)</span>
-                <span className="font-medium">
-                  {subscription.features.views.used} / {subscription.features.views.limit}
-                </span>
-              </div>
-              <Progress 
-                value={(subscription.features.views.used / subscription.features.views.limit) * 100} 
-              />
-            </div>
-
-            <div>
-              <div className="flex items-center justify-between text-sm mb-2">
-                <span className="text-muted-foreground">Хранилище</span>
-                <span className="font-medium">
-                  {subscription.features.storage.used} МБ / {subscription.features.storage.limit} МБ
-                </span>
-              </div>
-              <Progress 
-                value={(subscription.features.storage.used / subscription.features.storage.limit) * 100} 
-              />
-            </div>
-
-            <div className="bg-orange/10 border border-orange/20 rounded-lg p-3 mt-4">
-              <div className="flex items-start gap-2">
-                <Icon name="AlertCircle" size={16} className="text-orange flex-shrink-0 mt-0.5" />
-                <p className="text-xs text-muted-foreground">
-                  Вы использовали {subscription.features.views.used}% лимита просмотров. 
-                  Улучшите тариф для неограниченных просмотров.
-                </p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+        <CurrentPlanCard subscription={subscription} onUpgrade={handleUpgrade} />
+        <UsageStatsCard subscription={subscription} />
       </div>
 
       <SubscriptionNotifications />
@@ -193,60 +99,7 @@ const SubscriptionTab = () => {
         </TabsContent>
 
         <TabsContent value="history" className="mt-6">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Icon name="Receipt" size={20} />
-                История платежей
-              </CardTitle>
-              <CardDescription>
-                Все ваши транзакции и чеки
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              {invoices.length === 0 ? (
-                <div className="text-center py-12">
-                  <Icon name="Receipt" size={48} className="mx-auto text-muted-foreground mb-3" />
-                  <p className="text-muted-foreground mb-4">У вас пока нет платежей</p>
-                  <Button variant="outline">
-                    <Icon name="CreditCard" className="mr-2" size={16} />
-                    Выбрать тариф
-                  </Button>
-                </div>
-              ) : (
-                <div className="space-y-3">
-                  {invoices.map((invoice) => (
-                    <div 
-                      key={invoice.id}
-                      className="flex items-center justify-between p-4 border rounded-lg hover:bg-muted/30 transition-colors"
-                    >
-                      <div className="flex items-center gap-4">
-                        <div className="w-10 h-10 rounded-lg bg-green/10 flex items-center justify-center">
-                          <Icon name="Check" size={20} className="text-green" />
-                        </div>
-                        <div>
-                          <p className="font-medium">{invoice.plan}</p>
-                          <p className="text-sm text-muted-foreground">
-                            {new Date(invoice.date).toLocaleDateString('ru-RU', {
-                              year: 'numeric',
-                              month: 'long',
-                              day: 'numeric'
-                            })}
-                          </p>
-                        </div>
-                      </div>
-                      <div className="flex items-center gap-4">
-                        <span className="font-semibold">{invoice.amount} ₽</span>
-                        <Button variant="ghost" size="sm">
-                          <Icon name="Download" size={16} />
-                        </Button>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </CardContent>
-          </Card>
+          <InvoiceHistory invoices={invoices} />
         </TabsContent>
       </Tabs>
 
