@@ -100,7 +100,7 @@ const OnboardingFlow = ({ open, onComplete, userName = 'друг' }: OnboardingF
             {
               step: '2',
               title: 'Настройте дизайн',
-              description: 'Выберите шаблон, цвета и добавьте фото',
+              description: 'Выберите из 37 шаблонов, сгенерируйте через AI или загрузите свой',
               icon: 'Palette'
             },
             {
