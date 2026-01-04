@@ -7,11 +7,7 @@ import uuid
 import time
 from typing import Dict, Tuple, Optional
 
-try:
-    import anthropic
-    ANTHROPIC_AVAILABLE = True
-except ImportError:
-    ANTHROPIC_AVAILABLE = False
+# YandexGPT вместо Anthropic
 
 # In-memory rate limiting
 _rate_limit_store: Dict[str, list] = {}
@@ -257,7 +253,7 @@ def handler(event, context):
 
 
 def generate_template_handler(body: dict, user_id: str) -> dict:
-    """Генерация HTML/CSS макета через Claude"""
+    """Генерация HTML/CSS макета через YandexGPT"""
     
     prompt = body.get('prompt', '')
     section = body.get('section', 'full')
@@ -270,20 +266,14 @@ def generate_template_handler(body: dict, user_id: str) -> dict:
             'isBase64Encoded': False
         }
     
-    if not ANTHROPIC_AVAILABLE:
-        return {
-            'statusCode': 500,
-            'headers': {'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json'},
-            'body': json.dumps({'error': 'Anthropic library not available'}),
-            'isBase64Encoded': False
-        }
+    api_key = os.environ.get('YANDEX_API_KEY')
+    folder_id = os.environ.get('YANDEX_FOLDER_ID', '')
     
-    api_key = os.environ.get('ANTHROPIC_API_KEY')
     if not api_key:
         return {
             'statusCode': 500,
             'headers': {'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json'},
-            'body': json.dumps({'error': 'ANTHROPIC_API_KEY not configured'}),
+            'body': json.dumps({'error': 'YANDEX_API_KEY не настроен. Получите ключ на console.yandex.cloud'}),
             'isBase64Encoded': False
         }
     
@@ -319,36 +309,60 @@ def generate_template_handler(body: dict, user_id: str) -> dict:
 Отвечай ТОЛЬКО JSON, без markdown разметки."""
 
     try:
-        client = anthropic.Anthropic(api_key=api_key)
-        
-        message = client.messages.create(
-            model="claude-3-5-sonnet-20241022",
-            max_tokens=4000,
-            system=system_prompt,
-            messages=[
-                {
-                    "role": "user",
-                    "content": f"Создай макет по описанию: {prompt}"
-                }
-            ]
+        response = requests.post(
+            'https://llm.api.cloud.yandex.net/foundationModels/v1/completion',
+            headers={
+                'Authorization': f'Api-Key {api_key}',
+                'Content-Type': 'application/json',
+                'x-folder-id': folder_id
+            },
+            json={
+                'modelUri': f'gpt://{folder_id}/yandexgpt-lite/latest',
+                'completionOptions': {
+                    'stream': False,
+                    'temperature': 0.7,
+                    'maxTokens': 4000
+                },
+                'messages': [
+                    {'role': 'system', 'text': system_prompt},
+                    {'role': 'user', 'text': f"Создай макет по описанию: {prompt}"}
+                ]
+            },
+            timeout=60
         )
         
-        response_text = message.content[0].text.strip()
+        if response.status_code != 200:
+            error_detail = response.json() if response.content else str(response.status_code)
+            return {
+                'statusCode': 500,
+                'headers': {'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json'},
+                'body': json.dumps({
+                    'error': 'YandexGPT API ошибка',
+                    'details': error_detail
+                }),
+                'isBase64Encoded': False
+            }
+        
+        result = response.json()
+        content = result['result']['alternatives'][0]['message']['text']
+        
+        # Парсим JSON из ответа
+        response_text = content.strip()
         
         if response_text.startswith('```json'):
             response_text = response_text.replace('```json', '').replace('```', '').strip()
         elif response_text.startswith('```'):
             response_text = response_text.replace('```', '').strip()
         
-        result = json.loads(response_text)
+        parsed = json.loads(response_text)
         
         return {
             'statusCode': 200,
             'headers': {'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json'},
             'body': json.dumps({
-                'html': result.get('html', ''),
-                'css': result.get('css', ''),
-                'description': result.get('preview_description', ''),
+                'html': parsed.get('html', ''),
+                'css': parsed.get('css', ''),
+                'description': parsed.get('preview_description', ''),
                 'success': True
             }),
             'isBase64Encoded': False
