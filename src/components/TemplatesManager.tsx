@@ -101,7 +101,11 @@ const TemplatesManager = ({ cardId }: TemplatesManagerProps) => {
           'Content-Type': 'application/json',
           'X-User-Id': userId ? userId.toString() : ''
         },
-        body: JSON.stringify({ prompt }),
+        body: JSON.stringify({ 
+          action: 'generate_template',
+          prompt,
+          section: 'full'
+        }),
       });
 
       if (response.status === 429) {
@@ -131,15 +135,18 @@ const TemplatesManager = ({ cardId }: TemplatesManagerProps) => {
         return;
       }
       
-      if (data.image_url) {
-        setGeneratedPreview(data.image_url);
+      // Backend возвращает {html, css, description, success}
+      if (data.success && data.html) {
+        // Преобразуем HTML макет в изображение через data URI для предпросмотра
+        const htmlPreview = `data:text/html;charset=utf-8,${encodeURIComponent(data.html)}`;
+        setGeneratedPreview(htmlPreview);
         setGenerationsLeft(prev => Math.max(0, prev - 1));
         toast({
           title: 'Готово!',
-          description: 'Макет сгенерирован. Проверьте и сохраните.',
+          description: data.description || 'Макет сгенерирован. Проверьте и сохраните.',
         });
       } else {
-        throw new Error('No image URL');
+        throw new Error('No HTML template generated');
       }
     } catch (error: any) {
       console.error('Generation error:', error);
