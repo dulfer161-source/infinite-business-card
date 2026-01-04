@@ -1,6 +1,6 @@
 import { SecretStatus, CloudFunction } from './types';
 
-export const initialSecrets: SecretStatus[] = [
+export const mockSecrets: SecretStatus[] = [
   { name: 'VK_APP_ID', description: 'VK авторизация', status: 'checking', category: 'auth' },
   { name: 'VK_SECRET_KEY', description: 'VK защищённый ключ', status: 'checking', category: 'auth' },
   { name: 'YOOKASSA_SHOP_ID', description: 'ЮKassa магазин', status: 'checking', category: 'payment' },
@@ -14,7 +14,7 @@ export const initialSecrets: SecretStatus[] = [
   { name: 'AWS_SECRET_ACCESS_KEY', description: 'S3 ключ', status: 'checking', category: 'storage' },
 ];
 
-export const initialFunctions: CloudFunction[] = [
+export const mockFunctions: CloudFunction[] = [
   { name: 'auth', status: 'healthy', requests: 0 },
   { name: 'vk-auth', status: 'healthy', requests: 0 },
   { name: 'payment', status: 'healthy', requests: 0 },
