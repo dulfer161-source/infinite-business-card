@@ -14,6 +14,12 @@ export default function SocialAuthButtons({
   onTelegramAuth
 }: SocialAuthButtonsProps) {
   useEffect(() => {
+    // Создаём глобальный callback ПЕРЕД загрузкой скрипта
+    (window as any).onTelegramAuthCallback = (user: any) => {
+      console.log('Telegram auth callback:', user);
+      onTelegramAuth(user);
+    };
+
     const container = document.getElementById('telegram-login-container');
     if (container && !container.hasChildNodes()) {
       const script = document.createElement('script');
@@ -25,9 +31,12 @@ export default function SocialAuthButtons({
       script.setAttribute('data-request-access', 'write');
       script.async = true;
       container.appendChild(script);
-      
-      (window as any).onTelegramAuthCallback = onTelegramAuth;
     }
+
+    return () => {
+      // Очищаем глобальный callback при размонтировании
+      delete (window as any).onTelegramAuthCallback;
+    };
   }, [onTelegramAuth]);
 
   return (
