@@ -99,12 +99,13 @@ def handler(event, context):
                 cur.execute(f"""
                     SELECT us.*, s.name, s.price, s.duration_days, s.features, s.can_remove_branding
                     FROM t_p18253922_infinite_business_ca.user_subscriptions us
-                    JOIN t_p18253922_infinite_business_ca.subscriptions s ON us.subscription_id = s.id
-                    WHERE us.user_id = {int(user_id)} AND us.is_active = TRUE AND us.expires_at > NOW()
+                    JOIN t_p18253922_infinite_business_ca.subscriptions s ON us.plan_id = s.id
+                    WHERE us.user_id = {int(user_id)} AND us.status = 'active' AND us.expires_at > NOW()
                     ORDER BY us.expires_at DESC
                 """)
                 subscriptions = [dict(row) for row in cur.fetchall()]
                 
+                has_premium_access = len(subscriptions) > 0 and any(sub.get('price', 0) > 0 for sub in subscriptions)
                 has_branding_access = any(sub.get('can_remove_branding') for sub in subscriptions)
                 
                 return {
@@ -112,6 +113,7 @@ def handler(event, context):
                     'headers': {'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json'},
                     'body': json.dumps({
                         'subscriptions': subscriptions,
+                        'has_premium_access': has_premium_access,
                         'has_branding_access': has_branding_access
                     }, default=str),
                     'isBase64Encoded': False
