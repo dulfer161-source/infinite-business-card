@@ -58,8 +58,11 @@ def handler(event, context):
         cur = conn.cursor(cursor_factory=RealDictCursor)
         
         try:
+            query_params = event.get('queryStringParameters', {})
+            action = query_params.get('action') if query_params else None
+            
             # Get all subscription plans
-            if 'plans' in event.get('path', ''):
+            if action == 'plans':
                 cur.execute("SELECT * FROM t_p18253922_infinite_business_ca.subscriptions ORDER BY price ASC")
                 plans = [dict(row) for row in cur.fetchall()]
                 
@@ -71,7 +74,7 @@ def handler(event, context):
                 }
             
             # Get user subscriptions (requires auth)
-            if 'subscriptions' in event.get('path', ''):
+            if action == 'subscriptions':
                 headers = event.get('headers', {})
                 auth_token = headers.get('X-Auth-Token') or headers.get('x-auth-token')
                 
@@ -121,12 +124,12 @@ def handler(event, context):
                 }
             
             # Get white-label client info by domain (public)
-            if 'white-label' in event.get('path', ''):
-                query_params = event.get('queryStringParameters', {})
+            if action == 'white-label':
                 domain = query_params.get('domain') if query_params else None
+                my = query_params.get('my') == 'true'
                 
                 # Get white-label for current user
-                if 'my' in event.get('path', ''):
+                if my:
                     headers = event.get('headers', {})
                     auth_token = headers.get('X-Auth-Token') or headers.get('x-auth-token')
                     
@@ -175,7 +178,7 @@ def handler(event, context):
                         }
                 
                 # Get white-label by domain (public)
-                if domain:
+                elif domain:
                     domain_escaped = domain.replace("'", "''")
                     cur.execute(f"""
                         SELECT * FROM t_p18253922_infinite_business_ca.white_label_clients 
@@ -198,6 +201,14 @@ def handler(event, context):
                             'body': json.dumps({'error': 'White-label client not found'}),
                             'isBase64Encoded': False
                         }
+            
+            # Default: return error for GET without valid action
+            return {
+                'statusCode': 400,
+                'headers': {'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json'},
+                'body': json.dumps({'error': 'Missing or invalid action parameter'}),
+                'isBase64Encoded': False
+            }
         
         finally:
             if cur:

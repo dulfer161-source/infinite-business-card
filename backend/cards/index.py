@@ -339,7 +339,7 @@ def handler(event, context):
             }
         
         # --- TEMPLATES ---
-        elif method == 'GET' and query_params and 'templates' in event.get('path', ''):
+        elif method == 'GET' and query_params and query_params.get('action') == 'templates':
             card_id = query_params.get('card_id')
             if not card_id:
                 return {'statusCode': 400, 'headers': {'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json'}, 'body': json.dumps({'error': 'card_id required'}), 'isBase64Encoded': False}
@@ -348,7 +348,7 @@ def handler(event, context):
             templates = [dict(row) for row in cur.fetchall()]
             return {'statusCode': 200, 'headers': {'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json'}, 'body': json.dumps({'templates': templates}, default=str), 'isBase64Encoded': False}
         
-        elif method == 'POST' and 'templates' in event.get('path', ''):
+        elif method == 'POST' and query_params and query_params.get('action') == 'templates':
             body = json.loads(event.get('body', '{}'))
             card_id = body.get('card_id')
             template_url = body.get('template_url', '').replace("'", "''")
@@ -369,7 +369,7 @@ def handler(event, context):
             return {'statusCode': 200, 'headers': {'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json'}, 'body': json.dumps({'template': template}, default=str), 'isBase64Encoded': False}
         
         # --- AD ZONES ---
-        elif method == 'GET' and query_params and 'ad-zones' in event.get('path', ''):
+        elif method == 'GET' and query_params and query_params.get('action') == 'ad-zones':
             card_id = query_params.get('card_id')
             if not card_id:
                 return {'statusCode': 400, 'headers': {'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json'}, 'body': json.dumps({'error': 'card_id required'}), 'isBase64Encoded': False}
@@ -378,7 +378,7 @@ def handler(event, context):
             zones = [dict(row) for row in cur.fetchall()]
             return {'statusCode': 200, 'headers': {'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json'}, 'body': json.dumps({'zones': zones}, default=str), 'isBase64Encoded': False}
         
-        elif method == 'POST' and 'ad-zones' in event.get('path', ''):
+        elif method == 'POST' and query_params and query_params.get('action') == 'ad-zones':
             body = json.loads(event.get('body', '{}'))
             card_id = body.get('card_id')
             zone_name = body.get('zone_name', '').replace("'", "''")
@@ -396,7 +396,7 @@ def handler(event, context):
             return {'statusCode': 200, 'headers': {'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json'}, 'body': json.dumps({'zone': zone}, default=str), 'isBase64Encoded': False}
         
         # --- AD PLACEMENTS ---
-        elif method == 'POST' and 'ad-placements' in event.get('path', ''):
+        elif method == 'POST' and query_params and query_params.get('action') == 'ad-placements':
             body = json.loads(event.get('body', '{}'))
             ad_zone_id = body.get('ad_zone_id')
             advertiser_name = body.get('advertiser_name', '').replace("'", "''")

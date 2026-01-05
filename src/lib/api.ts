@@ -215,7 +215,7 @@ class ApiService {
 
   // Subscriptions
   async getSubscriptionPlans() {
-    const response = await this.fetchWithRetry(`${API_URLS.auth}/plans`, {
+    const response = await this.fetchWithRetry(`${API_URLS.auth}?action=plans`, {
       method: 'GET',
       headers: { 'Content-Type': 'application/json' },
     });
@@ -228,7 +228,7 @@ class ApiService {
   }
 
   async getUserSubscriptions() {
-    const response = await this.fetchWithRetry(`${API_URLS.auth}/subscriptions`, {
+    const response = await this.fetchWithRetry(`${API_URLS.auth}?action=subscriptions`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -245,7 +245,7 @@ class ApiService {
 
   // White-Label
   async getWhiteLabelByDomain(domain: string) {
-    const response = await this.fetchWithRetry(`${API_URLS.auth}/white-label?domain=${domain}`, {
+    const response = await this.fetchWithRetry(`${API_URLS.auth}?action=white-label&domain=${domain}`, {
       method: 'GET',
       headers: { 'Content-Type': 'application/json' },
     });
@@ -258,7 +258,7 @@ class ApiService {
   }
 
   async getMyWhiteLabel() {
-    const response = await this.fetchWithRetry(`${API_URLS.auth}/white-label/my`, {
+    const response = await this.fetchWithRetry(`${API_URLS.auth}?action=white-label&my=true`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -283,7 +283,7 @@ class ApiService {
 
   // Templates
   async getCardTemplates(cardId: number) {
-    const response = await this.fetchWithRetry(`${API_URLS.cards}/templates?card_id=${cardId}`, {
+    const response = await this.fetchWithRetry(`${API_URLS.cards}?action=templates&card_id=${cardId}`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -299,7 +299,7 @@ class ApiService {
   }
 
   async createCardTemplate(cardId: number, templateUrl: string, templateType: 'uploaded' | 'generated' = 'uploaded') {
-    const response = await this.fetchWithRetry(`${API_URLS.cards}/templates`, {
+    const response = await this.fetchWithRetry(`${API_URLS.cards}?action=templates`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -317,7 +317,7 @@ class ApiService {
 
   // Ad Zones
   async getAdZones(cardId: number) {
-    const response = await this.fetchWithRetry(`${API_URLS.cards}/ad-zones?card_id=${cardId}`, {
+    const response = await this.fetchWithRetry(`${API_URLS.cards}?action=ad-zones&card_id=${cardId}`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -333,7 +333,7 @@ class ApiService {
   }
 
   async createAdZone(cardId: number, zoneName: string, zonePosition: 'header' | 'footer' | 'sidebar' | 'content') {
-    const response = await this.fetchWithRetry(`${API_URLS.cards}/ad-zones`, {
+    const response = await this.fetchWithRetry(`${API_URLS.cards}?action=ad-zones`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -350,7 +350,7 @@ class ApiService {
   }
 
   async createAdPlacement(adZoneId: number, advertiserName: string, advertiserEmail: string, adContent: string, adImageUrl: string, pricePerMonth: number) {
-    const response = await this.fetchWithRetry(`${API_URLS.cards}/ad-placements`, {
+    const response = await this.fetchWithRetry(`${API_URLS.cards}?action=ad-placements`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

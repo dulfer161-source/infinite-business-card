@@ -35,7 +35,7 @@ const MyCardsTab = () => {
   const loadSubscription = async () => {
     try {
       const authToken = localStorage.getItem('auth_token');
-      const response = await fetch('https://functions.poehali.dev/063b09be-f07e-478c-a626-807980d111e1/subscriptions', {
+      const response = await fetch('https://functions.poehali.dev/063b09be-f07e-478c-a626-807980d111e1?action=subscriptions', {
         headers: { 'X-Auth-Token': authToken || '' }
       });
 
