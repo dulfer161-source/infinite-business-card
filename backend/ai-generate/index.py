@@ -259,9 +259,9 @@ def get_fallback_template(section: str, prompt: str) -> dict:
         'hero': {
             'html': '''<section class="bg-gradient-to-br from-gray-900 to-gray-800 text-white py-20 px-6">
   <div class="max-w-4xl mx-auto text-center">
-    <div class="w-32 h-32 bg-gold rounded-full mx-auto mb-6 flex items-center justify-center text-4xl">👤</div>
+    <div class="w-32 h-32 bg-gold rounded-full mx-auto mb-6"></div>
     <h1 class="text-5xl font-bold mb-4">Иван Петров</h1>
-    <p class="text-xl text-gray-300 mb-8">Веб-дизайнер • UX/UI эксперт</p>
+    <p class="text-xl text-gray-300 mb-8">Веб-дизайнер - UX/UI эксперт</p>
     <div class="flex gap-4 justify-center flex-wrap">
       <a href="#contacts" class="bg-gold text-black px-8 py-3 rounded-lg font-semibold hover:bg-yellow-500 transition">Связаться</a>
       <a href="#portfolio" class="border-2 border-white px-8 py-3 rounded-lg font-semibold hover:bg-white hover:text-black transition">Портфолио</a>
@@ -281,11 +281,11 @@ def get_fallback_template(section: str, prompt: str) -> dict:
         <p class="text-gray-600 mb-6 leading-relaxed">Создаю современные, удобные интерфейсы, которые работают на результат вашего бизнеса. Более 5 лет опыта в веб-дизайне.</p>
         <div class="grid grid-cols-2 gap-4">
           <div class="bg-gray-50 p-4 rounded-lg">
-            <div class="text-3xl mb-2">🏆</div>
+            <div class="text-2xl mb-2 font-bold text-gold">&#9733;</div>
             <div class="font-semibold text-gray-900">50+ проектов</div>
           </div>
           <div class="bg-gray-50 p-4 rounded-lg">
-            <div class="text-3xl mb-2">⭐</div>
+            <div class="text-2xl mb-2 font-bold text-gold">&#9733;</div>
             <div class="font-semibold text-gray-900">5.0 рейтинг</div>
           </div>
         </div>
@@ -302,21 +302,21 @@ def get_fallback_template(section: str, prompt: str) -> dict:
     <h2 class="text-4xl font-bold text-center mb-12 text-gray-900">Услуги</h2>
     <div class="grid md:grid-cols-3 gap-8">
       <div class="bg-white p-8 rounded-xl shadow-lg hover:shadow-2xl transition">
-        <div class="text-5xl mb-4">🎨</div>
+        <div class="text-4xl mb-4 font-bold text-gold">&#9733;</div>
         <h3 class="text-2xl font-bold mb-3 text-gray-900">Дизайн визиток</h3>
         <p class="text-gray-600 mb-6">Современный дизайн визитной карточки для вашего бизнеса</p>
         <div class="text-3xl font-bold text-gold mb-4">от 5 000 ₽</div>
         <button class="w-full bg-gray-900 text-white py-3 rounded-lg hover:bg-gray-800 transition">Заказать</button>
       </div>
       <div class="bg-white p-8 rounded-xl shadow-lg hover:shadow-2xl transition">
-        <div class="text-5xl mb-4">💼</div>
+        <div class="text-4xl mb-4 font-bold text-gold">&#9733;</div>
         <h3 class="text-2xl font-bold mb-3 text-gray-900">Лендинг</h3>
         <p class="text-gray-600 mb-6">Продающая посадочная страница под ключ</p>
         <div class="text-3xl font-bold text-gold mb-4">от 15 000 ₽</div>
         <button class="w-full bg-gray-900 text-white py-3 rounded-lg hover:bg-gray-800 transition">Заказать</button>
       </div>
       <div class="bg-white p-8 rounded-xl shadow-lg hover:shadow-2xl transition">
-        <div class="text-5xl mb-4">🚀</div>
+        <div class="text-4xl mb-4 font-bold text-gold">&#9733;</div>
         <h3 class="text-2xl font-bold mb-3 text-gray-900">Корпоративный сайт</h3>
         <p class="text-gray-600 mb-6">Полноценный сайт компании с админкой</p>
         <div class="text-3xl font-bold text-gold mb-4">от 50 000 ₽</div>
@@ -346,15 +346,15 @@ def get_fallback_template(section: str, prompt: str) -> dict:
         <h3 class="text-2xl font-semibold mb-6 text-gray-900">Социальные сети</h3>
         <div class="space-y-4">
           <a href="#" class="flex items-center gap-4 p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition">
-            <div class="text-3xl">📱</div>
+            <div class="w-12 h-12 bg-gold rounded-full flex items-center justify-center text-black font-bold">TG</div>
             <div><div class="font-semibold text-gray-900">Telegram</div><div class="text-gray-600">@username</div></div>
           </a>
           <a href="#" class="flex items-center gap-4 p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition">
-            <div class="text-3xl">📧</div>
+            <div class="w-12 h-12 bg-gold rounded-full flex items-center justify-center text-black font-bold">@</div>
             <div><div class="font-semibold text-gray-900">Email</div><div class="text-gray-600">hello@example.com</div></div>
           </a>
           <a href="#" class="flex items-center gap-4 p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition">
-            <div class="text-3xl">📞</div>
+            <div class="w-12 h-12 bg-gold rounded-full flex items-center justify-center text-black font-bold">TEL</div>
             <div><div class="font-semibold text-gray-900">Телефон</div><div class="text-gray-600">+7 (999) 123-45-67</div></div>
           </a>
         </div>
@@ -369,9 +369,9 @@ def get_fallback_template(section: str, prompt: str) -> dict:
             'html': '''<div class="min-h-screen bg-white">
   <section class="bg-gradient-to-br from-gray-900 to-gray-800 text-white py-20 px-6">
     <div class="max-w-4xl mx-auto text-center">
-      <div class="w-32 h-32 bg-gold rounded-full mx-auto mb-6 flex items-center justify-center text-4xl">👤</div>
+      <div class="w-32 h-32 bg-gold rounded-full mx-auto mb-6"></div>
       <h1 class="text-5xl font-bold mb-4">Ваше имя</h1>
-      <p class="text-xl text-gray-300 mb-8">Специалист • Профессия</p>
+      <p class="text-xl text-gray-300 mb-8">Специалист - Профессия</p>
       <a href="#contacts" class="inline-block bg-gold text-black px-8 py-3 rounded-lg font-semibold hover:bg-yellow-500 transition">Связаться</a>
     </div>
   </section>
@@ -388,13 +388,13 @@ def get_fallback_template(section: str, prompt: str) -> dict:
       <h2 class="text-4xl font-bold mb-8 text-gray-900">Контакты</h2>
       <div class="flex gap-6 justify-center flex-wrap">
         <a href="#" class="flex items-center gap-2 bg-white px-6 py-3 rounded-lg shadow hover:shadow-lg transition">
-          <span class="text-2xl">📱</span> <span class="font-semibold">Telegram</span>
+          <span class="w-8 h-8 bg-gold rounded-full flex items-center justify-center text-black text-xs font-bold">TG</span> <span class="font-semibold">Telegram</span>
         </a>
         <a href="#" class="flex items-center gap-2 bg-white px-6 py-3 rounded-lg shadow hover:shadow-lg transition">
-          <span class="text-2xl">📧</span> <span class="font-semibold">Email</span>
+          <span class="w-8 h-8 bg-gold rounded-full flex items-center justify-center text-black text-xs font-bold">@</span> <span class="font-semibold">Email</span>
         </a>
         <a href="#" class="flex items-center gap-2 bg-white px-6 py-3 rounded-lg shadow hover:shadow-lg transition">
-          <span class="text-2xl">📞</span> <span class="font-semibold">Телефон</span>
+          <span class="w-8 h-8 bg-gold rounded-full flex items-center justify-center text-black text-xs font-bold">TEL</span> <span class="font-semibold">Телефон</span>
         </a>
       </div>
     </div>
