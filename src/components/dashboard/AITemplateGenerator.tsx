@@ -38,11 +38,6 @@ const AITemplateGenerator = ({
   };
 
   const handleGenerate = async () => {
-    if (!isPremium) {
-      toast.error('Генерация AI макетов доступна только на премиум-тарифах');
-      return;
-    }
-
     if (!prompt.trim()) {
       toast.error('Опишите, какой макет вы хотите создать');
       return;
