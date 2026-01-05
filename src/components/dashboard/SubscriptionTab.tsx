@@ -16,9 +16,8 @@ const SubscriptionTab = () => {
   const navigate = useNavigate();
   const [showPayment, setShowPayment] = useState(false);
   const [selectedPlan, setSelectedPlan] = useState<SelectedPlan>({ name: '', price: 0, period: 'monthly' });
-  const [currentPlan] = useState('free');
-
-  const subscription: SubscriptionData = {
+  const [currentPlan, setCurrentPlan] = useState('free');
+  const [subscription, setSubscription] = useState<SubscriptionData>({
     plan: 'Базовый',
     status: 'active',
     startDate: '2024-12-01',
@@ -28,20 +27,70 @@ const SubscriptionTab = () => {
       views: { used: 47, limit: 100 },
       storage: { used: 2.3, limit: 100 }
     }
-  };
+  });
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    subscriptionMonitor.start({
-      plan: subscription.plan,
-      status: subscription.status as 'active' | 'expiring' | 'expired',
-      endDate: subscription.endDate,
-      features: subscription.features
-    });
-
-    return () => {
-      subscriptionMonitor.stop();
-    };
+    loadSubscriptionData();
   }, []);
+
+  useEffect(() => {
+    if (!loading) {
+      subscriptionMonitor.start({
+        plan: subscription.plan,
+        status: subscription.status as 'active' | 'expiring' | 'expired',
+        endDate: subscription.endDate,
+        features: subscription.features
+      });
+
+      return () => {
+        subscriptionMonitor.stop();
+      };
+    }
+  }, [loading, subscription]);
+
+  const loadSubscriptionData = async () => {
+    try {
+      const authToken = localStorage.getItem('auth_token');
+      const response = await fetch('https://functions.poehali.dev/063b09be-f07e-478c-a626-807980d111e1/subscriptions', {
+        headers: { 'X-Auth-Token': authToken || '' }
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        const subs = data.subscriptions || [];
+        
+        if (subs.length > 0) {
+          const activeSub = subs[0];
+          const planNameToId: Record<string, string> = {
+            'Базовый': 'free',
+            'Продвинутый': 'pro',
+            'Бизнес': 'business'
+          };
+          
+          setCurrentPlan(planNameToId[activeSub.name] || 'free');
+          setSubscription({
+            plan: activeSub.name,
+            status: activeSub.status,
+            startDate: activeSub.created_at?.split('T')[0] || new Date().toISOString().split('T')[0],
+            endDate: activeSub.expires_at ? activeSub.expires_at.split('T')[0] : null,
+            features: {
+              cards: { 
+                used: 1, 
+                limit: activeSub.features?.max_cards || 1 
+              },
+              views: { used: 0, limit: -1 },
+              storage: { used: 0, limit: 100 }
+            }
+          });
+        }
+      }
+    } catch (error) {
+      console.error('Failed to load subscription:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleSelectPlan = (planId: string) => {
     const plans: Record<string, { name: string; price: number }> = {
@@ -64,6 +113,17 @@ const SubscriptionTab = () => {
   const handleUpgrade = () => {
     console.log('Navigate to pricing plans');
   };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center py-12">
+        <div className="flex flex-col items-center gap-4">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gold"></div>
+          <p className="text-muted-foreground">Загрузка подписки...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">

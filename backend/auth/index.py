@@ -105,7 +105,8 @@ def handler(event, context):
                 """)
                 subscriptions = [dict(row) for row in cur.fetchall()]
                 
-                has_premium_access = len(subscriptions) > 0 and any(sub.get('price', 0) > 0 for sub in subscriptions)
+                # CRITICAL: Convert Decimal to float for price comparison
+                has_premium_access = len(subscriptions) > 0 and any(float(sub.get('price', 0)) > 0 for sub in subscriptions)
                 has_branding_access = any(sub.get('can_remove_branding') for sub in subscriptions)
                 
                 return {
