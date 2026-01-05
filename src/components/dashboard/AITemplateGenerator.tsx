@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
@@ -24,6 +25,7 @@ const AITemplateGenerator = ({
   onTemplateGenerated,
   isPremium
 }: AITemplateGeneratorProps) => {
+  const navigate = useNavigate();
   const [prompt, setPrompt] = useState('');
   const [isGenerating, setIsGenerating] = useState(false);
   const [generationProgress, setGenerationProgress] = useState(0);
@@ -40,6 +42,11 @@ const AITemplateGenerator = ({
   const handleGenerate = async () => {
     if (!prompt.trim()) {
       toast.error('Опишите, какой макет вы хотите создать');
+      return;
+    }
+
+    if (!isPremium) {
+      toast.error('AI генерация доступна только на платных тарифах (от 490₽/мес)');
       return;
     }
 
@@ -159,9 +166,15 @@ const AITemplateGenerator = ({
                   <div>
                     <h3 className="font-semibold mb-1">Функция доступна на Premium</h3>
                     <p className="text-sm text-muted-foreground mb-4">
-                      Генерация AI макетов, загрузка собственных дизайнов и расширенная библиотека доступны на тарифах "Базовый" и выше
+                      Генерация AI макетов и загрузка собственных дизайнов доступны на платных тарифах от 490₽/мес
                     </p>
-                    <Button className="bg-gold text-black hover:bg-gold/90">
+                    <Button 
+                      className="bg-gold text-black hover:bg-gold/90"
+                      onClick={() => {
+                        onOpenChange(false);
+                        navigate('/dashboard?tab=subscription');
+                      }}
+                    >
                       <Icon name="Crown" className="mr-2" size={16} />
                       Перейти на Premium
                     </Button>
@@ -185,7 +198,7 @@ const AITemplateGenerator = ({
                 value={prompt}
                 onChange={(e) => setPrompt(e.target.value)}
                 className="min-h-[120px]"
-                disabled={isGenerating}
+                disabled={isGenerating || !isPremium}
               />
             </div>
 
@@ -260,7 +273,7 @@ const AITemplateGenerator = ({
               <>
                 <Button
                   onClick={handleGenerate}
-                  disabled={isGenerating || !prompt.trim()}
+                  disabled={isGenerating || !prompt.trim() || !isPremium}
                   className="flex-1 bg-gradient-to-r from-gold to-yellow-500 text-black hover:from-gold/90 hover:to-yellow-500/90 shadow-lg hover:shadow-xl transition-all"
                 >
                   {isGenerating ? (

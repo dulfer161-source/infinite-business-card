@@ -135,6 +135,38 @@ def handler(event, context):
         elif method == 'POST':
             body = json.loads(event.get('body', '{}'))
             
+            # CRITICAL: Check max_cards limit BEFORE creating
+            cur.execute(f"""
+                SELECT COUNT(*) as card_count
+                FROM t_p18253922_infinite_business_ca.business_cards
+                WHERE user_id = {int(user_id)}
+            """)
+            current_cards = cur.fetchone()['card_count']
+            
+            cur.execute(f"""
+                SELECT s.features->>'max_cards' as max_cards
+                FROM t_p18253922_infinite_business_ca.user_subscriptions us
+                JOIN t_p18253922_infinite_business_ca.subscriptions s ON us.plan_id = s.id
+                WHERE us.user_id = {int(user_id)} 
+                  AND us.status = 'active' 
+                  AND (us.expires_at IS NULL OR us.expires_at > NOW())
+                ORDER BY us.expires_at DESC NULLS FIRST LIMIT 1
+            """)
+            subscription_row = cur.fetchone()
+            max_cards = int(subscription_row['max_cards']) if subscription_row and subscription_row['max_cards'] else 1
+            
+            if current_cards >= max_cards:
+                return {
+                    'statusCode': 403,
+                    'headers': {'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json'},
+                    'body': json.dumps({
+                        'error': f'Достигнут лимит визиток для вашего тарифа ({max_cards} шт). Обновите подписку для создания дополнительных визиток.',
+                        'current': current_cards,
+                        'max': max_cards
+                    }),
+                    'isBase64Encoded': False
+                }
+            
             name = body.get('name', '').replace("'", "''")
             position = body.get('position', '').replace("'", "''")
             company = body.get('company', '').replace("'", "''")

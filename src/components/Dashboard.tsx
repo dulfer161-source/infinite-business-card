@@ -84,6 +84,15 @@ const Dashboard = ({ onLogout }: DashboardProps) => {
     if (!onboardingCompleted) {
       setShowOnboarding(true);
     }
+
+    // Обработка URL параметра ?tab=subscription
+    const urlParams = new URLSearchParams(window.location.search);
+    const tabParam = urlParams.get('tab');
+    if (tabParam) {
+      setActiveTab(tabParam);
+      // Убираем параметр из URL
+      window.history.replaceState({}, '', window.location.pathname);
+    }
   }, []);
 
   useEffect(() => {

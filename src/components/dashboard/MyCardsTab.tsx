@@ -13,6 +13,7 @@ const MyCardsTab = () => {
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [cardToDelete, setCardToDelete] = useState<CardData | null>(null);
+  const [maxCards, setMaxCards] = useState(1);
   const [newCard, setNewCard] = useState<NewCardForm>({
     name: '',
     position: '',
@@ -28,7 +29,28 @@ const MyCardsTab = () => {
 
   useEffect(() => {
     loadCards();
+    loadSubscription();
   }, []);
+
+  const loadSubscription = async () => {
+    try {
+      const authToken = localStorage.getItem('auth_token');
+      const response = await fetch('https://functions.poehali.dev/063b09be-f07e-478c-a626-807980d111e1/subscriptions', {
+        headers: { 'X-Auth-Token': authToken || '' }
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        const subs = data.subscriptions || [];
+        if (subs.length > 0) {
+          const activeSub = subs[0];
+          setMaxCards(activeSub.features?.max_cards || 1);
+        }
+      }
+    } catch (error) {
+      console.error('Failed to load subscription:', error);
+    }
+  };
 
   const loadCards = async () => {
     setLoading(true);
@@ -90,11 +112,18 @@ const MyCardsTab = () => {
       } else {
         const errorData = await response.json();
         console.error('Create card error:', errorData);
-        throw new Error(errorData.error || 'Failed to create');
+        
+        if (response.status === 403 && errorData.max) {
+          toast.error(errorData.error || `Достигнут лимит визиток (${errorData.max} шт)`);
+        } else {
+          throw new Error(errorData.error || 'Failed to create');
+        }
       }
     } catch (error) {
       console.error('Create card exception:', error);
-      toast.error('Не удалось создать визитку');
+      if (error instanceof Error && !error.message.includes('403')) {
+        toast.error('Не удалось создать визитку');
+      }
     } finally {
       setCreating(false);
     }
@@ -201,9 +230,15 @@ const MyCardsTab = () => {
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-2xl font-bold">Мои визитки</h2>
-          <p className="text-muted-foreground">Управляйте несколькими визитками для разных целей</p>
+          <p className="text-muted-foreground">
+            Управляйте несколькими визитками для разных целей • <span className="font-semibold">{cards.length}/{maxCards}</span>
+          </p>
         </div>
-        <Button onClick={() => setCreateDialogOpen(true)} className="bg-gold text-black hover:bg-gold/90">
+        <Button 
+          onClick={() => setCreateDialogOpen(true)} 
+          className="bg-gold text-black hover:bg-gold/90"
+          disabled={cards.length >= maxCards}
+        >
           <Icon name="Plus" size={18} className="mr-2" />
           Создать визитку
         </Button>

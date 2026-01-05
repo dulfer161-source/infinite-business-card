@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
@@ -23,6 +24,7 @@ const CustomTemplateUpload = ({
   onTemplateUploaded,
   isPremium
 }: CustomTemplateUploadProps) => {
+  const navigate = useNavigate();
   const [uploadMethod, setUploadMethod] = useState<'image' | 'code'>('image');
   const [uploadedImage, setUploadedImage] = useState<string | null>(null);
   const [htmlCode, setHtmlCode] = useState('');
@@ -137,9 +139,15 @@ const CustomTemplateUpload = ({
                 <div>
                   <h3 className="font-semibold mb-1">Функция доступна на Premium</h3>
                   <p className="text-sm text-muted-foreground mb-4">
-                    Загрузка собственных макетов, изображений и HTML/CSS кода доступна на тарифах "Базовый" и выше
+                    Загрузка собственных макетов, изображений и HTML/CSS кода доступна на платных тарифах от 490₽/мес
                   </p>
-                  <Button className="bg-gold text-black hover:bg-gold/90">
+                  <Button 
+                    className="bg-gold text-black hover:bg-gold/90"
+                    onClick={() => {
+                      onOpenChange(false);
+                      navigate('/dashboard?tab=subscription');
+                    }}
+                  >
                     <Icon name="Crown" className="mr-2" size={16} />
                     Перейти на Premium
                   </Button>
