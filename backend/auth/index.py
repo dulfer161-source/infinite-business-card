@@ -38,6 +38,7 @@ def handler(event, context):
     GET /white-label/my - получить white-label данные текущего пользователя
     '''
     method = event.get('httpMethod', 'GET')
+    print(f"DEBUG START: method={method}, queryStringParameters={event.get('queryStringParameters')}")
     
     if method == 'OPTIONS':
         return {
