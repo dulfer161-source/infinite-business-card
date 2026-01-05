@@ -60,6 +60,7 @@ def handler(event, context):
         try:
             query_params = event.get('queryStringParameters', {})
             action = query_params.get('action') if query_params else None
+            print(f"DEBUG GET: action={action}, query_params={query_params}")
             
             # Get all subscription plans
             if action == 'plans':
