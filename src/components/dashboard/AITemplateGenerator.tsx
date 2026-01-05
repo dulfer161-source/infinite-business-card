@@ -185,7 +185,7 @@ const AITemplateGenerator = ({
                 value={prompt}
                 onChange={(e) => setPrompt(e.target.value)}
                 className="min-h-[120px]"
-                disabled={!isPremium || isGenerating}
+                disabled={isGenerating}
               />
             </div>
 
@@ -260,7 +260,7 @@ const AITemplateGenerator = ({
               <>
                 <Button
                   onClick={handleGenerate}
-                  disabled={!isPremium || isGenerating || !prompt.trim()}
+                  disabled={isGenerating || !prompt.trim()}
                   className="flex-1 bg-gradient-to-r from-gold to-yellow-500 text-black hover:from-gold/90 hover:to-yellow-500/90 shadow-lg hover:shadow-xl transition-all"
                 >
                   {isGenerating ? (
